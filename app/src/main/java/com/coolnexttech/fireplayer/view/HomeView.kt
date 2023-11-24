@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +38,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -161,20 +165,28 @@ private fun TopBar(
             actionIconContentColor = AppColors.unHighlight
         ),
         title = {
-            TextField(
+            BasicTextField(
                 value = searchQuery.value,
                 onValueChange = {
                     searchQuery.value = it
                     onSearchQueryChanged(it)
                 },
-                placeholder = { Text(stringResource(id = searchTitleId)) },
+                singleLine = true,
+                decorationBox = { innerTextField ->
+                    if (searchQuery.value.isEmpty()) {
+                        Text(
+                            text = stringResource(id = searchTitleId),
+                            style = MaterialTheme.typography.bodyMedium.copy(AppColors.unHighlight),
+                        )
+                    }
+                    innerTextField()
+                },
                 modifier = Modifier
+                    .height(intrinsicSize = IntrinsicSize.Min)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = AppColors.textColor,
-                )
+                textStyle = MaterialTheme.typography.bodyMedium.copy(AppColors.unHighlight),
+                cursorBrush = SolidColor(AppColors.unHighlight)
             )
         },
         actions = {
@@ -225,19 +237,21 @@ private fun SortOptionsAlertDialog(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = stringResource(id = R.string.home_sort_dialog_title),
-                color = AppColors.textColor,
-                style = MaterialTheme.typography.headlineMedium,
-            )
-
             Image(
                 painter = painterResource(id = R.drawable.im_app_icon),
-                modifier = Modifier.size(75.dp),
+                modifier = Modifier.size(60.dp),
                 contentDescription = "AppIcon"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(id = R.string.home_sort_dialog_title),
+                color = AppColors.textColor,
+                style = MaterialTheme.typography.headlineSmall,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button({ sortByTitle(true) }) {
                 Text(
