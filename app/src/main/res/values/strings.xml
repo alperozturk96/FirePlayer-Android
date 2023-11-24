@@ -1,3 +1,30 @@
 <resources>
     <string name="app_name">FirePlayer</string>
+
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+
+    <string name="home_filter_by_album_section_title">Filtered By Album</string>
+    <string name="home_filter_by_artist_section_title">Filtered By Artist</string>
+    <string name="home_filter_by_title_section_title">Filtered By Title</string>
+
+    <string name="home_list_swipe_action_title">Add To Playlist</string>
+
+    <string name="home_search_in_titles_text">Search Track In Titles</string>
+    <string name="home_search_in_albums_text">Search Track In Albums</string>
+    <string name="home_search_in_artists_text">Search Track In Artists</string>
+
+    <string name="home_sort_dialog_title">Sort</string>
+    <string name="home_sort_dialog_sort_by_title_a_z_title">Sort By Title A-Z</string>
+    <string name="home_sort_dialog_sort_by_title_z_a_title">Sort By Title Z-A</string>
+
+
+    <string name="playlists_title">Playlists</string>
+    <string name="playlist_add_playlist_placeholder">Add Playlist Title</string>
+    <string name="playlist_item_swipe_action_title">Delete</string>
+    <string name="playlists_content_unavailable_text">You dont have any playlist yet</string>
+    <string name="playlists_content_unavailable_title">No playlists</string>
+
+    <string name="content_unavailable_title_prefix">No results for </string>
+    <string name="content_unavailable_description">Check the spelling or try a new search</string>
 </resources>

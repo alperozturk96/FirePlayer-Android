@@ -1,13 +1,10 @@
 package com.coolnexttech.fireplayer.view
 
-import android.app.Dialog
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,19 +16,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,26 +36,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.extensions.sortByTitleAZ
-import com.coolnexttech.fireplayer.extensions.sortByTitleZA
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
-import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
+import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 
 @Composable
@@ -72,8 +59,9 @@ fun HomeView(
 ) {
     val context = LocalContext.current
     val folderAnalyzer = FolderAnalyzer(context)
-    var trackList by viewModel.trackList.collectAsState()
+    val filteredTracks by viewModel.filteredTracks.collectAsState()
     val filterOption = remember { mutableStateOf(FilterOptions.title) }
+    val searchText = remember { mutableStateOf("") }
     val playMode = remember { mutableStateOf(PlayMode.shuffle) }
     val showSortOptions = remember { mutableStateOf(false) }
 
@@ -95,14 +83,18 @@ fun HomeView(
                 showSortOptions = {
                     showSortOptions.value = true
                 },
-                selectFolder = {})
+                selectFolder = {},
+                onSearchQueryChanged = {
+                    searchText.value = it
+                    viewModel.search(it, filterOption.value)
+                })
         },
         bottomBar = { BottomBar(audioPlayerViewModel) }) {
-        if (trackList.isEmpty()) {
-            ContentUnavailable()
+        if (filteredTracks.isEmpty()) {
+            ContentUnavailableView(titleSuffix = searchText.value)
         } else {
             LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
-                items(trackList) { track ->
+                items(filteredTracks) { track ->
                     Text(
                         text = track.title,
                         style = MaterialTheme.typography.headlineSmall,
@@ -122,38 +114,11 @@ fun HomeView(
                 SortOptionsAlertDialog(
                     dismiss = { showSortOptions.value = !showSortOptions.value },
                     sortByTitle = { isAtoZ ->
-                        val result =  if (isAtoZ) {
-                            trackList.sortByTitleAZ()
-                        } else {
-                            trackList.sortByTitleZA()
-                        }
-
-                        trackList = result
+                        viewModel.sort(isAtoZ)
                     })
             }
 
         }
-    }
-}
-
-// FIXME not looking good
-@Composable
-private fun ContentUnavailable() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Please add tracks into your music folder",
-            style = MaterialTheme.typography.headlineLarge
-        )
-        // Optionally include an icon or image
-        Icon(
-            painter = painterResource(id = R.drawable.ic_folder),
-            contentDescription = "No content available",
-            modifier = Modifier.size(128.dp)
-        )
     }
 }
 
@@ -165,13 +130,10 @@ private fun TopBar(
     changeFilterOption: (FilterOptions) -> Unit,
     changePlayMode: (PlayMode) -> Unit,
     showSortOptions: () -> Unit,
-    selectFolder: () -> Unit
+    selectFolder: () -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
 ) {
-    val topBarTitle = when (filterOption) {
-        FilterOptions.title -> "Filtered By Title"
-        FilterOptions.album -> "Filtered By Album"
-        FilterOptions.artist -> "Filtered By Artist"
-    }
+    val searchQuery = remember { mutableStateOf("") }
 
     val filterOptionIcon = when (filterOption) {
         FilterOptions.title -> R.drawable.ic_title
@@ -184,6 +146,12 @@ private fun TopBar(
         PlayMode.sequential -> R.drawable.ic_sequential
     }
 
+    val searchTitleId = when (filterOption) {
+        FilterOptions.title -> R.string.home_search_in_titles_text
+        FilterOptions.album -> R.string.home_search_in_albums_text
+        FilterOptions.artist -> R.string.home_search_in_artists_text
+    }
+
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = AppColors.background,
@@ -193,10 +161,20 @@ private fun TopBar(
             actionIconContentColor = AppColors.unHighlight
         ),
         title = {
-            Text(
-                text = topBarTitle,
-                style = MaterialTheme.typography.headlineSmall,
-                color = AppColors.textColor
+            TextField(
+                value = searchQuery.value,
+                onValueChange = {
+                    searchQuery.value = it
+                    onSearchQueryChanged(it)
+                },
+                placeholder = { Text(stringResource(id = searchTitleId)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = AppColors.textColor,
+                )
             )
         },
         actions = {
@@ -247,6 +225,12 @@ private fun SortOptionsAlertDialog(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
+            Text(
+                text = stringResource(id = R.string.home_sort_dialog_title),
+                color = AppColors.textColor,
+                style = MaterialTheme.typography.headlineMedium,
+            )
+
             Image(
                 painter = painterResource(id = R.drawable.im_app_icon),
                 modifier = Modifier.size(75.dp),
@@ -256,13 +240,22 @@ private fun SortOptionsAlertDialog(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button({ sortByTitle(true) }) {
-                Text(text = "Sort by Title A-Z", color = AppColors.textColor)
+                Text(
+                    text = stringResource(id = R.string.home_sort_dialog_sort_by_title_a_z_title),
+                    color = AppColors.textColor
+                )
             }
             Button({ sortByTitle(false) }) {
-                Text(text = "Sort by Title Z-A", color = AppColors.textColor)
+                Text(
+                    text = stringResource(id = R.string.home_sort_dialog_sort_by_title_z_a_title),
+                    color = AppColors.textColor
+                )
             }
             Button({ dismiss() }) {
-                Text(text = "Cancel", color = AppColors.textColor)
+                Text(
+                    text = stringResource(id = R.string.common_cancel),
+                    color = AppColors.textColor
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

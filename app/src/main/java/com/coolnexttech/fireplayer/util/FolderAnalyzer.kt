@@ -7,8 +7,8 @@ import com.coolnexttech.fireplayer.model.Track
 
 class FolderAnalyzer(private val context: Context) {
 
-    fun getTracks(): List<Track> {
-        val result = mutableListOf<Track>()
+    fun getTracks(): ArrayList<Track> {
+        val result = arrayListOf<Track>()
 
         val contentResolver = context.contentResolver
         val projection = arrayOf(
