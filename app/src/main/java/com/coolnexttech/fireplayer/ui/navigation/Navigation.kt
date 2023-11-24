@@ -5,9 +5,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.view.HomeView
 import com.coolnexttech.fireplayer.view.PlaylistsView
+import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
 

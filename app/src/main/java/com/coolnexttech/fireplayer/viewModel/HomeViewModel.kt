@@ -1,12 +1,10 @@
 package com.coolnexttech.fireplayer.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.coolnexttech.fireplayer.extensions.filterByAlbum
-import com.coolnexttech.fireplayer.extensions.filterByArtist
-import com.coolnexttech.fireplayer.extensions.filterByTitle
-import com.coolnexttech.fireplayer.extensions.sortByTitleAZ
-import com.coolnexttech.fireplayer.extensions.sortByTitleZA
+import com.coolnexttech.fireplayer.extensions.filter
+import com.coolnexttech.fireplayer.extensions.sort
 import com.coolnexttech.fireplayer.model.FilterOptions
+import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,26 +34,18 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun sort(isAtoZ: Boolean) {
+    fun sort(sortOption: SortOptions) {
         _filteredTracks.update {
-            if (isAtoZ) {
-                it.sortByTitleAZ()
-            } else {
-                it.sortByTitleZA()
-            }
+            it.sort(sortOption)
         }
     }
 
     fun search(searchText: String, filterOption: FilterOptions) {
         _filteredTracks.update {
             if (searchText.isEmpty()) {
-                _tracks.value.sortByTitleAZ()
+                _tracks.value.sort(SortOptions.AtoZ)
             } else {
-                when(filterOption) {
-                    FilterOptions.title -> it.filterByTitle(searchText).sortByTitleAZ()
-                    FilterOptions.artist -> it.filterByArtist(searchText).sortByTitleAZ()
-                    FilterOptions.album -> it.filterByAlbum(searchText).sortByTitleAZ()
-                }
+                it.filter(filterOption, searchText).sort(SortOptions.AtoZ)
             }
         }
     }

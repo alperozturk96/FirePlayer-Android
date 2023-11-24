@@ -1,15 +1,25 @@
 package com.coolnexttech.fireplayer.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.extensions.HSpacing8
 import com.coolnexttech.fireplayer.extensions.convertToReadableTime
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.theme.AppColors
@@ -63,7 +73,7 @@ private fun MediaSlider(
             color = AppColors.unhighlight
         )
 
-        Spacer(Modifier.width(4.dp))
+        HSpacing8()
 
         // FIXME fix seekto
         Slider(
@@ -84,7 +94,7 @@ private fun MediaSlider(
             modifier = Modifier.weight(0.85f)
         )
 
-        Spacer(Modifier.width(4.dp))
+        HSpacing8()
 
         Text(
             totalTime.convertToReadableTime(),

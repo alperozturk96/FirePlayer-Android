@@ -3,31 +3,26 @@ package com.coolnexttech.fireplayer.view
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,16 +36,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.extensions.VSpacing16
+import com.coolnexttech.fireplayer.extensions.VSpacing8
+import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
+import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.ActionButton
+import com.coolnexttech.fireplayer.ui.components.BodyMediumText
+import com.coolnexttech.fireplayer.ui.components.DialogButton
+import com.coolnexttech.fireplayer.ui.components.Drawable
+import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.navigation.Destinations
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
@@ -66,9 +67,9 @@ fun HomeView(
     val context = LocalContext.current
     val folderAnalyzer = FolderAnalyzer(context)
     val filteredTracks by viewModel.filteredTracks.collectAsState()
-    val filterOption = remember { mutableStateOf(FilterOptions.title) }
+    val filterOption = remember { mutableStateOf(FilterOptions.Title) }
     val searchText = remember { mutableStateOf("") }
-    val playMode = remember { mutableStateOf(PlayMode.shuffle) }
+    val playMode = remember { mutableStateOf(PlayMode.Shuffle) }
     val showSortOptions = remember { mutableStateOf(false) }
     val selectedTrackIndex = remember { mutableIntStateOf(-1) }
     val prevTrackIndexesStack = remember { mutableStateListOf<Int>() }
@@ -153,8 +154,8 @@ fun HomeView(
             if (showSortOptions.value) {
                 SortOptionsAlertDialog(
                     dismiss = { showSortOptions.value = false },
-                    sortByTitle = { isAtoZ ->
-                        viewModel.sort(isAtoZ)
+                    sortByTitle = { sortOption ->
+                        viewModel.sort(sortOption)
                         showSortOptions.value = false
                     })
             }
@@ -177,31 +178,8 @@ private fun TopBar(
 ) {
     val searchQuery = remember { mutableStateOf("") }
 
-    val filterOptionIcon = when (filterOption) {
-        FilterOptions.title -> R.drawable.ic_title
-        FilterOptions.album -> R.drawable.ic_album
-        FilterOptions.artist -> R.drawable.ic_artist
-    }
-
-    val playModeIcon = when (playMode) {
-        PlayMode.shuffle -> R.drawable.ic_shuffle
-        PlayMode.sequential -> R.drawable.ic_sequential
-    }
-
-    val searchTitleId = when (filterOption) {
-        FilterOptions.title -> R.string.home_search_in_titles_text
-        FilterOptions.album -> R.string.home_search_in_albums_text
-        FilterOptions.artist -> R.string.home_search_in_artists_text
-    }
-
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = AppColors.background,
-            scrolledContainerColor = AppColors.background,
-            navigationIconContentColor = AppColors.unhighlight,
-            titleContentColor = AppColors.unhighlight,
-            actionIconContentColor = AppColors.unhighlight
-        ),
+        colors = getTopAppBarColor(),
         title = {
             BasicTextField(
                 value = searchQuery.value,
@@ -212,10 +190,7 @@ private fun TopBar(
                 singleLine = true,
                 decorationBox = { innerTextField ->
                     if (searchQuery.value.isEmpty()) {
-                        Text(
-                            text = stringResource(id = searchTitleId),
-                            style = MaterialTheme.typography.bodyMedium.copy(AppColors.unhighlight),
-                        )
+                        BodyMediumText(id = filterOption.searchTitleId())
                     }
                     innerTextField()
                 },
@@ -232,21 +207,12 @@ private fun TopBar(
                 navController.navigate(Destinations.Playlists)
             }
 
-            ActionButton(filterOptionIcon) {
-                val newFilterOption = when (filterOption) {
-                    FilterOptions.title -> FilterOptions.artist
-                    FilterOptions.artist -> FilterOptions.album
-                    FilterOptions.album -> FilterOptions.title
-                }
-                changeFilterOption(newFilterOption)
+            ActionButton(filterOption.filterOptionIconId()) {
+                changeFilterOption(filterOption.selectNextFilterOption())
             }
 
-            ActionButton(playModeIcon) {
-                val newPlayMode = when (playMode) {
-                    PlayMode.shuffle -> PlayMode.sequential
-                    PlayMode.sequential -> PlayMode.shuffle
-                }
-                changePlayMode(newPlayMode)
+            ActionButton(playMode.getIconId()) {
+                changePlayMode(playMode.selectNextPlayMode())
             }
 
             ActionButton(R.drawable.ic_sort) {
@@ -263,7 +229,7 @@ private fun TopBar(
 @Composable
 private fun SortOptionsAlertDialog(
     dismiss: () -> Unit,
-    sortByTitle: (Boolean) -> Unit,
+    sortByTitle: (SortOptions) -> Unit,
 ) {
     Dialog({ dismiss() }) {
         Column(
@@ -275,44 +241,29 @@ private fun SortOptionsAlertDialog(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            VSpacing16()
 
-            Image(
-                painter = painterResource(id = R.drawable.im_app_icon),
-                modifier = Modifier.size(60.dp),
-                contentDescription = "AppIcon"
-            )
+            Drawable(R.drawable.im_app_icon)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            VSpacing16()
 
-            Text(
-                text = stringResource(id = R.string.home_sort_dialog_title),
-                color = AppColors.textColor,
-                style = MaterialTheme.typography.headlineSmall,
-            )
+            HeadlineSmallText(R.string.home_sort_dialog_title)
 
-            Spacer(modifier = Modifier.height(8.dp))
+            VSpacing8()
 
-            Button({ sortByTitle(true) }) {
-                Text(
-                    text = stringResource(id = R.string.home_sort_dialog_sort_by_title_a_z_title),
-                    color = AppColors.textColor
-                )
-            }
-            Button({ sortByTitle(false) }) {
-                Text(
-                    text = stringResource(id = R.string.home_sort_dialog_sort_by_title_z_a_title),
-                    color = AppColors.textColor
-                )
-            }
-            Button({ dismiss() }) {
-                Text(
-                    text = stringResource(id = R.string.common_cancel),
-                    color = AppColors.textColor
-                )
+            DialogButton(R.string.home_sort_dialog_sort_by_title_a_z_title) {
+                sortByTitle(SortOptions.AtoZ)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            DialogButton(R.string.home_sort_dialog_sort_by_title_z_a_title) {
+                sortByTitle(SortOptions.ZtoA)
+            }
+
+            DialogButton(R.string.common_cancel) {
+                dismiss()
+            }
+
+            VSpacing16()
         }
     }
 }
@@ -340,8 +291,8 @@ private fun selectNextTrack(
     }
 
     val nextIndex = when (playMode) {
-        PlayMode.shuffle -> filteredTracks.indices.random()
-        PlayMode.sequential -> (selectedTrackIndex + 1).takeIf { it < filteredTracks.size } ?: 0
+        PlayMode.Shuffle -> filteredTracks.indices.random()
+        PlayMode.Sequential -> (selectedTrackIndex + 1).takeIf { it < filteredTracks.size } ?: 0
     }
     updateSelectedTrackIndex(nextIndex)
 }

@@ -1,25 +1,22 @@
 package com.coolnexttech.fireplayer.extensions
 
+import com.coolnexttech.fireplayer.model.FilterOptions
+import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 
-fun List<Track>.sortByTitleAZ(): List<Track> {
-    return this.sortedBy { it.title }
+fun List<Track>.sort(sortOption: SortOptions): List<Track> {
+    return when(sortOption) {
+        SortOptions.AtoZ -> this.sortedBy { it.title }
+        SortOptions.ZtoA -> this.sortedByDescending { it.title }
+    }
 }
 
-fun List<Track>.sortByTitleZA(): List<Track> {
-    return this.sortedByDescending { it.title }
-}
-
-fun List<Track>.filterByTitle(title: String): List<Track> {
-    return this.filter { it.title.contains(title, ignoreCase = true) }
-}
-
-fun List<Track>.filterByArtist(artist: String): List<Track> {
-    return this.filter { it.artist.contains(artist, ignoreCase = true) }
-}
-
-fun List<Track>.filterByAlbum(album: String): List<Track> {
-    return this.filter { it.album.contains(album, ignoreCase = true) }
+fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
+    return when(filterOption) {
+        FilterOptions.Title -> this.filter { it.title.contains(text, ignoreCase = true) }
+        FilterOptions.Artist -> this.filter { it.artist.contains(text, ignoreCase = true) }
+        FilterOptions.Album -> this.filter { it.album.contains(text, ignoreCase = true) }
+    }
 }
 
 val List<Track>.randomIndex: Int
