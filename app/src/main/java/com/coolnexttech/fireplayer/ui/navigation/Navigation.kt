@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.view.HomeView
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 
@@ -13,7 +14,8 @@ fun Navigation(navController: NavHostController, startDestination: String) {
     NavHost(navController, startDestination) {
         composable(route = Destinations.Home) {
             val viewModel: HomeViewModel = viewModel()
-            HomeView(navController, viewModel)
+            val audioPlayerViewModel: AudioPlayerViewModel = viewModel()
+            HomeView(navController, viewModel, audioPlayerViewModel)
         }
     }
 }

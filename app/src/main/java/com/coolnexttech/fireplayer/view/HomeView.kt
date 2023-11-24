@@ -29,11 +29,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 
 @Composable
-fun HomeView(navController: NavController, viewModel: HomeViewModel) {
+fun HomeView(
+    navController: NavController,
+    viewModel: HomeViewModel,
+    audioPlayerViewModel: AudioPlayerViewModel
+) {
     val context = LocalContext.current
     val folderAnalyzer = FolderAnalyzer(context)
     val trackList by viewModel.trackList.collectAsState()
@@ -42,7 +47,7 @@ fun HomeView(navController: NavController, viewModel: HomeViewModel) {
         viewModel.initTrackList(folderAnalyzer)
     }
 
-    Scaffold(topBar = { TopBar() }, bottomBar = { BottomBar() }) {
+    Scaffold(topBar = { TopBar() }, bottomBar = { BottomBar(audioPlayerViewModel) }) {
         if (trackList.isEmpty()) {
             ContentUnavailable()
         } else {
@@ -54,12 +59,18 @@ fun HomeView(navController: NavController, viewModel: HomeViewModel) {
                         modifier = Modifier
                             .padding(all = 8.dp)
                             .clickable {
-
+                                audioPlayerViewModel.play(context, track.path)
                             })
                 }
+
+
             }
+
+
         }
     }
+
+
 }
 
 @Composable
@@ -101,6 +112,8 @@ private fun TopBar() {
 }
 
 @Composable
-private fun BottomBar() {
+private fun BottomBar(audioPlayerViewModel: AudioPlayerViewModel) {
+    SeekbarView(audioPlayerViewModel, selectPreviousTrack = { /*TODO*/ }) {
 
+    }
 }
