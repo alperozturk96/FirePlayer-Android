@@ -1,11 +1,14 @@
 package com.coolnexttech.fireplayer.view
 
 import android.app.Dialog
+import android.widget.Space
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.extensions.sortByTitleAZ
+import com.coolnexttech.fireplayer.extensions.sortByTitleZA
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
@@ -66,7 +72,7 @@ fun HomeView(
 ) {
     val context = LocalContext.current
     val folderAnalyzer = FolderAnalyzer(context)
-    val trackList by viewModel.trackList.collectAsState()
+    var trackList by viewModel.trackList.collectAsState()
     val filterOption = remember { mutableStateOf(FilterOptions.title) }
     val playMode = remember { mutableStateOf(PlayMode.shuffle) }
     val showSortOptions = remember { mutableStateOf(false) }
@@ -107,6 +113,8 @@ fun HomeView(
                             },
                         color = AppColors.textColor
                     )
+
+                    Divider()
                 }
             }
 
@@ -114,7 +122,13 @@ fun HomeView(
                 SortOptionsAlertDialog(
                     dismiss = { showSortOptions.value = !showSortOptions.value },
                     sortByTitle = { isAtoZ ->
+                        val result =  if (isAtoZ) {
+                            trackList.sortByTitleAZ()
+                        } else {
+                            trackList.sortByTitleZA()
+                        }
 
+                        trackList = result
                     })
             }
 
@@ -153,6 +167,12 @@ private fun TopBar(
     showSortOptions: () -> Unit,
     selectFolder: () -> Unit
 ) {
+    val topBarTitle = when (filterOption) {
+        FilterOptions.title -> "Filtered By Title"
+        FilterOptions.album -> "Filtered By Album"
+        FilterOptions.artist -> "Filtered By Artist"
+    }
+
     val filterOptionIcon = when (filterOption) {
         FilterOptions.title -> R.drawable.ic_title
         FilterOptions.album -> R.drawable.ic_album
@@ -172,7 +192,13 @@ private fun TopBar(
             titleContentColor = AppColors.unHighlight,
             actionIconContentColor = AppColors.unHighlight
         ),
-        title = { /* Add title if needed */ },
+        title = {
+            Text(
+                text = topBarTitle,
+                style = MaterialTheme.typography.headlineSmall,
+                color = AppColors.textColor
+            )
+        },
         actions = {
             ActionButton(filterOptionIcon) {
                 val newFilterOption = when (filterOption) {
@@ -212,7 +238,6 @@ private fun SortOptionsAlertDialog(
         Column(
             modifier = Modifier
                 .width(400.dp)
-                .height(400.dp)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(30.dp))
                 .background(AppColors.alternateBackground),
@@ -220,6 +245,16 @@ private fun SortOptionsAlertDialog(
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.im_app_icon),
+                modifier = Modifier.size(75.dp),
+                contentDescription = "AppIcon"
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button({ sortByTitle(true) }) {
                 Text(text = "Sort by Title A-Z", color = AppColors.textColor)
             }
@@ -229,6 +264,8 @@ private fun SortOptionsAlertDialog(
             Button({ dismiss() }) {
                 Text(text = "Cancel", color = AppColors.textColor)
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
