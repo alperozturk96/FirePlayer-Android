@@ -17,7 +17,6 @@ import com.coolnexttech.fireplayer.util.PermissionManager
 class MainActivity : ComponentActivity() {
     private val permissionManager = PermissionManager(this)
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

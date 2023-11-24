@@ -76,6 +76,9 @@ class AudioPlayerViewModel: ViewModel() {
             while (isActive) {
                 val currentPosInMillis = mediaPlayer?.currentPosition
                 _currentTime.update {  currentPosInMillis?.div(1000.0) ?: 0.0 }
+                if (_currentTime.value >= totalTime.value) {
+                    // Notify next track
+                }
                 delay(1000)
             }
         }

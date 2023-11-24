@@ -22,11 +22,17 @@ class HomeViewModel: ViewModel() {
 
     fun initTrackList(folderAnalyzer: FolderAnalyzer) {
         _tracks.update {
-            folderAnalyzer.getTracks()
+            folderAnalyzer.getTracksFromMusicFolder()
         }
 
         _filteredTracks.update {
             _tracks.value
+        }
+    }
+
+    fun updateTrackList(tracks: List<Track>) {
+        _filteredTracks.update {
+            tracks
         }
     }
 

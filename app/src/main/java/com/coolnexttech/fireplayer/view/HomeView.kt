@@ -1,5 +1,8 @@
 package com.coolnexttech.fireplayer.view
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,7 +72,7 @@ fun HomeView(
     val showSortOptions = remember { mutableStateOf(false) }
     val selectedTrackIndex = remember { mutableIntStateOf(-1) }
     val prevTrackIndexesStack = remember { mutableStateListOf<Int>() }
-
+    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.initTrackList(folderAnalyzer)
@@ -78,6 +81,16 @@ fun HomeView(
     LaunchedEffect(selectedTrackIndex.intValue) {
         if (selectedTrackIndex.intValue != -1) {
             audioPlayerViewModel.play(context, filteredTracks[selectedTrackIndex.intValue].path)
+            listState.animateScrollToItem(selectedTrackIndex.intValue)
+        }
+    }
+
+    val pickFolderLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri: Uri? ->
+        uri?.let {
+            val tracks = folderAnalyzer.getTracksFromSelectedPath(uri)
+            viewModel.updateTrackList(tracks)
         }
     }
 
@@ -97,7 +110,7 @@ fun HomeView(
                     showSortOptions.value = true
                 },
                 selectFolder = {
-
+                    pickFolderLauncher.launch(null)
                 },
                 onSearchQueryChanged = {
                     searchText.value = it
@@ -119,7 +132,7 @@ fun HomeView(
         if (filteredTracks.isEmpty()) {
             ContentUnavailableView(titleSuffix = searchText.value)
         } else {
-            LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
+            LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                 itemsIndexed(filteredTracks) { index, track ->
                     Text(
                         text = track.title,
@@ -139,9 +152,10 @@ fun HomeView(
 
             if (showSortOptions.value) {
                 SortOptionsAlertDialog(
-                    dismiss = { showSortOptions.value = !showSortOptions.value },
+                    dismiss = { showSortOptions.value = false },
                     sortByTitle = { isAtoZ ->
                         viewModel.sort(isAtoZ)
+                        showSortOptions.value = false
                     })
             }
 
@@ -239,7 +253,6 @@ private fun TopBar(
                 showSortOptions()
             }
 
-            // TODO implement for sdcard
             ActionButton(R.drawable.ic_folder) {
                 selectFolder()
             }
@@ -261,7 +274,6 @@ private fun SortOptionsAlertDialog(
                 .background(AppColors.alternateBackground),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -323,6 +335,10 @@ private fun selectNextTrack(
     selectedTrackIndex: Int,
     updateSelectedTrackIndex: (Int) -> Unit
 ) {
+    if (filteredTracks.isEmpty()) {
+        return
+    }
+
     val nextIndex = when (playMode) {
         PlayMode.shuffle -> filteredTracks.indices.random()
         PlayMode.sequential -> (selectedTrackIndex + 1).takeIf { it < filteredTracks.size } ?: 0
