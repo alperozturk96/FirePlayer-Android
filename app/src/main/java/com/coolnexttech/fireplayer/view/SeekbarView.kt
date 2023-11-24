@@ -4,18 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.convertToReadableTime
 import com.coolnexttech.fireplayer.ui.components.ActionButton
@@ -46,7 +39,7 @@ fun SeekbarView(
     ) {
 
         MediaSlider(audioPlayerViewModel, currentTime, totalTime)
-        MediaControl(audioPlayerViewModel, isPlaying, selectPreviousTrack = selectPreviousTrack) {
+        MediaControl(audioPlayerViewModel, isPlaying, selectPreviousTrack) {
             selectNextTrack()
         }
     }
@@ -67,7 +60,7 @@ private fun MediaSlider(
         Text(
             currentTime.convertToReadableTime(),
             modifier = Modifier.wrapContentWidth(Alignment.Start),
-            color = AppColors.unHighlight
+            color = AppColors.unhighlight
         )
 
         Spacer(Modifier.width(4.dp))
@@ -75,10 +68,10 @@ private fun MediaSlider(
         // FIXME fix seekto
         Slider(
             colors = SliderDefaults.colors(
-                thumbColor = AppColors.unHighlight,
-                activeTickColor = AppColors.unHighlight,
+                thumbColor = AppColors.unhighlight,
+                activeTickColor = AppColors.unhighlight,
                 activeTrackColor = AppColors.slider,
-                inactiveTickColor = AppColors.unHighlight
+                inactiveTickColor = AppColors.unhighlight
             ),
             value = currentTime.toFloat(),
             onValueChange = { newPosition ->
@@ -96,7 +89,7 @@ private fun MediaSlider(
         Text(
             totalTime.convertToReadableTime(),
             modifier = Modifier.wrapContentWidth(Alignment.End),
-            color = AppColors.unHighlight
+            color = AppColors.unhighlight
         )
     }
 }

@@ -7,38 +7,35 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -49,7 +46,9 @@ import androidx.navigation.NavController
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
+import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.ActionButton
+import com.coolnexttech.fireplayer.ui.navigation.Destinations
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
@@ -68,14 +67,24 @@ fun HomeView(
     val searchText = remember { mutableStateOf("") }
     val playMode = remember { mutableStateOf(PlayMode.shuffle) }
     val showSortOptions = remember { mutableStateOf(false) }
+    val selectedTrackIndex = remember { mutableIntStateOf(-1) }
+    val prevTrackIndexesStack = remember { mutableStateListOf<Int>() }
+
 
     LaunchedEffect(Unit) {
         viewModel.initTrackList(folderAnalyzer)
     }
 
+    LaunchedEffect(selectedTrackIndex.intValue) {
+        if (selectedTrackIndex.intValue != -1) {
+            audioPlayerViewModel.play(context, filteredTracks[selectedTrackIndex.intValue].path)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopBar(
+                navController,
                 filterOption.value,
                 playMode.value,
                 changeFilterOption = {
@@ -93,21 +102,33 @@ fun HomeView(
                     viewModel.search(it, filterOption.value)
                 })
         },
-        bottomBar = { BottomBar(audioPlayerViewModel) }) {
+        bottomBar = {
+            SeekbarView(audioPlayerViewModel, {
+                selectPreviousTrack(prevTrackIndexesStack) {
+                    selectedTrackIndex.intValue = it
+                }
+            }) {
+                selectNextTrack(filteredTracks, playMode.value, selectedTrackIndex.intValue) {
+                    selectedTrackIndex.intValue = it
+                    prevTrackIndexesStack.add(it)
+                }
+            }
+        }) {
         if (filteredTracks.isEmpty()) {
             ContentUnavailableView(titleSuffix = searchText.value)
         } else {
             LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
-                items(filteredTracks) { track ->
+                itemsIndexed(filteredTracks) { index, track ->
                     Text(
                         text = track.title,
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier
                             .padding(all = 8.dp)
                             .clickable {
-                                audioPlayerViewModel.play(context, track.path)
+                                selectedTrackIndex.intValue = index
+                                prevTrackIndexesStack.add(index)
                             },
-                        color = AppColors.textColor
+                        color = if (selectedTrackIndex.intValue == index) AppColors.highlight else AppColors.textColor
                     )
 
                     Divider()
@@ -129,6 +150,7 @@ fun HomeView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
+    navController: NavController,
     filterOption: FilterOptions,
     playMode: PlayMode,
     changeFilterOption: (FilterOptions) -> Unit,
@@ -160,9 +182,9 @@ private fun TopBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = AppColors.background,
             scrolledContainerColor = AppColors.background,
-            navigationIconContentColor = AppColors.unHighlight,
-            titleContentColor = AppColors.unHighlight,
-            actionIconContentColor = AppColors.unHighlight
+            navigationIconContentColor = AppColors.unhighlight,
+            titleContentColor = AppColors.unhighlight,
+            actionIconContentColor = AppColors.unhighlight
         ),
         title = {
             BasicTextField(
@@ -176,7 +198,7 @@ private fun TopBar(
                     if (searchQuery.value.isEmpty()) {
                         Text(
                             text = stringResource(id = searchTitleId),
-                            style = MaterialTheme.typography.bodyMedium.copy(AppColors.unHighlight),
+                            style = MaterialTheme.typography.bodyMedium.copy(AppColors.unhighlight),
                         )
                     }
                     innerTextField()
@@ -185,11 +207,15 @@ private fun TopBar(
                     .height(intrinsicSize = IntrinsicSize.Min)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                textStyle = MaterialTheme.typography.bodyMedium.copy(AppColors.unHighlight),
-                cursorBrush = SolidColor(AppColors.unHighlight)
+                textStyle = MaterialTheme.typography.bodyMedium.copy(AppColors.unhighlight),
+                cursorBrush = SolidColor(AppColors.unhighlight)
             )
         },
         actions = {
+            ActionButton(R.drawable.ic_playlists) {
+                navController.navigate(Destinations.Playlists)
+            }
+
             ActionButton(filterOptionIcon) {
                 val newFilterOption = when (filterOption) {
                     FilterOptions.title -> FilterOptions.artist
@@ -277,9 +303,27 @@ private fun SortOptionsAlertDialog(
     }
 }
 
-@Composable
-private fun BottomBar(audioPlayerViewModel: AudioPlayerViewModel) {
-    SeekbarView(audioPlayerViewModel, selectPreviousTrack = { /*TODO*/ }) {
-
+private fun selectPreviousTrack(
+    prevTrackIndexesStack: MutableList<Int>,
+    updateSelectedTrackIndex: (Int) -> Unit
+) {
+    if (prevTrackIndexesStack.size > 1) {
+        prevTrackIndexesStack.removeLast()
+        prevTrackIndexesStack.lastOrNull()?.let { prevIndex ->
+            updateSelectedTrackIndex(prevIndex)
+        }
     }
+}
+
+private fun selectNextTrack(
+    filteredTracks: List<Track>,
+    playMode: PlayMode,
+    selectedTrackIndex: Int,
+    updateSelectedTrackIndex: (Int) -> Unit
+) {
+    val nextIndex = when (playMode) {
+        PlayMode.shuffle -> filteredTracks.indices.random()
+        PlayMode.sequential -> (selectedTrackIndex + 1).takeIf { it < filteredTracks.size } ?: 0
+    }
+    updateSelectedTrackIndex(nextIndex)
 }

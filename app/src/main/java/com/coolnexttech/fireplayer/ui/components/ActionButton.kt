@@ -12,7 +12,7 @@ fun ActionButton(id: Int, action: () -> Unit) {
     IconButton(action) {
         Icon(
             imageVector = ImageVector.vectorResource(id),
-            tint = AppColors.unHighlight,
+            tint = AppColors.unhighlight,
             contentDescription = "IconButton"
         )
     }

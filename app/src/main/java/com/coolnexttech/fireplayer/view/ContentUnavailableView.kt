@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,14 +34,14 @@ fun ContentUnavailableView(titleSuffix: String) {
             painter = painterResource(id = R.drawable.ic_search),
             modifier = Modifier.size(75.dp),
             contentDescription = "Search",
-            colorFilter = ColorFilter.tint(AppColors.unHighlight)
+            colorFilter = ColorFilter.tint(AppColors.unhighlight)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = stringResource(id = R.string.content_unavailable_title_prefix) + " " + titleSuffix,
-            color = AppColors.unHighlight,
+            color = AppColors.unhighlight,
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
         )
@@ -51,7 +50,7 @@ fun ContentUnavailableView(titleSuffix: String) {
 
         Text(
             text = stringResource(id = R.string.content_unavailable_description),
-            color = AppColors.unHighlight,
+            color = AppColors.unhighlight,
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )

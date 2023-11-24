@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,8 +35,9 @@ class AudioPlayerViewModel: ViewModel() {
         mediaPlayer?.reset()
         mediaPlayer = MediaPlayer().apply {
             setDataSource(context, uri)
-            prepare() // Use prepareAsync() with OnPreparedListener if you're streaming online media
+            prepare()
             start()
+
             val durationInMillis = duration
             _totalTime.update {
                 durationInMillis / 1000.0
@@ -49,21 +49,10 @@ class AudioPlayerViewModel: ViewModel() {
         }
     }
 
-    fun pause() {
-        if (mediaPlayer?.isPlaying == true) {
-            mediaPlayer?.pause()
-            _isPlaying.update {
-                false
-            }
-            stopPeriodicUpdateJob()
-        }
-    }
-
     fun togglePlayPause() {
-        if (mediaPlayer?.isPlaying == true) {
-            mediaPlayer?.stop()
-        } else {
-            resume()
+        mediaPlayer?.apply {
+            if (isPlaying) pause() else start()
+            _isPlaying.update { isPlaying }
         }
     }
 
@@ -73,23 +62,11 @@ class AudioPlayerViewModel: ViewModel() {
         }
     }
 
-    fun resume() {
-        if (mediaPlayer?.isPlaying == false) {
-            mediaPlayer?.start()
-            _isPlaying.update {
-                true
-            }
-            startPeriodicUpdateJob()
-        }
-    }
-
     fun seekTo(time: Double) {
         mediaPlayer?.let {
             val timeInMillis = (time * 1000).toInt()
             it.seekTo(timeInMillis)
-            _currentTime.update {
-                time
-            }
+            updateCurrentTime(time)
         }
     }
 
@@ -99,18 +76,8 @@ class AudioPlayerViewModel: ViewModel() {
             while (isActive) {
                 val currentPosInMillis = mediaPlayer?.currentPosition
                 _currentTime.update {  currentPosInMillis?.div(1000.0) ?: 0.0 }
-                delay(100) // Update the current time every 100 milliseconds
+                delay(1000)
             }
         }
-    }
-
-    private fun stopPeriodicUpdateJob() {
-        periodicUpdateJob?.cancel()
-    }
-
-    fun release() {
-        coroutineScope.cancel()
-        mediaPlayer?.release()
-        mediaPlayer = null
     }
 }
