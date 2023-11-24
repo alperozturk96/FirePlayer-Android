@@ -1,19 +1,22 @@
 package com.coolnexttech.fireplayer.util
 
-import android.Manifest
 import android.app.Activity
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import android.provider.Settings
 
 class PermissionManager(private val activity: Activity) {
 
-    private val externalStoragePermission = Manifest.permission.READ_EXTERNAL_STORAGE
-    private val requestReadExternalStorageCode = 101
-
     fun askStoragePermission() {
-        if (ContextCompat.checkSelfPermission(activity, externalStoragePermission) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), requestReadExternalStorageCode)
+        if (Environment.isExternalStorageManager()) {
+            return
         }
+
+        val intent = Intent()
+        intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+        val uri = Uri.fromParts("package", activity.packageName, null)
+        intent.data = uri
+        activity.startActivity(intent)
     }
 }
