@@ -96,7 +96,9 @@ fun HomeView(
                 showSortOptions = {
                     showSortOptions.value = true
                 },
-                selectFolder = {},
+                selectFolder = {
+
+                },
                 onSearchQueryChanged = {
                     searchText.value = it
                     viewModel.search(it, filterOption.value)
