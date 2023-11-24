@@ -11,9 +11,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color.DarkGray,
-    secondary = Color.DarkGray,
-    background = Color(0xFF000000),
+    primary = AppColors.background,
+    background = AppColors.background,
 )
 
 /* Other default colors to override

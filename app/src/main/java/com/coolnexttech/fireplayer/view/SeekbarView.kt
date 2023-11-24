@@ -11,8 +11,15 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.convertToReadableTime
+import com.coolnexttech.fireplayer.ui.components.ActionButton
+import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 
 @Composable
@@ -21,7 +28,6 @@ fun SeekbarView(
     selectPreviousTrack: () -> Unit,
     selectNextTrack: () -> Unit
 ) {
-    var isSeeking by remember { mutableStateOf(false) }
     val currentTime by audioPlayerViewModel.currentTime.collectAsState()
     val totalTime by audioPlayerViewModel.totalTime.collectAsState()
     val isPlaying by audioPlayerViewModel.isPlaying.collectAsState()
@@ -33,48 +39,93 @@ fun SeekbarView(
         }
     }
 
+    Column(
+        modifier = Modifier
+            .background(AppColors.alternateBackground)
+            .padding(all = 16.dp)
+    ) {
+
+        MediaSlider(audioPlayerViewModel, currentTime, totalTime)
+        MediaControl(audioPlayerViewModel, isPlaying, selectPreviousTrack = selectPreviousTrack) {
+            selectNextTrack()
+        }
+    }
+}
+
+@Composable
+private fun MediaSlider(
+    audioPlayerViewModel: AudioPlayerViewModel,
+    currentTime: Double,
+    totalTime: Double
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
-            .background(Color.LightGray) // Replace with your color
+            .height(50.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(15.dp))
+        Text(
+            currentTime.convertToReadableTime(),
+            modifier = Modifier.wrapContentWidth(Alignment.Start),
+            color = AppColors.unHighlight
+        )
 
-        Text(currentTime.convertToReadableTime())
+        Spacer(Modifier.width(4.dp))
 
+        // FIXME fix seekto
         Slider(
+            colors = SliderDefaults.colors(
+                thumbColor = AppColors.unHighlight,
+                activeTickColor = AppColors.unHighlight,
+                activeTrackColor = AppColors.slider,
+                inactiveTickColor = AppColors.unHighlight
+            ),
             value = currentTime.toFloat(),
             onValueChange = { newPosition ->
-                isSeeking = true
                 audioPlayerViewModel.updateCurrentTime(newPosition.toDouble())
             },
             onValueChangeFinished = {
-                isSeeking = false
                 audioPlayerViewModel.seekTo(currentTime)
             },
-            valueRange = 0f..totalTime.toFloat()
+            valueRange = 0f..totalTime.toFloat(),
+            modifier = Modifier.weight(0.85f)
         )
 
-        Text(totalTime.convertToReadableTime())
+        Spacer(Modifier.width(4.dp))
 
-        Spacer(modifier = Modifier.width(15.dp))
+        Text(
+            totalTime.convertToReadableTime(),
+            modifier = Modifier.wrapContentWidth(Alignment.End),
+            color = AppColors.unHighlight
+        )
+    }
+}
 
-        IconButton(onClick = selectPreviousTrack) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "Previous")
+@Composable
+private fun MediaControl(
+    audioPlayerViewModel: AudioPlayerViewModel,
+    isPlaying: Boolean,
+    selectPreviousTrack: () -> Unit,
+    selectNextTrack: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+
+        ActionButton(R.drawable.ic_previous) {
+            selectPreviousTrack()
         }
 
-        IconButton(onClick = { audioPlayerViewModel.togglePlayPause() }) {
-            Icon(
-                imageVector = if (isPlaying) Icons.Filled.Place else Icons.Filled.PlayArrow,
-                contentDescription = if (isPlaying) "Pause" else "Play"
-            )
+        ActionButton(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play) {
+            audioPlayerViewModel.togglePlayPause()
         }
 
-        IconButton(onClick = selectNextTrack) {
-            Icon(Icons.Filled.ArrowForward, contentDescription = "Next")
+        ActionButton(R.drawable.ic_next) {
+            selectNextTrack()
         }
 
-        Spacer(modifier = Modifier.width(15.dp))
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
