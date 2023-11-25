@@ -1,12 +1,9 @@
 package com.coolnexttech.fireplayer.service
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.coolnexttech.fireplayer.R
@@ -19,7 +16,6 @@ import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 class PlayerService : Service() {
     private var homeViewModel = ViewModelProvider.getHomeViewModel()
     private var audioPlayerViewModel = ViewModelProvider.getAudioPlayerViewModel()
-    private var notificationManager: NotificationManager? = null
 
     companion object {
         const val notificationId = 1
@@ -31,17 +27,10 @@ class PlayerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = createNotification()
-
-        startForeground(
-            notificationId,
-            notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-        )
-
         when (intent?.action) {
             PlayerEvents.Previous.name -> {
                 homeViewModel.selectPreviousTrack()
+                updateNotification()
             }
 
             PlayerEvents.Toggle.name -> {
@@ -50,10 +39,21 @@ class PlayerService : Service() {
 
             PlayerEvents.Next.name -> {
                 homeViewModel.selectNextTrack()
+                updateNotification()
             }
         }
 
+        updateNotification()
         return START_STICKY
+    }
+
+    private fun updateNotification() {
+        val notification = createNotification()
+        startForeground(
+            notificationId,
+            notification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+        )
     }
 
     private fun createNotification(): Notification {
@@ -62,13 +62,24 @@ class PlayerService : Service() {
         val nextTrackIntent = createNextTrackPendingIntent()
 
         return NotificationCompat.Builder(this, channelId)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setContentTitle("FirePlayer")
-            .setContentText(homeViewModel.currentTrackTitle())
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentTitle(homeViewModel.currentTrackTitle())
             .setSmallIcon(R.drawable.im_app_icon)
-            .addAction(R.drawable.ic_previous, "Previous", previousTrackIntent)
-            .addAction(audioPlayerViewModel.toggleIconId(), "Play", toggleTrackIntent)
-            .addAction(R.drawable.ic_next, "Previous", nextTrackIntent)
+            .addAction(
+                R.drawable.ic_previous,
+                getString(R.string.media_control_previous_text),
+                previousTrackIntent
+            )
+            .addAction(
+                audioPlayerViewModel.toggleIconId(),
+                getString(audioPlayerViewModel.toggleIconTextId()),
+                toggleTrackIntent
+            )
+            .addAction(
+                R.drawable.ic_next,
+                getString(R.string.media_control_next_text),
+                nextTrackIntent
+            )
             .setSilent(true)
             .build()
     }

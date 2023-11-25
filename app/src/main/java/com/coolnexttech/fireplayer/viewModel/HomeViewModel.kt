@@ -19,9 +19,6 @@ class HomeViewModel: ViewModel() {
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText
 
-    private val _sortOption = MutableStateFlow(SortOptions.AtoZ)
-    val sortOption: StateFlow<SortOptions> = _sortOption
-
     private val _filterOption = MutableStateFlow(FilterOptions.Title)
     val filterOption: StateFlow<FilterOptions> = _filterOption
 
@@ -32,7 +29,6 @@ class HomeViewModel: ViewModel() {
     val selectedTrackIndex: StateFlow<Int> = _selectedTrackIndex
 
     private val _prevTrackIndexesStack = MutableStateFlow<ArrayList<Int>>(arrayListOf())
-    val prevTrackIndexesStack: StateFlow<ArrayList<Int>> = _prevTrackIndexesStack
 
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
@@ -44,12 +40,6 @@ class HomeViewModel: ViewModel() {
 
         _filteredTracks.update {
             _tracks.value
-        }
-    }
-
-    fun updateTrackList(tracks: List<Track>) {
-        _filteredTracks.update {
-            tracks
         }
     }
 
@@ -122,11 +112,7 @@ class HomeViewModel: ViewModel() {
     }
 
     fun currentTrackTitle(): String {
-        return if (_selectedTrackIndex.value != -1) {
-            _filteredTracks.value[_selectedTrackIndex.value].title
-        } else {
-            ""
-        }
+        return _filteredTracks.value[_selectedTrackIndex.value].title
     }
 
 }

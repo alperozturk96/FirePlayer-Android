@@ -72,7 +72,6 @@ fun HomeView(
 
     LaunchedEffect(Unit) {
         viewModel.initTrackList(folderAnalyzer)
-        startPlayerService(context)
         Log.d("Home","Total Track Count: " + filteredTracks.count())
     }
 
@@ -114,6 +113,7 @@ fun HomeView(
                             .padding(all = 8.dp)
                             .clickable {
                                 viewModel.selectTrack(index)
+                                startPlayerService(context)
                             },
                         color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
                     )

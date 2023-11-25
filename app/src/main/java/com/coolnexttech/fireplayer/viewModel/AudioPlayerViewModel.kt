@@ -79,6 +79,14 @@ class AudioPlayerViewModel: ViewModel() {
         }
     }
 
+    fun toggleIconTextId(): Int {
+        return if (_isPlaying.value) {
+            R.string.media_control_pause_text
+        } else {
+            R.string.media_control_play_text
+        }
+    }
+
     private fun startPeriodicUpdateJob() {
         periodicUpdateJob?.cancel()
         periodicUpdateJob = coroutineScope.launch {

@@ -18,6 +18,3 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
         FilterOptions.Album -> this.filter { it.album.contains(text, ignoreCase = true) }
     }
 }
-
-val List<Track>.randomIndex: Int
-    get() = (indices).random()
