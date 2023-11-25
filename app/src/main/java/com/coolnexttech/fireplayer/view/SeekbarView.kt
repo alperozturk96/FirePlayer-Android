@@ -24,12 +24,12 @@ import com.coolnexttech.fireplayer.extensions.convertToReadableTime
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
+import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 
 @Composable
 fun SeekbarView(
     audioPlayerViewModel: AudioPlayerViewModel,
-    selectPreviousTrack: () -> Unit,
-    selectNextTrack: () -> Unit
+    homeViewModel: HomeViewModel,
 ) {
     val currentTime by audioPlayerViewModel.currentTime.collectAsState()
     val totalTime by audioPlayerViewModel.totalTime.collectAsState()
@@ -38,7 +38,7 @@ fun SeekbarView(
     // When currentTime reaches totalTime, trigger next track
     LaunchedEffect(currentTime, totalTime) {
         if (currentTime != 0.0 && currentTime >= totalTime) {
-            selectNextTrack()
+            homeViewModel.selectNextTrack()
         }
     }
 
@@ -49,8 +49,8 @@ fun SeekbarView(
     ) {
 
         MediaSlider(audioPlayerViewModel, currentTime, totalTime)
-        MediaControl(audioPlayerViewModel, isPlaying, selectPreviousTrack) {
-            selectNextTrack()
+        MediaControl(audioPlayerViewModel, isPlaying, { homeViewModel.selectPreviousTrack() }) {
+            homeViewModel.selectNextTrack()
         }
     }
 }

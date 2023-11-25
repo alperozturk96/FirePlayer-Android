@@ -25,8 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,10 +40,7 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.VSpacing16
 import com.coolnexttech.fireplayer.extensions.VSpacing8
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
-import com.coolnexttech.fireplayer.model.FilterOptions
-import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.DialogButton
@@ -66,12 +61,9 @@ fun HomeView(
     val context = LocalContext.current
     val folderAnalyzer = FolderAnalyzer(context)
     val filteredTracks by viewModel.filteredTracks.collectAsState()
-    val filterOption = remember { mutableStateOf(FilterOptions.Title) }
-    val searchText = remember { mutableStateOf("") }
-    val playMode = remember { mutableStateOf(PlayMode.Shuffle) }
+    val searchText by viewModel.searchText.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
-    val selectedTrackIndex = remember { mutableIntStateOf(-1) }
-    val prevTrackIndexesStack = remember { mutableStateListOf<Int>() }
+    val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
@@ -79,10 +71,10 @@ fun HomeView(
         Log.d("Home","Total Track Count: " + filteredTracks.count())
     }
 
-    LaunchedEffect(selectedTrackIndex.intValue) {
-        if (selectedTrackIndex.intValue != -1) {
-            audioPlayerViewModel.play(context, filteredTracks[selectedTrackIndex.intValue].path)
-            listState.animateScrollToItem(selectedTrackIndex.intValue)
+    LaunchedEffect(selectedTrackIndex) {
+        if (selectedTrackIndex != -1) {
+            audioPlayerViewModel.play(context, filteredTracks[selectedTrackIndex].path)
+            listState.animateScrollToItem(selectedTrackIndex)
         }
     }
 
@@ -90,37 +82,17 @@ fun HomeView(
         topBar = {
             TopBar(
                 navController,
-                filterOption.value,
-                playMode.value,
-                changeFilterOption = {
-                    filterOption.value = it
-                },
-                changePlayMode = {
-                    playMode.value = it
-                },
+                viewModel,
                 showSortOptions = {
                     showSortOptions.value = true
-                },
-                onSearchQueryChanged = {
-                    searchText.value = it
-                    viewModel.search(it, filterOption.value)
                 })
         },
         bottomBar = {
-            SeekbarView(audioPlayerViewModel, {
-                selectPreviousTrack(prevTrackIndexesStack) {
-                    selectedTrackIndex.intValue = it
-                }
-            }) {
-                selectNextTrack(filteredTracks, playMode.value, selectedTrackIndex.intValue) {
-                    selectedTrackIndex.intValue = it
-                    prevTrackIndexesStack.add(it)
-                }
-            }
+            SeekbarView(audioPlayerViewModel, viewModel)
         }) {
         if (filteredTracks.isEmpty()) {
-            if (searchText.value.isNotEmpty()) {
-                ContentUnavailableView(titleSuffix = searchText.value)
+            if (searchText.isNotEmpty()) {
+                ContentUnavailableView(titleSuffix = searchText)
             } else {
                 ContentUnavailableView(
                     titleSuffix = null,
@@ -136,10 +108,9 @@ fun HomeView(
                         modifier = Modifier
                             .padding(all = 8.dp)
                             .clickable {
-                                selectedTrackIndex.intValue = index
-                                prevTrackIndexesStack.add(index)
+                                viewModel.selectTrack(index)
                             },
-                        color = if (selectedTrackIndex.intValue == index) AppColors.highlight else AppColors.textColor
+                        color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
                     )
 
                     Divider()
@@ -163,27 +134,24 @@ fun HomeView(
 @Composable
 private fun TopBar(
     navController: NavController,
-    filterOption: FilterOptions,
-    playMode: PlayMode,
-    changeFilterOption: (FilterOptions) -> Unit,
-    changePlayMode: (PlayMode) -> Unit,
+    viewModel: HomeViewModel,
     showSortOptions: () -> Unit,
-    onSearchQueryChanged: (String) -> Unit,
 ) {
-    val searchQuery = remember { mutableStateOf("") }
+    val filterOption by viewModel.filterOption.collectAsState()
+    val searchText by viewModel.searchText.collectAsState()
+    val playMode by viewModel.playMode.collectAsState()
 
     TopAppBar(
         colors = getTopAppBarColor(),
         title = {
             BasicTextField(
-                value = searchQuery.value,
+                value = searchText,
                 onValueChange = {
-                    searchQuery.value = it
-                    onSearchQueryChanged(it)
+                    viewModel.search(it)
                 },
                 singleLine = true,
                 decorationBox = { innerTextField ->
-                    if (searchQuery.value.isEmpty()) {
+                    if (searchText.isEmpty()) {
                         BodyMediumText(id = filterOption.searchTitleId())
                     }
                     innerTextField()
@@ -202,11 +170,11 @@ private fun TopBar(
             }
 
             ActionButton(filterOption.filterOptionIconId()) {
-                changeFilterOption(filterOption.selectNextFilterOption())
+                viewModel.changeFilterOption()
             }
 
             ActionButton(playMode.getIconId()) {
-                changePlayMode(playMode.selectNextPlayMode())
+                viewModel.changePlayMode()
             }
 
             ActionButton(R.drawable.ic_sort) {
@@ -256,33 +224,4 @@ private fun SortOptionsAlertDialog(
             VSpacing16()
         }
     }
-}
-
-private fun selectPreviousTrack(
-    prevTrackIndexesStack: MutableList<Int>,
-    updateSelectedTrackIndex: (Int) -> Unit
-) {
-    if (prevTrackIndexesStack.size > 1) {
-        prevTrackIndexesStack.removeLast()
-        prevTrackIndexesStack.lastOrNull()?.let { prevIndex ->
-            updateSelectedTrackIndex(prevIndex)
-        }
-    }
-}
-
-private fun selectNextTrack(
-    filteredTracks: List<Track>,
-    playMode: PlayMode,
-    selectedTrackIndex: Int,
-    updateSelectedTrackIndex: (Int) -> Unit
-) {
-    if (filteredTracks.isEmpty()) {
-        return
-    }
-
-    val nextIndex = when (playMode) {
-        PlayMode.Shuffle -> filteredTracks.indices.random()
-        PlayMode.Sequential -> (selectedTrackIndex + 1).takeIf { it < filteredTracks.size } ?: 0
-    }
-    updateSelectedTrackIndex(nextIndex)
 }
