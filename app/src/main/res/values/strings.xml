@@ -17,7 +17,7 @@
     <string name="home_sort_dialog_title">Sort</string>
     <string name="home_sort_dialog_sort_by_title_a_z_title">Sort By Title A-Z</string>
     <string name="home_sort_dialog_sort_by_title_z_a_title">Sort By Title Z-A</string>
-
+    <string name="home_content_not_available_text">Add Your Tracks To Music Folder</string>
 
     <string name="playlists_title">Playlists</string>
     <string name="playlist_add_playlist_placeholder">Add Playlist Title</string>

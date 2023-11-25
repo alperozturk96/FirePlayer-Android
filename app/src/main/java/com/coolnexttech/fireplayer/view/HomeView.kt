@@ -1,8 +1,6 @@
 package com.coolnexttech.fireplayer.view
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
@@ -77,21 +76,13 @@ fun HomeView(
 
     LaunchedEffect(Unit) {
         viewModel.initTrackList(folderAnalyzer)
+        Log.d("Home","Total Track Count: " + filteredTracks.count())
     }
 
     LaunchedEffect(selectedTrackIndex.intValue) {
         if (selectedTrackIndex.intValue != -1) {
             audioPlayerViewModel.play(context, filteredTracks[selectedTrackIndex.intValue].path)
             listState.animateScrollToItem(selectedTrackIndex.intValue)
-        }
-    }
-
-    val pickFolderLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocumentTree()
-    ) { uri: Uri? ->
-        uri?.let {
-            val tracks = folderAnalyzer.getTracksFromSelectedPath(uri)
-            viewModel.updateTrackList(tracks)
         }
     }
 
@@ -109,9 +100,6 @@ fun HomeView(
                 },
                 showSortOptions = {
                     showSortOptions.value = true
-                },
-                selectFolder = {
-                    pickFolderLauncher.launch(null)
                 },
                 onSearchQueryChanged = {
                     searchText.value = it
@@ -131,7 +119,14 @@ fun HomeView(
             }
         }) {
         if (filteredTracks.isEmpty()) {
-            ContentUnavailableView(titleSuffix = searchText.value)
+            if (searchText.value.isNotEmpty()) {
+                ContentUnavailableView(titleSuffix = searchText.value)
+            } else {
+                ContentUnavailableView(
+                    titleSuffix = null,
+                    title = stringResource(R.string.home_content_not_available_text)
+                )
+            }
         } else {
             LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                 itemsIndexed(filteredTracks) { index, track ->
@@ -173,7 +168,6 @@ private fun TopBar(
     changeFilterOption: (FilterOptions) -> Unit,
     changePlayMode: (PlayMode) -> Unit,
     showSortOptions: () -> Unit,
-    selectFolder: () -> Unit,
     onSearchQueryChanged: (String) -> Unit,
 ) {
     val searchQuery = remember { mutableStateOf("") }
@@ -217,10 +211,6 @@ private fun TopBar(
 
             ActionButton(R.drawable.ic_sort) {
                 showSortOptions()
-            }
-
-            ActionButton(R.drawable.ic_folder) {
-                selectFolder()
             }
         }
     )

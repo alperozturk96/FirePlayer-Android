@@ -18,7 +18,10 @@ import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @Composable
-fun ContentUnavailableView(titleSuffix: String) {
+fun ContentUnavailableView(titleSuffix: String?, title: String? = null) {
+    val titleText = title
+        ?: (stringResource(id = R.string.content_unavailable_title_prefix) + " " + titleSuffix)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,12 +34,13 @@ fun ContentUnavailableView(titleSuffix: String) {
         VSpacing16()
 
         HeadlineMediumText(
-            stringResource(id = R.string.content_unavailable_title_prefix) + " " + titleSuffix,
+            titleText,
             AppColors.unhighlight
         )
 
-        VSpacing8()
-
-        HeadlineSmallText(R.string.content_unavailable_description, AppColors.unhighlight)
+        if (title == null) {
+            VSpacing8()
+            HeadlineSmallText(R.string.content_unavailable_description, AppColors.unhighlight)
+        }
     }
 }
