@@ -4,11 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager
+import android.util.Log
 import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 class CallReceiver : BroadcastReceiver() {
     private val audioPlayerViewModel = ViewModelProvider.getAudioPlayerViewModel()
 
+    // FIXME not working
     override fun onReceive(context: Context, intent: Intent) {
         if (TelephonyManager.ACTION_PHONE_STATE_CHANGED == intent.action) {
             val state = intent.getStringExtra(TelephonyManager.EXTRA_STATE)
