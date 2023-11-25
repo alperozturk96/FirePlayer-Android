@@ -1,11 +1,17 @@
 package com.coolnexttech.fireplayer.util
 
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore
+import android.webkit.MimeTypeMap
 import com.coolnexttech.fireplayer.model.Track
+import java.io.File
 
 class FolderAnalyzer(private val context: Context) {
+
+    private val unsupportedFileFormats = listOf("dsf")
 
     fun getTracksFromMusicFolder(): ArrayList<Track> {
         val result = arrayListOf<Track>()
@@ -35,7 +41,6 @@ class FolderAnalyzer(private val context: Context) {
                 val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
                 val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
                 val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-                val mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
                 val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
 
                 while (cursor.moveToNext()) {
@@ -43,18 +48,28 @@ class FolderAnalyzer(private val context: Context) {
                     val title = cursor.getString(titleColumn)
                     val artist = cursor.getString(artistColumn)
                     val album = cursor.getString(albumColumn)
-                    val pathExtension = cursor.getString(mimeTypeColumn)
                     val duration = cursor.getLong(durationColumn)
-                    val path =
-                        ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                    val path = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                    val pathExtension = getFileMimeType(path)
 
-                    val track = Track(id, title, artist, album, path, duration, pathExtension)
-                    result.add(track)
+                    if (!unsupportedFileFormats.contains(pathExtension)) {
+                        val track = Track(id, title, artist, album, path, duration, pathExtension)
+                        result.add(track)
+                    }
                 }
             }
         }
 
         return result
+    }
+
+    private fun getFileMimeType(uri: Uri): String? {
+        return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+            val mime = MimeTypeMap.getSingleton()
+            mime.getExtensionFromMimeType(context.contentResolver.getType(uri))
+        } else {
+            MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(uri.path?.let { File(it) }).toString())
+        }
     }
 
 }
