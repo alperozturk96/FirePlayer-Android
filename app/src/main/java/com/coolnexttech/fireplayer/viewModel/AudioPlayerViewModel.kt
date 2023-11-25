@@ -57,6 +57,14 @@ class AudioPlayerViewModel: ViewModel() {
         }
     }
 
+    fun pause() {
+        mediaPlayer?.pause()
+    }
+
+    fun start() {
+        mediaPlayer?.start()
+    }
+
     fun updateCurrentTime(value: Double) {
         _currentTime.update {
             value
@@ -68,14 +76,6 @@ class AudioPlayerViewModel: ViewModel() {
             val timeInMillis = (time * 1000).toInt()
             it.seekTo(timeInMillis)
             updateCurrentTime(time)
-        }
-    }
-
-    fun toggleIconId(): Int {
-        return if (_isPlaying.value) {
-            R.drawable.ic_pause
-        } else {
-            R.drawable.ic_play
         }
     }
 

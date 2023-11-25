@@ -2,7 +2,8 @@ package com.coolnexttech.fireplayer.view
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -113,7 +114,9 @@ fun HomeView(
                             .padding(all = 8.dp)
                             .clickable {
                                 viewModel.selectTrack(index)
-                                startPlayerService(context)
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    startPlayerService(context)
+                                }, 1500)
                             },
                         color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
                     )

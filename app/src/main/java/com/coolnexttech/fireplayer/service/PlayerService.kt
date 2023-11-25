@@ -14,8 +14,8 @@ import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 class PlayerService : Service() {
-    private var homeViewModel = ViewModelProvider.getHomeViewModel()
-    private var audioPlayerViewModel = ViewModelProvider.getAudioPlayerViewModel()
+    private val homeViewModel = ViewModelProvider.getHomeViewModel()
+    private val audioPlayerViewModel = ViewModelProvider.getAudioPlayerViewModel()
 
     companion object {
         const val notificationId = 1
@@ -71,7 +71,7 @@ class PlayerService : Service() {
                 previousTrackIntent
             )
             .addAction(
-                audioPlayerViewModel.toggleIconId(),
+                R.drawable.ic_pause,
                 getString(audioPlayerViewModel.toggleIconTextId()),
                 toggleTrackIntent
             )
