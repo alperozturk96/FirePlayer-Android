@@ -10,13 +10,14 @@ import com.coolnexttech.fireplayer.view.PlaylistsView
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
+import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 @Composable
 fun Navigation(navController: NavHostController, startDestination: String) {
     NavHost(navController, startDestination) {
         composable(Destinations.Home) {
-            val viewModel: HomeViewModel = viewModel()
-            val audioPlayerViewModel: AudioPlayerViewModel = viewModel()
+            val viewModel: HomeViewModel = ViewModelProvider.getHomeViewModel()
+            val audioPlayerViewModel: AudioPlayerViewModel = ViewModelProvider.getAudioPlayerViewModel()
             HomeView(navController, viewModel, audioPlayerViewModel)
         }
 

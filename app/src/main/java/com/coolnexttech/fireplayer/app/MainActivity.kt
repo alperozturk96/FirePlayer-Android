@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer
+package com.coolnexttech.fireplayer.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             LaunchedEffect(Unit) {
                 checkPermissions()
             }
@@ -38,5 +39,6 @@ class MainActivity : ComponentActivity() {
 
     private fun checkPermissions() {
         permissionManager.askStoragePermission()
+        permissionManager.askNotificationPermission()
     }
 }

@@ -1,5 +1,8 @@
 package com.coolnexttech.fireplayer.view
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +44,7 @@ import com.coolnexttech.fireplayer.extensions.VSpacing16
 import com.coolnexttech.fireplayer.extensions.VSpacing8
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.model.SortOptions
+import com.coolnexttech.fireplayer.service.PlayerService
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.DialogButton
@@ -68,6 +72,7 @@ fun HomeView(
 
     LaunchedEffect(Unit) {
         viewModel.initTrackList(folderAnalyzer)
+        startPlayerService(context)
         Log.d("Home","Total Track Count: " + filteredTracks.count())
     }
 
@@ -224,4 +229,9 @@ private fun SortOptionsAlertDialog(
             VSpacing16()
         }
     }
+}
+
+private fun startPlayerService(context: Context) {
+    val intent = Intent(context, PlayerService::class.java)
+    context.startForegroundService(intent)
 }

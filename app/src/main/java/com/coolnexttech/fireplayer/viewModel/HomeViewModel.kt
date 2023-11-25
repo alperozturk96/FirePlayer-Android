@@ -121,4 +121,12 @@ class HomeViewModel: ViewModel() {
         }
     }
 
+    fun currentTrackTitle(): String {
+        return if (_selectedTrackIndex.value != -1) {
+            _filteredTracks.value[_selectedTrackIndex.value].title
+        } else {
+            ""
+        }
+    }
+
 }

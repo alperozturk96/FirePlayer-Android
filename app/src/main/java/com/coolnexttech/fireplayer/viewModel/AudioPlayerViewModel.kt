@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import com.coolnexttech.fireplayer.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -67,6 +68,14 @@ class AudioPlayerViewModel: ViewModel() {
             val timeInMillis = (time * 1000).toInt()
             it.seekTo(timeInMillis)
             updateCurrentTime(time)
+        }
+    }
+
+    fun toggleIconId(): Int {
+        return if (_isPlaying.value) {
+            R.drawable.ic_pause
+        } else {
+            R.drawable.ic_play
         }
     }
 
