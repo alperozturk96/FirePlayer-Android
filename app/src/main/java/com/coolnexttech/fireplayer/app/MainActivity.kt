@@ -1,6 +1,7 @@
 package com.coolnexttech.fireplayer.app
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 checkPermissions()
+                keepScreenOn()
             }
 
             FirePlayerTheme {
@@ -35,6 +37,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun keepScreenOn() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     private fun checkPermissions() {
