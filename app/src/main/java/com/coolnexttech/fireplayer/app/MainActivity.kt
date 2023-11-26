@@ -1,6 +1,9 @@
 package com.coolnexttech.fireplayer.app
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.PowerManager
 import android.view.WindowManager
@@ -15,10 +18,15 @@ import androidx.navigation.compose.rememberNavController
 import com.coolnexttech.fireplayer.ui.navigation.Destinations
 import com.coolnexttech.fireplayer.ui.navigation.Navigation
 import com.coolnexttech.fireplayer.ui.theme.FirePlayerTheme
+import com.coolnexttech.fireplayer.util.CallReceiver
+import com.coolnexttech.fireplayer.util.MediaButtonReceiver
 import com.coolnexttech.fireplayer.util.PermissionManager
+
 
 class MainActivity : ComponentActivity() {
     private val permissionManager = PermissionManager(this)
+    private val callReceiver = CallReceiver()
+    private val mediaButtonReceiver = MediaButtonReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +36,7 @@ class MainActivity : ComponentActivity() {
                 checkPermissions()
                 keepScreenOn()
                 acquireWakeLock(this@MainActivity)
+                registerCallReceiver()
             }
 
             FirePlayerTheme {
@@ -40,6 +49,24 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    override fun onResume() {
+        super.onResume()
+        val mediaButtonFilter = IntentFilter(Intent.ACTION_MEDIA_BUTTON)
+        registerReceiver(mediaButtonReceiver, mediaButtonFilter)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(mediaButtonReceiver)
+        unregisterReceiver(callReceiver)
+    }
+
+    private fun registerCallReceiver() {
+        val filter = IntentFilter(Intent.ACTION_CALL)
+        registerReceiver(callReceiver, filter)
     }
 
     private fun acquireWakeLock(context: Context) {
