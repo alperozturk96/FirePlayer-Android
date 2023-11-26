@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -28,12 +30,19 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
     private val _currentTime = MutableStateFlow(0L)
     val currentTime: StateFlow<Long> = _currentTime
 
-    private val _totalTime = MutableStateFlow(0L)
+    private val _totalTime = MutableStateFlow(2L)
     val totalTime: StateFlow<Long> = _totalTime
 
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+
+    private val homeViewModel = ViewModelProvider.getHomeViewModel()
+
+    private val audioAttributes = AudioAttributes.Builder()
+        .setUsage(C.USAGE_MEDIA)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+        .build()
 
     init {
         player = ExoPlayer.Builder(context).build().apply {
@@ -44,6 +53,10 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
                         startPeriodicUpdateJob()
                     } else {
                         periodicUpdateJob?.cancel()
+
+                        if (shouldPlayNextTrack()) {
+                            homeViewModel.selectNextTrack()
+                        }
                     }
                 }
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -54,6 +67,8 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
                 }
             })
         }
+
+        player?.setAudioAttributes(audioAttributes, true)
     }
 
     fun play(uri: Uri) {
@@ -103,21 +118,17 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
         }
     }
 
+    private fun shouldPlayNextTrack(): Boolean = _currentTime.value + 1000 >= _totalTime.value
+
     private fun startPeriodicUpdateJob() {
         periodicUpdateJob?.cancel()
         periodicUpdateJob = coroutineScope.launch {
             while (true) {
+                 delay(1000)
                 _currentTime.value = player?.currentPosition ?: 0
                 _totalTime.value = player?.duration ?: 0
-                delay(1000)
+
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        periodicUpdateJob?.cancel()
-        player?.release()
-        player = null
     }
 }
