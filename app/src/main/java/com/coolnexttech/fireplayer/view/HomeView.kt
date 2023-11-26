@@ -111,7 +111,6 @@ fun HomeView(
                             .padding(all = 8.dp)
                             .clickable {
                                 viewModel.selectTrack(index)
-                                context.startPlayerServiceWithDelay()
                             },
                         color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
                     )
