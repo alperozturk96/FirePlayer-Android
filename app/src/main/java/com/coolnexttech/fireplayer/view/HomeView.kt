@@ -78,7 +78,7 @@ fun HomeView(
 
     LaunchedEffect(selectedTrackIndex) {
         if (selectedTrackIndex != -1) {
-            audioPlayerViewModel.play(context, filteredTracks[selectedTrackIndex].path)
+            audioPlayerViewModel.play(filteredTracks[selectedTrackIndex].path)
             listState.animateScrollToItem(selectedTrackIndex)
         }
     }

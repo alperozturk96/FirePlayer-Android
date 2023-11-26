@@ -1,5 +1,7 @@
 package com.coolnexttech.fireplayer.viewModel
 
+import com.coolnexttech.fireplayer.app.FirePlayer
+
 object ViewModelProvider {
     private var homeViewModel: HomeViewModel? = null
     private var audioPlayerViewModel: AudioPlayerViewModel? = null
@@ -14,7 +16,7 @@ object ViewModelProvider {
 
     fun getAudioPlayerViewModel(): AudioPlayerViewModel {
         if (audioPlayerViewModel == null) {
-            audioPlayerViewModel = AudioPlayerViewModel()
+            audioPlayerViewModel = AudioPlayerViewModel(FirePlayer.context)
         }
 
         return audioPlayerViewModel!!

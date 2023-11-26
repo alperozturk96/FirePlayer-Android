@@ -1,6 +1,8 @@
 package com.coolnexttech.fireplayer.app
 
+import android.content.Context
 import android.os.Bundle
+import android.os.PowerManager
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +27,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 checkPermissions()
                 keepScreenOn()
+                acquireWakeLock(this@MainActivity)
             }
 
             FirePlayerTheme {
@@ -35,6 +38,15 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     Navigation(navController, startDestination = Destinations.Home)
                 }
+            }
+        }
+    }
+
+    private fun acquireWakeLock(context: Context) {
+        val wakeLock = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock.run {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FirePlayer::WakeLock").apply {
+                acquire(60*60*1000L)
             }
         }
     }

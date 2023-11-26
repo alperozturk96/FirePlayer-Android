@@ -1,7 +1,7 @@
 package com.coolnexttech.fireplayer.extensions
 
-fun Double.convertToReadableTime(): String {
-    val totalSeconds = this.toInt()
+fun Long.convertToReadableTime(): String {
+    val totalSeconds = this.toInt() / 1000
     val hours = totalSeconds / 3600
     val minutes = (totalSeconds % 3600) / 60
     val seconds = totalSeconds % 60

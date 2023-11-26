@@ -37,7 +37,7 @@ fun SeekbarView(
 
     // When currentTime reaches totalTime, trigger next track
     LaunchedEffect(currentTime, totalTime) {
-        if (currentTime != 0.0 && currentTime >= totalTime) {
+        if (currentTime != 0L && currentTime >= totalTime) {
             homeViewModel.selectNextTrack()
         }
     }
@@ -58,8 +58,8 @@ fun SeekbarView(
 @Composable
 private fun MediaSlider(
     audioPlayerViewModel: AudioPlayerViewModel,
-    currentTime: Double,
-    totalTime: Double
+    currentTime: Long,
+    totalTime: Long
 ) {
     Row(
         modifier = Modifier
@@ -85,7 +85,7 @@ private fun MediaSlider(
             ),
             value = currentTime.toFloat(),
             onValueChange = { newPosition ->
-                audioPlayerViewModel.updateCurrentTime(newPosition.toDouble())
+                audioPlayerViewModel.updateCurrentTime(newPosition.toLong())
             },
             onValueChangeFinished = {
                 audioPlayerViewModel.seekTo(currentTime)

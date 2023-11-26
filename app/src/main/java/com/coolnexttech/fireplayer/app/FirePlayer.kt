@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.app
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,8 +9,15 @@ import com.coolnexttech.fireplayer.service.PlayerService
 
 class FirePlayer: Application() {
 
+    companion object {
+        @SuppressLint("StaticFieldLeak")
+        lateinit var context: Context
+    }
+
     override fun onCreate() {
         super.onCreate()
+
+        context = applicationContext
         createNotificationChannel()
     }
 

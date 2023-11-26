@@ -1,9 +1,12 @@
 package com.coolnexttech.fireplayer.viewModel
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.media.MediaPlayer
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.coolnexttech.fireplayer.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,70 +15,83 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class AudioPlayerViewModel: ViewModel() {
+@SuppressLint("StaticFieldLeak")
+class AudioPlayerViewModel(context: Context): ViewModel() {
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var player: ExoPlayer? = null
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
-    private val _currentTime = MutableStateFlow(0.0)
-    val currentTime: StateFlow<Double> = _currentTime
+    private val _currentTime = MutableStateFlow(0L)
+    val currentTime: StateFlow<Long> = _currentTime
 
-    private val _totalTime = MutableStateFlow(0.0)
-    val totalTime: StateFlow<Double> = _totalTime
+    private val _totalTime = MutableStateFlow(0L)
+    val totalTime: StateFlow<Long> = _totalTime
 
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
-    fun play(context: Context, uri: Uri) {
-        mediaPlayer?.reset()
-        mediaPlayer = MediaPlayer().apply {
-            setDataSource(context, uri)
-            prepare()
-            start()
+    init {
+        player = ExoPlayer.Builder(context).build().apply {
+            addListener(object : Player.Listener {
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    _isPlaying.value = isPlaying
+                    if (isPlaying) {
+                        startPeriodicUpdateJob()
+                    } else {
+                        periodicUpdateJob?.cancel()
+                    }
+                }
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    if (playbackState == Player.STATE_READY) {
+                        _totalTime.value = duration
+                        _currentTime.value = currentPosition
+                    }
+                }
+            })
+        }
+    }
 
-            val durationInMillis = duration
-            _totalTime.update {
-                durationInMillis / 1000.0
-            }
-            _isPlaying.update {
-                true
-            }
-            startPeriodicUpdateJob()
+    fun play(uri: Uri) {
+        player?.apply {
+            stop()
+            clearMediaItems()
+            val mediaItem: MediaItem = MediaItem.fromUri(uri)
+            setMediaItem(mediaItem)
+            prepare()
+            play()
         }
     }
 
     fun togglePlayPause() {
-        mediaPlayer?.apply {
+        player?.apply {
             if (isPlaying) pause() else start()
             _isPlaying.update { isPlaying }
         }
     }
 
     fun pause() {
-        mediaPlayer?.pause()
+        player?.pause()
     }
 
     fun start() {
-        mediaPlayer?.start()
+        player?.play()
     }
 
-    fun updateCurrentTime(value: Double) {
+    fun updateCurrentTime(value: Long) {
         _currentTime.update {
             value
         }
     }
 
-    fun seekTo(time: Double) {
-        mediaPlayer?.let {
-            val timeInMillis = (time * 1000).toInt()
-            it.seekTo(timeInMillis)
-            updateCurrentTime(time)
+    fun seekTo(time: Long) {
+        player?.let {
+            it.seekTo(time)
+            _currentTime.value = time
         }
     }
 
@@ -90,14 +106,18 @@ class AudioPlayerViewModel: ViewModel() {
     private fun startPeriodicUpdateJob() {
         periodicUpdateJob?.cancel()
         periodicUpdateJob = coroutineScope.launch {
-            while (isActive) {
-                val currentPosInMillis = mediaPlayer?.currentPosition
-                _currentTime.update {  currentPosInMillis?.div(1000.0) ?: 0.0 }
-                if (_currentTime.value >= totalTime.value) {
-                    // Notify next track
-                }
+            while (true) {
+                _currentTime.value = player?.currentPosition ?: 0
+                _totalTime.value = player?.duration ?: 0
                 delay(1000)
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        periodicUpdateJob?.cancel()
+        player?.release()
+        player = null
     }
 }
