@@ -1,9 +1,5 @@
 package com.coolnexttech.fireplayer.view
 
-import android.content.Context
-import android.content.Intent
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,8 +40,8 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.VSpacing16
 import com.coolnexttech.fireplayer.extensions.VSpacing8
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
+import com.coolnexttech.fireplayer.extensions.startPlayerServiceWithDelay
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.service.PlayerService
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.DialogButton
@@ -79,6 +75,7 @@ fun HomeView(
     LaunchedEffect(selectedTrackIndex) {
         if (selectedTrackIndex != -1) {
             audioPlayerViewModel.play(filteredTracks[selectedTrackIndex].path)
+            context.startPlayerServiceWithDelay()
             listState.animateScrollToItem(selectedTrackIndex)
         }
     }
@@ -114,9 +111,7 @@ fun HomeView(
                             .padding(all = 8.dp)
                             .clickable {
                                 viewModel.selectTrack(index)
-                                Handler(Looper.getMainLooper()).postDelayed({
-                                    startPlayerService(context)
-                                }, 1500)
+                                context.startPlayerServiceWithDelay()
                             },
                         color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
                     )
@@ -232,9 +227,4 @@ private fun SortOptionsAlertDialog(
             VSpacing16()
         }
     }
-}
-
-private fun startPlayerService(context: Context) {
-    val intent = Intent(context, PlayerService::class.java)
-    context.startForegroundService(intent)
 }
