@@ -53,18 +53,16 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
                         startPeriodicUpdateJob()
                     } else {
                         periodicUpdateJob?.cancel()
-
-                        if (shouldPlayNextTrack()) {
-                            homeViewModel.selectNextTrack()
-                        }
                     }
                 }
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     if (playbackState == Player.STATE_READY) {
                         _totalTime.value = duration
                         _currentTime.value = currentPosition
+                    } else if (playbackState == Player.STATE_ENDED) {
+                        homeViewModel.selectNextTrack()
                     }
-                }
+                 }
             })
         }
 
@@ -110,6 +108,8 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
         }
     }
 
+    fun isTotalTimeValid(): Boolean = totalTime.value > 2L
+
     fun toggleIconTextId(): Int {
         return if (_isPlaying.value) {
             R.string.media_control_pause_text
@@ -117,8 +117,6 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
             R.string.media_control_play_text
         }
     }
-
-    private fun shouldPlayNextTrack(): Boolean = _currentTime.value + 1000 >= _totalTime.value
 
     private fun startPeriodicUpdateJob() {
         periodicUpdateJob?.cancel()

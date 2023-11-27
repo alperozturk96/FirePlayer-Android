@@ -30,6 +30,8 @@
     <string name="media_control_previous_text">Previous</string>
     <string name="media_control_next_text">Next</string>
 
+    <string name="seek_bar_media_slider_not_available_text">Track Duration Info Not Available</string>
+
     <string name="content_unavailable_title_prefix">No results for </string>
     <string name="content_unavailable_description">Check the spelling or try a new search</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.coolnexttech.fireplayer.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +13,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,6 +22,7 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.HSpacing8
 import com.coolnexttech.fireplayer.extensions.convertToReadableTime
 import com.coolnexttech.fireplayer.ui.components.ActionButton
+import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
@@ -35,24 +36,31 @@ fun SeekbarView(
     val totalTime by audioPlayerViewModel.totalTime.collectAsState()
     val isPlaying by audioPlayerViewModel.isPlaying.collectAsState()
 
-    // When currentTime reaches totalTime, trigger next track
-    LaunchedEffect(currentTime, totalTime) {
-        if (currentTime != 0L && currentTime >= totalTime) {
-            homeViewModel.selectNextTrack()
-        }
-    }
-
     Column(
         modifier = Modifier
             .background(AppColors.alternateBackground)
-            .padding(all = 16.dp)
+            .padding(all = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
+        if (audioPlayerViewModel.isTotalTimeValid()) {
+            MediaSlider(audioPlayerViewModel, currentTime, totalTime)
+        } else {
+            MediaSliderNotAvailable()
+        }
 
-        MediaSlider(audioPlayerViewModel, currentTime, totalTime)
         MediaControl(audioPlayerViewModel, isPlaying, { homeViewModel.selectPreviousTrack() }) {
             homeViewModel.selectNextTrack()
         }
     }
+}
+
+@Composable
+private fun MediaSliderNotAvailable() {
+    HeadlineSmallText(
+        R.string.seek_bar_media_slider_not_available_text,
+        color = AppColors.unhighlight
+    )
 }
 
 @Composable
@@ -75,7 +83,6 @@ private fun MediaSlider(
 
         HSpacing8()
 
-        // FIXME fix seekto
         Slider(
             colors = SliderDefaults.colors(
                 thumbColor = AppColors.unhighlight,
