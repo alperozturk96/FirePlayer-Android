@@ -61,6 +61,13 @@ class HomeViewModel: ViewModel() {
         }
     }
 
+    fun updatePrevTracks() {
+        _prevTrackIndexesStack.update {
+            it.add(_selectedTrackIndex.value)
+            it
+        }
+    }
+
     fun selectPreviousTrack() {
         if (_prevTrackIndexesStack.value.size > 1) {
             _prevTrackIndexesStack.value.removeLast()
@@ -75,10 +82,6 @@ class HomeViewModel: ViewModel() {
     fun selectTrack(index: Int) {
         _selectedTrackIndex.update {
             index
-        }
-        _prevTrackIndexesStack.update {
-            it.add(index)
-            it
         }
     }
 
@@ -97,11 +100,13 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun search(value: String) {
+    fun updateSearchText(value: String) {
         _searchText.update {
             value
         }
+    }
 
+    fun search(value: String) {
         _filteredTracks.update {
             if (value.isEmpty()) {
                 _tracks.value.sort(SortOptions.AtoZ)

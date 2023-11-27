@@ -25,7 +25,7 @@ class FirePlayer: Application() {
         val channel = NotificationChannel(
             PlayerService.channelId,
             "MediaControl",
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_HIGH
         )
         channel.description = "Used for the media control"
 

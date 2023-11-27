@@ -63,6 +63,7 @@ fun HomeView(
     val folderAnalyzer = FolderAnalyzer(context)
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
+    val filterOption by viewModel.filterOption.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
     val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
     val listState = rememberLazyListState()
@@ -72,9 +73,18 @@ fun HomeView(
         Log.d("Home","Total Track Count: " + filteredTracks.count())
     }
 
+    LaunchedEffect(searchText) {
+        viewModel.search(searchText)
+    }
+
+    LaunchedEffect(filterOption) {
+        viewModel.search(searchText)
+    }
+
     LaunchedEffect(selectedTrackIndex) {
         if (selectedTrackIndex != -1) {
             audioPlayerViewModel.play(filteredTracks[selectedTrackIndex].path)
+            viewModel.updatePrevTracks()
             context.startPlayerServiceWithDelay()
             listState.animateScrollToItem(selectedTrackIndex)
         }
@@ -84,6 +94,7 @@ fun HomeView(
         topBar = {
             TopBar(
                 navController,
+                searchText,
                 viewModel,
                 showSortOptions = {
                     showSortOptions.value = true
@@ -102,6 +113,7 @@ fun HomeView(
                 )
             }
         } else {
+            // TODO add swipe action
             LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                 itemsIndexed(filteredTracks) { index, track ->
                     Text(
@@ -136,11 +148,11 @@ fun HomeView(
 @Composable
 private fun TopBar(
     navController: NavController,
+    searchText: String,
     viewModel: HomeViewModel,
     showSortOptions: () -> Unit,
 ) {
     val filterOption by viewModel.filterOption.collectAsState()
-    val searchText by viewModel.searchText.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
 
     TopAppBar(
@@ -149,7 +161,7 @@ private fun TopBar(
             BasicTextField(
                 value = searchText,
                 onValueChange = {
-                    viewModel.search(it)
+                    viewModel.updateSearchText(it)
                 },
                 singleLine = true,
                 decorationBox = { innerTextField ->

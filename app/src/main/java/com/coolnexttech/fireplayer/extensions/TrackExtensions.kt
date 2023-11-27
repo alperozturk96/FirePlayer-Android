@@ -6,15 +6,15 @@ import com.coolnexttech.fireplayer.model.Track
 
 fun List<Track>.sort(sortOption: SortOptions): List<Track> {
     return when(sortOption) {
-        SortOptions.AtoZ -> this.sortedBy { it.title }
-        SortOptions.ZtoA -> this.sortedByDescending { it.title }
+        SortOptions.AtoZ -> sortedBy { it.title }
+        SortOptions.ZtoA -> sortedByDescending { it.title }
     }
 }
 
 fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
     return when(filterOption) {
-        FilterOptions.Title -> this.filter { it.title.contains(text, ignoreCase = true) }
-        FilterOptions.Artist -> this.filter { it.artist.contains(text, ignoreCase = true) }
-        FilterOptions.Album -> this.filter { it.album.contains(text, ignoreCase = true) }
+        FilterOptions.Title -> filter { it.title.contains(text, ignoreCase = true) }
+        FilterOptions.Artist -> filter { it.artist.contains(text, ignoreCase = true) }
+        FilterOptions.Album -> filter { it.album.contains(text, ignoreCase = true) }
     }
 }

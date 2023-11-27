@@ -27,7 +27,6 @@
         <activity
             android:name=".app.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.FirePlayer"
             tools:ignore="LockedOrientationActivity">
