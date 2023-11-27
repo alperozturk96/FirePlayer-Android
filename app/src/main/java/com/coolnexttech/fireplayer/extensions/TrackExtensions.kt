@@ -12,9 +12,10 @@ fun List<Track>.sort(sortOption: SortOptions): List<Track> {
 }
 
 fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
+    val normalizedText = text.normalize()
     return when(filterOption) {
-        FilterOptions.Title -> filter { it.title.contains(text, ignoreCase = true) }
-        FilterOptions.Artist -> filter { it.artist.contains(text, ignoreCase = true) }
-        FilterOptions.Album -> filter { it.album.contains(text, ignoreCase = true) }
+        FilterOptions.Title -> filter { it.title.normalize().contains(normalizedText, ignoreCase = true) }
+        FilterOptions.Artist -> filter { it.artist.normalize().contains(normalizedText, ignoreCase = true) }
+        FilterOptions.Album -> filter { it.album.normalize().contains(normalizedText, ignoreCase = true) }
     }
 }

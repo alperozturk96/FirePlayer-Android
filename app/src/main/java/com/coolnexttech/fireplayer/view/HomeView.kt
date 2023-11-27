@@ -101,7 +101,9 @@ fun HomeView(
                 })
         },
         bottomBar = {
-            SeekbarView(audioPlayerViewModel, viewModel)
+            if (selectedTrackIndex != -1) {
+                SeekbarView(audioPlayerViewModel, viewModel)
+            }
         }) {
         if (filteredTracks.isEmpty()) {
             if (searchText.isNotEmpty()) {
