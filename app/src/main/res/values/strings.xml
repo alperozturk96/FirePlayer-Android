@@ -25,6 +25,11 @@
     <string name="playlists_content_unavailable_text">You dont have any playlist yet</string>
     <string name="playlists_content_unavailable_title">No playlists</string>
 
+    <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
+    <string name="playlist_screen_add_playlist_placeholder">Title</string>
+
+
+
     <string name="media_control_play_text">Play</string>
     <string name="media_control_pause_text">Pause</string>
     <string name="media_control_previous_text">Previous</string>

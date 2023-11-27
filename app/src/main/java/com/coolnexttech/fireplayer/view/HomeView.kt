@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.VSpacing16
 import com.coolnexttech.fireplayer.extensions.VSpacing8
@@ -55,7 +55,7 @@ import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 
 @Composable
 fun HomeView(
-    navController: NavController,
+    navController: NavHostController,
     viewModel: HomeViewModel,
     audioPlayerViewModel: AudioPlayerViewModel
 ) {
@@ -149,7 +149,7 @@ fun HomeView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
-    navController: NavController,
+    navController: NavHostController,
     searchText: String,
     viewModel: HomeViewModel,
     showSortOptions: () -> Unit,
@@ -182,7 +182,7 @@ private fun TopBar(
         },
         actions = {
             ActionButton(R.drawable.ic_playlists) {
-                navController.navigate(Destinations.Playlists)
+                Destinations.navigateToPlaylists(false, navController)
             }
 
             ActionButton(filterOption.filterOptionIconId()) {

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.view.WindowManager
@@ -55,7 +56,11 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         val mediaButtonFilter = IntentFilter(Intent.ACTION_MEDIA_BUTTON)
-        registerReceiver(mediaButtonReceiver, mediaButtonFilter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(mediaButtonReceiver, mediaButtonFilter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(mediaButtonReceiver, mediaButtonFilter)
+        }
     }
 
     override fun onDestroy() {
@@ -66,7 +71,11 @@ class MainActivity : ComponentActivity() {
 
     private fun registerCallReceiver() {
         val filter = IntentFilter(Intent.ACTION_CALL)
-        registerReceiver(callReceiver, filter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(callReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(callReceiver, filter)
+        }
     }
 
     private fun acquireWakeLock(context: Context) {
