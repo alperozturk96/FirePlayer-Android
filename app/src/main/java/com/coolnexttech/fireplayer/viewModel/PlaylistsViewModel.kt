@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.coolnexttech.fireplayer.extensions.add
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.Playlists
+import com.coolnexttech.fireplayer.ui.navigation.NavigationArgs
 import com.coolnexttech.fireplayer.util.UserStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.update
 
 class PlaylistsViewModel: ViewModel() {
 
-    private val _playlistViewMode = MutableStateFlow(PlaylistViewMode.Add)
+    private val _playlistViewMode = MutableStateFlow(NavigationArgs.playlistViewMode)
     val playlistViewMode: StateFlow<PlaylistViewMode> = _playlistViewMode
 
     private val _playlists = MutableStateFlow<Playlists>(hashMapOf())
@@ -23,12 +24,6 @@ class PlaylistsViewModel: ViewModel() {
     fun initUserStorage(context: Context) {
         storage = UserStorage(context)
         readPlaylists()
-    }
-
-    fun initPlaylistViewMode(value: PlaylistViewMode) {
-        _playlistViewMode.update {
-            value
-        }
     }
 
     private fun readPlaylists() {
@@ -42,6 +37,21 @@ class PlaylistsViewModel: ViewModel() {
             it.add(title)
             storage?.savePlaylists(it)
             it
+        }
+    }
+
+    fun addTrackToPlaylist(trackTitle: String, playlistTitle: String) {
+        _playlists.update {
+            it[playlistTitle]?.add(trackTitle)
+            storage?.savePlaylists(it)
+            it
+        }
+    }
+
+    fun selectPlaylist(playlistTitle: String) {
+        val homeViewModel = ViewModelProvider.getHomeViewModel()
+        storage?.let {
+            homeViewModel.selectPlaylist(playlistTitle, it)
         }
     }
 

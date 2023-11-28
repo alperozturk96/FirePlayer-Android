@@ -1,8 +1,9 @@
 package com.coolnexttech.fireplayer.view
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -41,6 +42,7 @@ import com.coolnexttech.fireplayer.extensions.VSpacing16
 import com.coolnexttech.fireplayer.extensions.VSpacing8
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.extensions.startPlayerServiceWithDelay
+import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
@@ -50,9 +52,11 @@ import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.navigation.Destinations
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
+import com.coolnexttech.fireplayer.util.UserStorage
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeView(
     navController: NavHostController,
@@ -60,6 +64,7 @@ fun HomeView(
     audioPlayerViewModel: AudioPlayerViewModel
 ) {
     val context = LocalContext.current
+    val userStorage = UserStorage(context)
     val folderAnalyzer = FolderAnalyzer(context)
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
@@ -70,7 +75,7 @@ fun HomeView(
 
     LaunchedEffect(Unit) {
         viewModel.initTrackList(folderAnalyzer)
-        Log.d("Home","Total Track Count: " + filteredTracks.count())
+        Log.d("Home", "Total Track Count: " + filteredTracks.count())
     }
 
     LaunchedEffect(searchText) {
@@ -115,7 +120,6 @@ fun HomeView(
                 )
             }
         } else {
-            // TODO add swipe action
             LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                 itemsIndexed(filteredTracks) { index, track ->
                     Text(
@@ -123,9 +127,16 @@ fun HomeView(
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier
                             .padding(all = 8.dp)
-                            .clickable {
-                                viewModel.selectTrack(index)
-                            },
+                            .combinedClickable(
+                                onClick = { viewModel.selectTrack(index) },
+                                onLongClick = {
+                                    Destinations.navigateToPlaylists(
+                                        PlaylistViewMode.Add,
+                                        track.title,
+                                        navController
+                                    )
+                                },
+                            ),
                         color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
                     )
 
@@ -182,7 +193,7 @@ private fun TopBar(
         },
         actions = {
             ActionButton(R.drawable.ic_playlists) {
-                Destinations.navigateToPlaylists(false, navController)
+                Destinations.navigateToPlaylists(PlaylistViewMode.Select, "", navController)
             }
 
             ActionButton(filterOption.filterOptionIconId()) {

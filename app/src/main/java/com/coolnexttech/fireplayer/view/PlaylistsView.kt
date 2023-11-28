@@ -1,5 +1,7 @@
 package com.coolnexttech.fireplayer.view
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,7 +41,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
 
 @Composable
-fun PlaylistsView(navController: NavController, viewModel: PlaylistsViewModel) {
+fun PlaylistsView(trackTitle: String, navController: NavController, viewModel: PlaylistsViewModel) {
     val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
     val playlistViewMode by viewModel.playlistViewMode.collectAsState()
@@ -55,20 +57,22 @@ fun PlaylistsView(navController: NavController, viewModel: PlaylistsViewModel) {
         LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
             val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
             itemsIndexed(sortedPlaylists) { _, entry ->
-                val (title, value) = entry
+                val (playlistTitle, value) = entry
 
                 Text(
-                    text = title,
+                    text = playlistTitle,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .padding(all = 8.dp)
                         .clickable {
+                            // TODO use Room
                             if (playlistViewMode == PlaylistViewMode.Add) {
-                                // TODO add selected track to playlist
+                                viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
                             } else {
-                                // TODO navigate back with playlist
-                                navController.popBackStack()
+                                viewModel.selectPlaylist(playlistTitle)
                             }
+
+                            navController.popBackStack()
                         },
                     color = AppColors.textColor
                 )

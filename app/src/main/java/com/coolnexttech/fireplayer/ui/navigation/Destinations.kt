@@ -1,15 +1,20 @@
 package com.coolnexttech.fireplayer.ui.navigation
 
 import androidx.navigation.NavHostController
+import com.coolnexttech.fireplayer.model.PlaylistViewMode
 
 object Destinations {
     const val Home = "Home"
     const val Playlists = "Playlists"
 
     fun navigateToPlaylists(
-        isAdd: Boolean,
+        playlistViewMode: PlaylistViewMode,
+        trackTitle: String,
         navController: NavHostController
     ) {
-        navController.navigate("$Playlists/${isAdd}")
+        NavigationArgs.playlistViewMode = playlistViewMode
+        NavigationArgs.trackTitle = trackTitle
+
+        navController.navigate(Playlists)
     }
 }

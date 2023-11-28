@@ -19,3 +19,7 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
         FilterOptions.Album -> filter { it.album.normalize().contains(normalizedText, ignoreCase = true) }
     }
 }
+
+fun List<Track>.filterByPlaylist(titles: ArrayList<String>): List<Track> {
+    return this.filter { track -> track.title in titles }
+}
