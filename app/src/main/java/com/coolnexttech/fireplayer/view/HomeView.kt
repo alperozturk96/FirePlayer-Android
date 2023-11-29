@@ -79,11 +79,16 @@ fun HomeView(
     }
 
     LaunchedEffect(selectedTrackIndex) {
-        if (selectedTrackIndex != -1) {
-            audioPlayerViewModel.play(filteredTracks[selectedTrackIndex].path)
-            viewModel.updatePrevTracks()
-            context.startPlayerServiceWithDelay()
-            listState.animateScrollToItem(selectedTrackIndex)
+        selectedTrackIndex?.let {
+            val isInBounds = it >= 0 && it < filteredTracks.size
+            if (isInBounds) {
+                audioPlayerViewModel.play(filteredTracks[it].path)
+                viewModel.updatePrevTracks()
+                context.startPlayerServiceWithDelay()
+                listState.animateScrollToItem(it)
+            } else {
+                audioPlayerViewModel.stop()
+            }
         }
     }
 

@@ -91,6 +91,10 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
         player?.pause()
     }
 
+    fun stop() {
+        player?.stop()
+    }
+
     fun start() {
         player?.play()
     }

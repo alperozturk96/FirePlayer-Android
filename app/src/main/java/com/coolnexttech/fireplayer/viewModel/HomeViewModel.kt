@@ -28,8 +28,8 @@ class HomeViewModel: ViewModel() {
     private val _playMode = MutableStateFlow(PlayMode.Shuffle)
     val playMode: StateFlow<PlayMode> = _playMode
 
-    private val _selectedTrackIndex = MutableStateFlow(-1)
-    val selectedTrackIndex: StateFlow<Int> = _selectedTrackIndex
+    private val _selectedTrackIndex: MutableStateFlow<Int?> = MutableStateFlow(null)
+    val selectedTrackIndex: StateFlow<Int?> = _selectedTrackIndex
 
     private val _prevTrackIndexesStack = MutableStateFlow<ArrayList<Int>>(arrayListOf())
 
@@ -70,7 +70,7 @@ class HomeViewModel: ViewModel() {
 
     fun updatePrevTracks() {
         _prevTrackIndexesStack.update {
-            it.add(_selectedTrackIndex.value)
+            _selectedTrackIndex.value?.let { index -> it.add(index) }
             it
         }
     }
@@ -103,9 +103,13 @@ class HomeViewModel: ViewModel() {
             return
         }
 
+        if (_selectedTrackIndex.value == null) {
+            return
+        }
+
         val nextIndex = when (_playMode.value) {
             PlayMode.Shuffle -> _filteredTracks.value.indices.random()
-            PlayMode.Sequential -> (_selectedTrackIndex.value + 1).takeIf { it < _filteredTracks.value.size } ?: 0
+            PlayMode.Sequential -> (_selectedTrackIndex.value!! + 1).takeIf { it < _filteredTracks.value.size } ?: 0
         }
 
         _selectedTrackIndex.update {
@@ -139,7 +143,12 @@ class HomeViewModel: ViewModel() {
     }
 
     fun currentTrackTitle(): String {
-        return _filteredTracks.value[_selectedTrackIndex.value].title
+        val index = _selectedTrackIndex.value
+        return if (index != null) {
+            _filteredTracks.value[index].title
+        } else {
+            ""
+        }
     }
 
 }
