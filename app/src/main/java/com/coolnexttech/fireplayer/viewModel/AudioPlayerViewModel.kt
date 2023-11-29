@@ -37,7 +37,7 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
-    private val homeViewModel = ViewModelProvider.getHomeViewModel()
+    private val homeViewModel = ViewModelProvider.homeViewModel
 
     private val audioAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)

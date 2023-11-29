@@ -14,8 +14,8 @@ import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 class PlayerService : Service() {
-    private val homeViewModel = ViewModelProvider.getHomeViewModel()
-    private val audioPlayerViewModel = ViewModelProvider.getAudioPlayerViewModel()
+    private val homeViewModel = ViewModelProvider.homeViewModel
+    private val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel
 
     companion object {
         const val notificationId = 1

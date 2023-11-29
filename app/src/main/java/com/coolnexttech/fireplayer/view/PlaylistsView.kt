@@ -35,10 +35,11 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
-import com.coolnexttech.fireplayer.ui.components.ActionButton
+import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
+import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 class PlaylistsView(
     private val trackTitle: String?,
@@ -75,15 +76,19 @@ class PlaylistsView(
                         modifier = Modifier
                             .padding(all = 8.dp)
                             .clickable {
-                                // TODO use Room
                                 if (playlistViewMode == PlaylistViewMode.Add) {
                                     if (trackTitle != null) {
                                         viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
                                     }
                                     navigator?.pop()
                                 } else {
-                                    viewModel.selectPlaylist(playlistTitle)
-                                    navigator?.popAll()
+                                    navigator?.replaceAll(
+                                        HomeView(
+                                            playlistTitle,
+                                            ViewModelProvider.homeViewModel,
+                                            ViewModelProvider.audioPlayerViewModel
+                                        )
+                                    )
                                 }
                             },
                         color = AppColors.textColor
@@ -112,7 +117,7 @@ private fun TopBar(showAddPlaylist: () -> Unit) {
             HeadlineMediumText(text = stringResource(id = R.string.playlists_title))
         },
         actions = {
-            ActionButton(R.drawable.ic_add_playlist) {
+            ActionIconButton(R.drawable.ic_add_playlist) {
                 showAddPlaylist()
             }
         }

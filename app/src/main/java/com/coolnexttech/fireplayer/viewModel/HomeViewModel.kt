@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.coolnexttech.fireplayer.extensions.filter
 import com.coolnexttech.fireplayer.extensions.filterByPlaylist
+import com.coolnexttech.fireplayer.extensions.isTrackAvailable
 import com.coolnexttech.fireplayer.extensions.sort
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
@@ -88,7 +89,7 @@ class HomeViewModel: ViewModel() {
 
     fun selectTrack(index: Int) {
         if (index == _selectedTrackIndex.value) {
-            val audioPlayerViewModel = ViewModelProvider.getAudioPlayerViewModel()
+            val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel
             val track = _tracks[index]
             audioPlayerViewModel.play(track.path)
         } else {
@@ -143,12 +144,11 @@ class HomeViewModel: ViewModel() {
     }
 
     fun currentTrackTitle(): String {
-        val index = _selectedTrackIndex.value
-        return if (index != null) {
+        val index = _selectedTrackIndex.value ?: return ""
+        return if (_filteredTracks.value.isTrackAvailable()) {
             _filteredTracks.value[index].title
         } else {
             ""
         }
     }
-
 }

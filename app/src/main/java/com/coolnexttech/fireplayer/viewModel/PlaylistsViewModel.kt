@@ -53,13 +53,6 @@ class PlaylistsViewModel: ViewModel() {
         }
     }
 
-    fun selectPlaylist(playlistTitle: String) {
-        val homeViewModel = ViewModelProvider.getHomeViewModel()
-        storage?.let {
-            homeViewModel.selectPlaylist(playlistTitle, it)
-        }
-    }
-
     fun removePlaylist(title: String) {
         _playlists.update {
             it.remove(title)

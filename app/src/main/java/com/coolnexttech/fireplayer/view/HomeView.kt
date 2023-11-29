@@ -42,10 +42,11 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.VSpacing16
 import com.coolnexttech.fireplayer.extensions.VSpacing8
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
+import com.coolnexttech.fireplayer.extensions.isTrackAvailable
 import com.coolnexttech.fireplayer.extensions.startPlayerServiceWithDelay
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.ui.components.ActionButton
+import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.DialogButton
 import com.coolnexttech.fireplayer.ui.components.Drawable
@@ -89,8 +90,7 @@ class HomeView(
 
         LaunchedEffect(selectedTrackIndex) {
             selectedTrackIndex?.let {
-                val isInBounds = it >= 0 && it < filteredTracks.size
-                if (isInBounds) {
+                if (filteredTracks.isTrackAvailable()) {
                     audioPlayerViewModel.play(filteredTracks[it].path)
                     viewModel.updatePrevTracks()
                     context.startPlayerServiceWithDelay()
@@ -112,7 +112,7 @@ class HomeView(
                     })
             },
             bottomBar = {
-                if (selectedTrackIndex != -1) {
+                selectedTrackIndex?.let {
                     SeekbarView(audioPlayerViewModel, viewModel)
                 }
             }) {
@@ -140,7 +140,7 @@ class HomeView(
                                             PlaylistsView(
                                                 track.title,
                                                 PlaylistViewMode.Add,
-                                                ViewModelProvider.getPlaylistViewModel()
+                                                ViewModelProvider.playlistViewModel
                                             )
                                         )
                                     },
@@ -203,29 +203,29 @@ private fun TopBar(
             )
         },
         actions = {
-            ActionButton(R.drawable.ic_playlists) {
+            ActionIconButton(R.drawable.ic_playlists) {
                 navigator?.push(
                     PlaylistsView(
                         null,
                         PlaylistViewMode.Select,
-                        ViewModelProvider.getPlaylistViewModel()
+                        ViewModelProvider.playlistViewModel
                     )
                 )
             }
 
-            ActionButton(filterOption.filterOptionIconId()) {
+            ActionIconButton(filterOption.filterOptionIconId()) {
                 viewModel.changeFilterOption()
             }
 
-            ActionButton(playMode.getIconId()) {
+            ActionIconButton(playMode.getIconId()) {
                 viewModel.changePlayMode()
             }
 
-            ActionButton(R.drawable.ic_sort) {
+            ActionIconButton(R.drawable.ic_sort) {
                 showSortOptions()
             }
 
-            ActionButton(R.drawable.ic_reset) {
+            ActionIconButton(R.drawable.ic_reset) {
                 viewModel.initTrackList(folderAnalyzer, null)
             }
         }

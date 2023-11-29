@@ -20,8 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.HSpacing8
+import com.coolnexttech.fireplayer.extensions.VSpacing8
 import com.coolnexttech.fireplayer.extensions.convertToReadableTime
-import com.coolnexttech.fireplayer.ui.components.ActionButton
+import com.coolnexttech.fireplayer.ui.components.ActionImageButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
@@ -48,6 +49,8 @@ fun SeekbarView(
         } else {
             MediaSliderNotAvailable()
         }
+
+        VSpacing8()
 
         MediaControl(audioPlayerViewModel, isPlaying, { homeViewModel.selectPreviousTrack() }) {
             homeViewModel.selectNextTrack()
@@ -120,19 +123,24 @@ private fun MediaControl(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        ActionButton(R.drawable.ic_previous) {
+        ActionImageButton(R.drawable.ic_previous) {
             selectPreviousTrack()
         }
 
-        ActionButton(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play) {
+        HSpacing8()
+
+        ActionImageButton(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play, size = 40.dp) {
             audioPlayerViewModel.togglePlayPause()
         }
 
-        ActionButton(R.drawable.ic_next) {
+        HSpacing8()
+
+        ActionImageButton(R.drawable.ic_next) {
             selectNextTrack()
         }
 

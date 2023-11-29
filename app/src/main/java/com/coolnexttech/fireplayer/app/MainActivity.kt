@@ -47,8 +47,8 @@ class MainActivity : ComponentActivity() {
                     Navigator(
                         HomeView(
                             null,
-                            ViewModelProvider.getHomeViewModel(),
-                            ViewModelProvider.getAudioPlayerViewModel()
+                            ViewModelProvider.homeViewModel,
+                            ViewModelProvider.audioPlayerViewModel
                         )
                     )
                 }
