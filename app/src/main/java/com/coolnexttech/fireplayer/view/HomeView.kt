@@ -36,7 +36,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavHostController
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.VSpacing16
 import com.coolnexttech.fireplayer.extensions.VSpacing8
@@ -49,108 +50,118 @@ import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.DialogButton
 import com.coolnexttech.fireplayer.ui.components.Drawable
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
-import com.coolnexttech.fireplayer.ui.navigation.Destinations
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
+import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun HomeView(
-    navController: NavHostController,
-    viewModel: HomeViewModel,
-    audioPlayerViewModel: AudioPlayerViewModel
-) {
-    val context = LocalContext.current
-    val filteredTracks by viewModel.filteredTracks.collectAsState()
-    val searchText by viewModel.searchText.collectAsState()
-    val filterOption by viewModel.filterOption.collectAsState()
-    val showSortOptions = remember { mutableStateOf(false) }
-    val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
-    val listState = rememberLazyListState()
+class HomeView(
+    private val selectedPlaylistTitle: String?,
+    private val viewModel: HomeViewModel,
+    private val audioPlayerViewModel: AudioPlayerViewModel
+) : Screen {
 
-    LaunchedEffect(searchText) {
-        viewModel.search(searchText)
-    }
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.current
+        val context = LocalContext.current
+        val folderAnalyzer = FolderAnalyzer(context)
+        val filteredTracks by viewModel.filteredTracks.collectAsState()
+        val searchText by viewModel.searchText.collectAsState()
+        val filterOption by viewModel.filterOption.collectAsState()
+        val showSortOptions = remember { mutableStateOf(false) }
+        val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
+        val listState = rememberLazyListState()
 
-    LaunchedEffect(filterOption) {
-        viewModel.search(searchText)
-    }
-
-    LaunchedEffect(selectedTrackIndex) {
-        selectedTrackIndex?.let {
-            val isInBounds = it >= 0 && it < filteredTracks.size
-            if (isInBounds) {
-                audioPlayerViewModel.play(filteredTracks[it].path)
-                viewModel.updatePrevTracks()
-                context.startPlayerServiceWithDelay()
-                listState.animateScrollToItem(it)
-            } else {
-                audioPlayerViewModel.stop()
-            }
+        LaunchedEffect(Unit) {
+            viewModel.initTrackList(folderAnalyzer, selectedPlaylistTitle)
         }
-    }
 
-    Scaffold(
-        topBar = {
-            TopBar(
-                context,
-                navController,
-                searchText,
-                viewModel,
-                showSortOptions = {
-                    showSortOptions.value = true
-                })
-        },
-        bottomBar = {
-            if (selectedTrackIndex != -1) {
-                SeekbarView(audioPlayerViewModel, viewModel)
-            }
-        }) {
-        if (filteredTracks.isEmpty()) {
-            if (searchText.isNotEmpty()) {
-                ContentUnavailableView(titleSuffix = searchText)
-            } else {
-                ContentUnavailableView(
-                    titleSuffix = null,
-                    title = stringResource(R.string.home_content_not_available_text)
-                )
-            }
-        } else {
-            LazyColumn(state = listState, modifier = Modifier.padding(it)) {
-                itemsIndexed(filteredTracks) { index, track ->
-                    Text(
-                        text = track.title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .padding(all = 8.dp)
-                            .combinedClickable(
-                                onClick = { viewModel.selectTrack(index) },
-                                onLongClick = {
-                                    Destinations.navigateToPlaylists(
-                                        PlaylistViewMode.Add,
-                                        track.title,
-                                        navController
-                                    )
-                                },
-                            ),
-                        color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
-                    )
+        LaunchedEffect(searchText) {
+            viewModel.search(searchText)
+        }
 
-                    Divider()
+        LaunchedEffect(filterOption) {
+            viewModel.search(searchText)
+        }
+
+        LaunchedEffect(selectedTrackIndex) {
+            selectedTrackIndex?.let {
+                val isInBounds = it >= 0 && it < filteredTracks.size
+                if (isInBounds) {
+                    audioPlayerViewModel.play(filteredTracks[it].path)
+                    viewModel.updatePrevTracks()
+                    context.startPlayerServiceWithDelay()
+                    listState.animateScrollToItem(it)
+                } else {
+                    audioPlayerViewModel.stop()
                 }
             }
+        }
 
-            if (showSortOptions.value) {
-                SortOptionsAlertDialog(
-                    dismiss = { showSortOptions.value = false },
-                    sortByTitle = { sortOption ->
-                        viewModel.sort(sortOption)
-                        showSortOptions.value = false
+        Scaffold(
+            topBar = {
+                TopBar(
+                    context,
+                    searchText,
+                    viewModel,
+                    showSortOptions = {
+                        showSortOptions.value = true
                     })
-            }
+            },
+            bottomBar = {
+                if (selectedTrackIndex != -1) {
+                    SeekbarView(audioPlayerViewModel, viewModel)
+                }
+            }) {
+            if (filteredTracks.isEmpty()) {
+                if (searchText.isNotEmpty()) {
+                    ContentUnavailableView(titleSuffix = searchText)
+                } else {
+                    ContentUnavailableView(
+                        titleSuffix = null,
+                        title = stringResource(R.string.home_content_not_available_text)
+                    )
+                }
+            } else {
+                LazyColumn(state = listState, modifier = Modifier.padding(it)) {
+                    itemsIndexed(filteredTracks) { index, track ->
+                        Text(
+                            text = track.title,
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier
+                                .padding(all = 8.dp)
+                                .combinedClickable(
+                                    onClick = { viewModel.selectTrack(index) },
+                                    onLongClick = {
+                                        navigator?.push(
+                                            PlaylistsView(
+                                                track.title,
+                                                PlaylistViewMode.Add,
+                                                ViewModelProvider.getPlaylistViewModel()
+                                            )
+                                        )
+                                    },
+                                ),
+                            color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
+                        )
 
+                        Divider()
+                    }
+                }
+
+                if (showSortOptions.value) {
+                    SortOptionsAlertDialog(
+                        dismiss = { showSortOptions.value = false },
+                        sortByTitle = { sortOption ->
+                            viewModel.sort(sortOption)
+                            showSortOptions.value = false
+                        })
+                }
+
+            }
         }
     }
 }
@@ -159,11 +170,11 @@ fun HomeView(
 @Composable
 private fun TopBar(
     context: Context,
-    navController: NavHostController,
     searchText: String,
     viewModel: HomeViewModel,
     showSortOptions: () -> Unit,
 ) {
+    val navigator = LocalNavigator.current
     val filterOption by viewModel.filterOption.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
     val folderAnalyzer = FolderAnalyzer(context)
@@ -193,7 +204,13 @@ private fun TopBar(
         },
         actions = {
             ActionButton(R.drawable.ic_playlists) {
-                Destinations.navigateToPlaylists(PlaylistViewMode.Select, "", navController)
+                navigator?.push(
+                    PlaylistsView(
+                        null,
+                        PlaylistViewMode.Select,
+                        ViewModelProvider.getPlaylistViewModel()
+                    )
+                )
             }
 
             ActionButton(filterOption.filterOptionIconId()) {

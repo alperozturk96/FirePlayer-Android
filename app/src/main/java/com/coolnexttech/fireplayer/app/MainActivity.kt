@@ -15,14 +15,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
-import com.coolnexttech.fireplayer.ui.navigation.Destinations
-import com.coolnexttech.fireplayer.ui.navigation.Navigation
+import cafe.adriel.voyager.navigator.Navigator
 import com.coolnexttech.fireplayer.ui.theme.FirePlayerTheme
 import com.coolnexttech.fireplayer.util.CallReceiver
 import com.coolnexttech.fireplayer.util.MediaButtonReceiver
 import com.coolnexttech.fireplayer.util.PermissionManager
-
+import com.coolnexttech.fireplayer.view.HomeView
+import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
     private val permissionManager = PermissionManager(this)
@@ -45,8 +44,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    Navigation(navController, startDestination = Destinations.Home)
+                    Navigator(
+                        HomeView(
+                            null,
+                            ViewModelProvider.getHomeViewModel(),
+                            ViewModelProvider.getAudioPlayerViewModel()
+                        )
+                    )
                 }
             }
         }
@@ -82,7 +86,7 @@ class MainActivity : ComponentActivity() {
         val wakeLock = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock.run {
             newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FirePlayer::WakeLock").apply {
-                acquire(60*60*1000L)
+                acquire(60 * 60 * 1000L)
             }
         }
     }

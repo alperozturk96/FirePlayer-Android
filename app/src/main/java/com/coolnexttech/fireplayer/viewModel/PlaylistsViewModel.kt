@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import com.coolnexttech.fireplayer.extensions.add
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.Playlists
-import com.coolnexttech.fireplayer.ui.navigation.NavigationArgs
 import com.coolnexttech.fireplayer.util.UserStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +12,7 @@ import kotlinx.coroutines.flow.update
 
 class PlaylistsViewModel: ViewModel() {
 
-    private val _playlistViewMode = MutableStateFlow(NavigationArgs.playlistViewMode)
+    private val _playlistViewMode = MutableStateFlow(PlaylistViewMode.Add)
     val playlistViewMode: StateFlow<PlaylistViewMode> = _playlistViewMode
 
     private val _playlists = MutableStateFlow<Playlists>(hashMapOf())
@@ -24,6 +23,12 @@ class PlaylistsViewModel: ViewModel() {
     fun initUserStorage(context: Context) {
         storage = UserStorage(context)
         readPlaylists()
+    }
+
+    fun initPlaylistViewMode(playlistViewMode: PlaylistViewMode) {
+        _playlistViewMode.update {
+            playlistViewMode
+        }
     }
 
     private fun readPlaylists() {

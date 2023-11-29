@@ -60,7 +60,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc10")
 
     // Media3 ExoPlayer
     implementation("androidx.media3:media3-exoplayer:1.2.0")
