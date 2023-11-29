@@ -7,6 +7,16 @@ object Destinations {
     const val Home = "Home"
     const val Playlists = "Playlists"
 
+    fun navigateToHomeWithPlaylist(selectedPlaylist: String, navController: NavHostController) {
+        NavigationArgs.selectedPlaylistTitle = selectedPlaylist
+        navController.navigate(Home) {
+            popUpTo(Home) {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
+    }
+
     fun navigateToPlaylists(
         playlistViewMode: PlaylistViewMode,
         trackTitle: String,

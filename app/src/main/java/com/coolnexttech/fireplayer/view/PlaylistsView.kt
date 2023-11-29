@@ -1,7 +1,5 @@
 package com.coolnexttech.fireplayer.view
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,16 +30,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ActionButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
+import com.coolnexttech.fireplayer.ui.navigation.Destinations
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
 
 @Composable
-fun PlaylistsView(trackTitle: String, navController: NavController, viewModel: PlaylistsViewModel) {
+fun PlaylistsView(trackTitle: String, navController: NavHostController, viewModel: PlaylistsViewModel) {
     val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
     val playlistViewMode by viewModel.playlistViewMode.collectAsState()
@@ -68,11 +68,11 @@ fun PlaylistsView(trackTitle: String, navController: NavController, viewModel: P
                             // TODO use Room
                             if (playlistViewMode == PlaylistViewMode.Add) {
                                 viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
+                                navController.popBackStack()
                             } else {
                                 viewModel.selectPlaylist(playlistTitle)
+                                Destinations.navigateToHomeWithPlaylist(playlistTitle, navController)
                             }
-
-                            navController.popBackStack()
                         },
                     color = AppColors.textColor
                 )

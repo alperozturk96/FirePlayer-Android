@@ -1,6 +1,6 @@
 package com.coolnexttech.fireplayer.view
 
-import android.util.Log
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -52,7 +52,6 @@ import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.navigation.Destinations
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
-import com.coolnexttech.fireplayer.util.UserStorage
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 
@@ -64,19 +63,12 @@ fun HomeView(
     audioPlayerViewModel: AudioPlayerViewModel
 ) {
     val context = LocalContext.current
-    val userStorage = UserStorage(context)
-    val folderAnalyzer = FolderAnalyzer(context)
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val filterOption by viewModel.filterOption.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
     val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
     val listState = rememberLazyListState()
-
-    LaunchedEffect(Unit) {
-        viewModel.initTrackList(folderAnalyzer)
-        Log.d("Home", "Total Track Count: " + filteredTracks.count())
-    }
 
     LaunchedEffect(searchText) {
         viewModel.search(searchText)
@@ -98,6 +90,7 @@ fun HomeView(
     Scaffold(
         topBar = {
             TopBar(
+                context,
                 navController,
                 searchText,
                 viewModel,
@@ -160,6 +153,7 @@ fun HomeView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
+    context: Context,
     navController: NavHostController,
     searchText: String,
     viewModel: HomeViewModel,
@@ -167,6 +161,7 @@ private fun TopBar(
 ) {
     val filterOption by viewModel.filterOption.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
+    val folderAnalyzer = FolderAnalyzer(context)
 
     TopAppBar(
         colors = getTopAppBarColor(),
@@ -206,6 +201,10 @@ private fun TopBar(
 
             ActionButton(R.drawable.ic_sort) {
                 showSortOptions()
+            }
+
+            ActionButton(R.drawable.ic_reset) {
+                viewModel.initTrackList(folderAnalyzer, null)
             }
         }
     )

@@ -6,12 +6,27 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
+import com.coolnexttech.fireplayer.extensions.filterByPlaylist
+import com.coolnexttech.fireplayer.extensions.sort
+import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import java.io.File
 
 class FolderAnalyzer(private val context: Context) {
 
     private val unsupportedFileFormats = listOf("dsf")
+    private val userStorage = UserStorage(context)
+
+    fun getTracksFromPlaylist(selectedPlaylistTitle: String): List<Track> {
+        val tracks = getTracksFromMusicFolder()
+        val playlists = userStorage.readPlaylists()
+        val selectedPlaylist = playlists[selectedPlaylistTitle]
+        return if (selectedPlaylist != null) {
+            tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AtoZ)
+        } else {
+            listOf()
+        }
+    }
 
     fun getTracksFromMusicFolder(): ArrayList<Track> {
         val result = arrayListOf<Track>()

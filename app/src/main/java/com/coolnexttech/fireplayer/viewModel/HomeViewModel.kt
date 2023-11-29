@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.coolnexttech.fireplayer.extensions.filter
 import com.coolnexttech.fireplayer.extensions.filterByPlaylist
@@ -35,14 +36,18 @@ class HomeViewModel: ViewModel() {
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
 
-    fun initTrackList(folderAnalyzer: FolderAnalyzer) {
-        if (_tracks.isEmpty()) {
-            _tracks = folderAnalyzer.getTracksFromMusicFolder()
-
-            _filteredTracks.update {
-                _tracks
-            }
+    fun initTrackList(folderAnalyzer: FolderAnalyzer, selectedPlaylistTitle: String?) {
+        _tracks = if (selectedPlaylistTitle == null) {
+            folderAnalyzer.getTracksFromMusicFolder()
+        } else {
+            folderAnalyzer.getTracksFromPlaylist(selectedPlaylistTitle)
         }
+
+        _filteredTracks.update {
+            _tracks
+        }
+
+        Log.d("Home", "Total Track Count: " + _tracks.count())
     }
 
     fun sort(sortOption: SortOptions) {
