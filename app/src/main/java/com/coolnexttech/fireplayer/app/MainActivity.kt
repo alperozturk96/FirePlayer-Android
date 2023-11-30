@@ -15,14 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.navigator.Navigator
+import com.coolnexttech.fireplayer.ui.navigation.NavHostScreen
 import com.coolnexttech.fireplayer.ui.theme.FirePlayerTheme
 import com.coolnexttech.fireplayer.util.CallReceiver
-import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.util.MediaButtonReceiver
 import com.coolnexttech.fireplayer.util.PermissionManager
-import com.coolnexttech.fireplayer.view.HomeView
-import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
     private val permissionManager = PermissionManager(this)
@@ -45,17 +42,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val homeViewModel = ViewModelProvider.homeViewModel
-                    val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel
-                    val folderAnalyzer = FolderAnalyzer(this)
-                    homeViewModel.initTrackList(folderAnalyzer, null)
-
-                    Navigator(
-                        HomeView(
-                            homeViewModel,
-                            audioPlayerViewModel
-                        )
-                    )
+                    NavHostScreen(this)
                 }
             }
         }

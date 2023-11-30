@@ -29,86 +29,71 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
+import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
-import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
+import dev.olshevski.navigation.reimagined.NavController
+import dev.olshevski.navigation.reimagined.pop
+import dev.olshevski.navigation.reimagined.replaceAll
 
-class PlaylistsView(
-    private val trackTitle: String?,
-    private val viewMode: PlaylistViewMode,
-    private val viewModel: PlaylistsViewModel
-) : Screen {
+@Composable
+fun PlaylistsView(
+    navController: NavController<Destination>,
+    trackTitle: String?,
+    viewMode: PlaylistViewMode,
+    viewModel: PlaylistsViewModel
+) {
+    val context = LocalContext.current
+    val playlists by viewModel.playlists.collectAsState()
+    val playlistViewMode by viewModel.playlistViewMode.collectAsState()
+    val showAddPlaylist = remember { mutableStateOf(false) }
 
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.current
-        val context = LocalContext.current
-        val playlists by viewModel.playlists.collectAsState()
-        val playlistViewMode by viewModel.playlistViewMode.collectAsState()
-        val showAddPlaylist = remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        viewModel.initUserStorage(context)
+        viewModel.initPlaylistViewMode(viewMode)
+    }
 
-        LaunchedEffect(Unit) {
-            viewModel.initUserStorage(context)
-            viewModel.initPlaylistViewMode(viewMode)
+    Scaffold(topBar = {
+        TopBar {
+            showAddPlaylist.value = true
         }
+    }) {
+        LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
+            val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
+            itemsIndexed(sortedPlaylists) { _, entry ->
+                val (playlistTitle, _) = entry
 
-        Scaffold(topBar = {
-            TopBar {
-                showAddPlaylist.value = true
-            }
-        }) {
-            LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
-                val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
-                itemsIndexed(sortedPlaylists) { _, entry ->
-                    val (playlistTitle, _) = entry
-
-                    Text(
-                        text = playlistTitle,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .padding(all = 8.dp)
-                            .clickable {
-                                if (playlistViewMode == PlaylistViewMode.Add) {
-                                    if (trackTitle != null) {
-                                        viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
-                                    }
-                                    navigator?.pop()
-                                } else {
-                                    val homeViewModel = ViewModelProvider.homeViewModel
-                                    val audioPlayerViewModel =
-                                        ViewModelProvider.audioPlayerViewModel
-                                    val folderAnalyzer = FolderAnalyzer(context)
-                                    homeViewModel.initTrackList(folderAnalyzer, playlistTitle)
-
-                                    navigator?.replaceAll(
-                                        HomeView(
-                                            homeViewModel,
-                                            audioPlayerViewModel
-                                        )
-                                    )
+                Text(
+                    text = playlistTitle,
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .padding(all = 8.dp)
+                        .clickable {
+                            if (playlistViewMode == PlaylistViewMode.Add) {
+                                if (trackTitle != null) {
+                                    viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
                                 }
-                            },
-                        color = AppColors.textColor
-                    )
+                                navController.pop()
+                            } else {
+                                navController.replaceAll(Destination.Home(playlistTitle))
+                            }
+                        },
+                    color = AppColors.textColor
+                )
 
-                    Divider()
-                }
+                Divider()
             }
         }
+    }
 
-        if (showAddPlaylist.value) {
-            AddPlaylistAlertDialog(navigator, viewModel) {
-                showAddPlaylist.value = false
-            }
+    if (showAddPlaylist.value) {
+        AddPlaylistAlertDialog(navController, viewModel) {
+            showAddPlaylist.value = false
         }
     }
 }
@@ -131,7 +116,7 @@ private fun TopBar(showAddPlaylist: () -> Unit) {
 
 @Composable
 private fun AddPlaylistAlertDialog(
-    navigator: Navigator?,
+    navController: NavController<Destination>,
     viewModel: PlaylistsViewModel,
     dismiss: () -> Unit
 ) {
@@ -166,7 +151,7 @@ private fun AddPlaylistAlertDialog(
             TextButton(onClick = {
                 dismiss()
                 viewModel.addPlaylist(title)
-                navigator?.pop()
+                navController.pop()
             }) {
                 Text(
                     stringResource(id = R.string.common_ok),

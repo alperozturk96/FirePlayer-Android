@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -60,7 +61,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
     // Navigation
-    implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc10")
+    implementation("dev.olshevski.navigation:reimagined:1.5.0")
 
     // Media3 ExoPlayer
     implementation("androidx.media3:media3-exoplayer:1.2.0")
