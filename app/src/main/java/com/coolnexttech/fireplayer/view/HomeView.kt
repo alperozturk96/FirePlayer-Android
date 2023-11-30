@@ -57,8 +57,9 @@ import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
+private var prevIndex: Int? = null
+
 class HomeView(
-    private val selectedPlaylistTitle: String?,
     private val viewModel: HomeViewModel,
     private val audioPlayerViewModel: AudioPlayerViewModel
 ) : Screen {
@@ -68,36 +69,27 @@ class HomeView(
     override fun Content() {
         val navigator = LocalNavigator.current
         val context = LocalContext.current
-        val folderAnalyzer = FolderAnalyzer(context)
         val filteredTracks by viewModel.filteredTracks.collectAsState()
         val searchText by viewModel.searchText.collectAsState()
-        val filterOption by viewModel.filterOption.collectAsState()
         val showSortOptions = remember { mutableStateOf(false) }
         val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
         val listState = rememberLazyListState()
 
-        LaunchedEffect(Unit) {
-            viewModel.initTrackList(folderAnalyzer, selectedPlaylistTitle)
-        }
-
-        LaunchedEffect(searchText) {
-            viewModel.search(searchText)
-        }
-
-        LaunchedEffect(filterOption) {
-            viewModel.search(searchText)
-        }
-
         LaunchedEffect(selectedTrackIndex) {
-            selectedTrackIndex?.let {
-                if (filteredTracks.isTrackAvailable()) {
-                    audioPlayerViewModel.play(filteredTracks[it].path)
-                    viewModel.updatePrevTracks()
-                    context.startPlayerServiceWithDelay()
-                    listState.animateScrollToItem(it)
-                } else {
-                    audioPlayerViewModel.stop()
-                }
+            if (prevIndex == selectedTrackIndex) {
+                return@LaunchedEffect
+            }
+
+            val currentIndex = selectedTrackIndex ?: return@LaunchedEffect
+            prevIndex = currentIndex
+
+            if (filteredTracks.isTrackAvailable()) {
+                audioPlayerViewModel.play(filteredTracks[currentIndex].path)
+                viewModel.updatePrevTracks()
+                context.startPlayerServiceWithDelay()
+                listState.animateScrollToItem(currentIndex)
+            } else {
+                audioPlayerViewModel.stop()
             }
         }
 
@@ -185,7 +177,7 @@ private fun TopBar(
             BasicTextField(
                 value = searchText,
                 onValueChange = {
-                    viewModel.updateSearchText(it)
+                    viewModel.search(it)
                 },
                 singleLine = true,
                 decorationBox = { innerTextField ->
@@ -214,7 +206,7 @@ private fun TopBar(
             }
 
             ActionIconButton(filterOption.filterOptionIconId()) {
-                viewModel.changeFilterOption()
+                viewModel.changeFilterOption(searchText)
             }
 
             ActionIconButton(playMode.getIconId()) {

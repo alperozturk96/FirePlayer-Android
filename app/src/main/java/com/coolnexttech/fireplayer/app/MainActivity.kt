@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import com.coolnexttech.fireplayer.ui.theme.FirePlayerTheme
 import com.coolnexttech.fireplayer.util.CallReceiver
+import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.util.MediaButtonReceiver
 import com.coolnexttech.fireplayer.util.PermissionManager
 import com.coolnexttech.fireplayer.view.HomeView
@@ -44,11 +45,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val homeViewModel = ViewModelProvider.homeViewModel
+                    val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel
+                    val folderAnalyzer = FolderAnalyzer(this)
+                    homeViewModel.initTrackList(folderAnalyzer, null)
+
                     Navigator(
                         HomeView(
-                            null,
-                            ViewModelProvider.homeViewModel,
-                            ViewModelProvider.audioPlayerViewModel
+                            homeViewModel,
+                            audioPlayerViewModel
                         )
                     )
                 }

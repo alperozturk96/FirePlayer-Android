@@ -26,3 +26,8 @@ fun VSpacing8() {
 fun HSpacing8() {
     Spacer(modifier = Modifier.width(8.dp))
 }
+
+@Composable
+fun HSpacing16() {
+    Spacer(modifier = Modifier.width(16.dp))
+}

@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.extensions.HSpacing16
 import com.coolnexttech.fireplayer.extensions.HSpacing8
 import com.coolnexttech.fireplayer.extensions.VSpacing8
 import com.coolnexttech.fireplayer.extensions.convertToReadableTime
@@ -132,13 +133,13 @@ private fun MediaControl(
             selectPreviousTrack()
         }
 
-        HSpacing8()
+        HSpacing16()
 
         ActionImageButton(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play, size = 40.dp) {
             audioPlayerViewModel.togglePlayPause()
         }
 
-        HSpacing8()
+        HSpacing16()
 
         ActionImageButton(R.drawable.ic_next) {
             selectNextTrack()

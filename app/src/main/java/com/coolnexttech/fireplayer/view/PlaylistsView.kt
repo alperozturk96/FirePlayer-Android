@@ -38,6 +38,7 @@ import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
 import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
@@ -68,7 +69,7 @@ class PlaylistsView(
             LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
                 val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
                 itemsIndexed(sortedPlaylists) { _, entry ->
-                    val (playlistTitle, value) = entry
+                    val (playlistTitle, _) = entry
 
                     Text(
                         text = playlistTitle,
@@ -82,11 +83,16 @@ class PlaylistsView(
                                     }
                                     navigator?.pop()
                                 } else {
+                                    val homeViewModel = ViewModelProvider.homeViewModel
+                                    val audioPlayerViewModel =
+                                        ViewModelProvider.audioPlayerViewModel
+                                    val folderAnalyzer = FolderAnalyzer(context)
+                                    homeViewModel.initTrackList(folderAnalyzer, playlistTitle)
+
                                     navigator?.replaceAll(
                                         HomeView(
-                                            playlistTitle,
-                                            ViewModelProvider.homeViewModel,
-                                            ViewModelProvider.audioPlayerViewModel
+                                            homeViewModel,
+                                            audioPlayerViewModel
                                         )
                                     )
                                 }
@@ -104,7 +110,6 @@ class PlaylistsView(
                 showAddPlaylist.value = false
             }
         }
-
     }
 }
 

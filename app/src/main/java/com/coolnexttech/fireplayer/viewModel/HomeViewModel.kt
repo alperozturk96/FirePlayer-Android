@@ -3,7 +3,6 @@ package com.coolnexttech.fireplayer.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.coolnexttech.fireplayer.extensions.filter
-import com.coolnexttech.fireplayer.extensions.filterByPlaylist
 import com.coolnexttech.fireplayer.extensions.isTrackAvailable
 import com.coolnexttech.fireplayer.extensions.sort
 import com.coolnexttech.fireplayer.model.FilterOptions
@@ -11,7 +10,6 @@ import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.util.FolderAnalyzer
-import com.coolnexttech.fireplayer.util.UserStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -57,10 +55,12 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun changeFilterOption() {
+    fun changeFilterOption(value: String) {
         _filterOption.update {
             it.selectNextFilterOption()
         }
+
+        search(value)
     }
 
     fun changePlayMode() {
@@ -118,22 +118,11 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun updateSearchText(value: String) {
+    fun search(value: String) {
         _searchText.update {
             value
         }
-    }
 
-    fun selectPlaylist(selectedPlaylistTitle: String, userStorage: UserStorage) {
-        val playlists = userStorage.readPlaylists()
-        val selectedPlaylist = playlists[selectedPlaylistTitle] ?: return
-
-        _filteredTracks.update {
-            _tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AtoZ)
-        }
-    }
-
-    fun search(value: String) {
         _filteredTracks.update {
             if (value.isEmpty()) {
                 _tracks.sort(SortOptions.AtoZ)
