@@ -63,6 +63,7 @@ private var prevIndex: Int? = null
 @Composable
 fun HomeView(
     navController: NavController<Destination>,
+    folderAnalyzer: FolderAnalyzer,
     viewModel: HomeViewModel,
     audioPlayerViewModel: AudioPlayerViewModel
 ) {
@@ -94,8 +95,8 @@ fun HomeView(
     Scaffold(
         topBar = {
             TopBar(
+                folderAnalyzer,
                 navController,
-                context,
                 searchText,
                 viewModel,
                 showSortOptions = {
@@ -153,15 +154,14 @@ fun HomeView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
+    folderAnalyzer: FolderAnalyzer,
     navController: NavController<Destination>,
-    context: Context,
     searchText: String,
     viewModel: HomeViewModel,
     showSortOptions: () -> Unit,
 ) {
     val filterOption by viewModel.filterOption.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
-    val folderAnalyzer = FolderAnalyzer(context)
 
     TopAppBar(
         colors = getTopAppBarColor(),

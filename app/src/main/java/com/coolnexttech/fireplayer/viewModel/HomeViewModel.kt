@@ -89,7 +89,7 @@ class HomeViewModel: ViewModel() {
 
     fun selectTrack(index: Int) {
         if (index == _selectedTrackIndex.value) {
-            val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel
+            val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel()
             val track = _tracks[index]
             audioPlayerViewModel.play(track.path)
         } else {

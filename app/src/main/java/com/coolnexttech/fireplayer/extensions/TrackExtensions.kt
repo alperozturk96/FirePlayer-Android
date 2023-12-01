@@ -26,7 +26,7 @@ fun List<Track>.filterByPlaylist(titles: ArrayList<String>): List<Track> {
 }
 
 fun List<Track>.isTrackAvailable(): Boolean {
-    val homeViewModel = ViewModelProvider.homeViewModel
+    val homeViewModel = ViewModelProvider.homeViewModel()
     val selectedTrackIndex = homeViewModel.selectedTrackIndex.value ?: return false
     return selectedTrackIndex >= 0 && selectedTrackIndex < this.size
 }

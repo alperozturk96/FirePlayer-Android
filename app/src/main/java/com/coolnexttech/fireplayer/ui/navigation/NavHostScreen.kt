@@ -21,11 +21,10 @@ fun NavHostScreen(context: Context) {
     NavHost(navController) { destination ->
         when (destination) {
             is Destination.Home -> {
-                val homeViewModel = ViewModelProvider.homeViewModel
-                val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel
+                val homeViewModel = ViewModelProvider.homeViewModel()
                 val folderAnalyzer = FolderAnalyzer(context)
                 homeViewModel.initTrackList(folderAnalyzer, destination.selectedPlaylistTitle)
-                HomeView(navController, homeViewModel, audioPlayerViewModel)
+                HomeView(navController, folderAnalyzer, homeViewModel, ViewModelProvider.audioPlayerViewModel())
             }
 
             is Destination.Playlists -> {
@@ -33,7 +32,7 @@ fun NavHostScreen(context: Context) {
                     navController,
                     trackTitle = destination.trackTitle,
                     viewMode = destination.playlistViewMode,
-                    viewModel = ViewModelProvider.playlistViewModel
+                    viewModel = ViewModelProvider.playlistViewModel()
                 )
             }
         }

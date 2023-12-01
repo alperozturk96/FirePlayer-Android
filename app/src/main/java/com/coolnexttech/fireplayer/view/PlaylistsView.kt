@@ -39,6 +39,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.pop
+import dev.olshevski.navigation.reimagined.popUpTo
 import dev.olshevski.navigation.reimagined.replaceAll
 
 @Composable
@@ -92,7 +93,7 @@ fun PlaylistsView(
     }
 
     if (showAddPlaylist.value) {
-        AddPlaylistAlertDialog(navController, viewModel) {
+        AddPlaylistAlertDialog(viewModel) {
             showAddPlaylist.value = false
         }
     }
@@ -116,7 +117,6 @@ private fun TopBar(showAddPlaylist: () -> Unit) {
 
 @Composable
 private fun AddPlaylistAlertDialog(
-    navController: NavController<Destination>,
     viewModel: PlaylistsViewModel,
     dismiss: () -> Unit
 ) {
@@ -151,7 +151,6 @@ private fun AddPlaylistAlertDialog(
             TextButton(onClick = {
                 dismiss()
                 viewModel.addPlaylist(title)
-                navController.pop()
             }) {
                 Text(
                     stringResource(id = R.string.common_ok),
