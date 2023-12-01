@@ -9,9 +9,11 @@ import androidx.core.app.NotificationCompat
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.extensions.createNextTrackPendingIntent
 import com.coolnexttech.fireplayer.extensions.createPreviousTrackPendingIntent
+import com.coolnexttech.fireplayer.extensions.createReturnToAppPendingIntent
 import com.coolnexttech.fireplayer.extensions.createTogglePlayerPendingIntent
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
+
 
 class PlayerService : Service() {
     private val homeViewModel = ViewModelProvider.homeViewModel
@@ -60,10 +62,12 @@ class PlayerService : Service() {
         val previousTrackIntent = createPreviousTrackPendingIntent()
         val toggleTrackIntent = createTogglePlayerPendingIntent()
         val nextTrackIntent = createNextTrackPendingIntent()
+        val returnToAppIntent = createReturnToAppPendingIntent()
 
         return NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentTitle(homeViewModel.currentTrackTitle())
+            .setContentIntent(returnToAppIntent)
             .setSmallIcon(R.drawable.im_app_icon)
             .addAction(
                 R.drawable.ic_previous,

@@ -66,6 +66,7 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
             })
         }
 
+        player?.volume = 1.0f
         player?.setAudioAttributes(audioAttributes, true)
     }
 

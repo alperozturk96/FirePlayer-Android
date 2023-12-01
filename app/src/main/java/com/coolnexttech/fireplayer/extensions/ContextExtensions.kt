@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import com.coolnexttech.fireplayer.app.MainActivity
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.service.PlayerService
 
@@ -37,6 +38,17 @@ fun Context.createTogglePlayerPendingIntent(): PendingIntent {
         PendingIntent.getService(this, 1, intent, PendingIntent.FLAG_MUTABLE)
     } else {
         PendingIntent.getService(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+}
+
+fun Context.createReturnToAppPendingIntent(): PendingIntent {
+    val mainActivityIntent = Intent(this, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        PendingIntent.getActivity(this, 0, mainActivityIntent, PendingIntent.FLAG_MUTABLE)
+    } else {
+        PendingIntent.getActivity(this, 0, mainActivityIntent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
     }
 }
 
