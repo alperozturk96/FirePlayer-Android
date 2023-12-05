@@ -222,7 +222,7 @@ private fun SortOptionsAlertDialog(
         ) {
             VSpacing16()
 
-            Drawable(R.drawable.im_app_icon)
+            Drawable(R.drawable.ic_fire)
 
             VSpacing16()
 
