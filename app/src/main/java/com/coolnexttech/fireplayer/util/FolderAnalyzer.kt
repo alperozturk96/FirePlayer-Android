@@ -2,24 +2,28 @@ package com.coolnexttech.fireplayer.util
 
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
+import com.coolnexttech.fireplayer.app.FirePlayer
 import com.coolnexttech.fireplayer.extensions.filterByPlaylist
 import com.coolnexttech.fireplayer.extensions.sort
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import java.io.File
 
-class FolderAnalyzer(private val context: Context) {
+object FolderAnalyzer {
 
     private val unsupportedFileFormats = listOf("dsf")
-    private val userStorage = UserStorage(context)
+
+    var tracks: ArrayList<Track> = arrayListOf()
+
+    init {
+        fetchTrackList()
+    }
 
     fun getTracksFromPlaylist(selectedPlaylistTitle: String): List<Track> {
-        val tracks = getTracksFromMusicFolder()
-        val playlists = userStorage.readPlaylists()
+        val playlists = UserStorage.readPlaylists()
         val selectedPlaylist = playlists[selectedPlaylistTitle]
         return if (selectedPlaylist != null) {
             tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AtoZ)
@@ -28,10 +32,14 @@ class FolderAnalyzer(private val context: Context) {
         }
     }
 
-    fun getTracksFromMusicFolder(): ArrayList<Track> {
+    fun fetchTrackList() {
+        tracks = getTracksFromMusicFolder()
+    }
+
+    private fun getTracksFromMusicFolder(): ArrayList<Track> {
         val result = arrayListOf<Track>()
 
-        val contentResolver = context.contentResolver
+        val contentResolver = FirePlayer.context.contentResolver
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -81,7 +89,7 @@ class FolderAnalyzer(private val context: Context) {
     private fun getFileMimeType(uri: Uri): String? {
         return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
             val mime = MimeTypeMap.getSingleton()
-            mime.getExtensionFromMimeType(context.contentResolver.getType(uri))
+            mime.getExtensionFromMimeType(FirePlayer.context.contentResolver.getType(uri))
         } else {
             MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(uri.path?.let { File(it) }).toString())
         }

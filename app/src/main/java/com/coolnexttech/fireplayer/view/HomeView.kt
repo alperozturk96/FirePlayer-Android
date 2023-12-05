@@ -50,7 +50,6 @@ import com.coolnexttech.fireplayer.ui.components.Drawable
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
 import com.coolnexttech.fireplayer.viewModel.HomeViewModel
 import dev.olshevski.navigation.reimagined.NavController
@@ -62,7 +61,6 @@ private var prevIndex: Int? = null
 @Composable
 fun HomeView(
     navController: NavController<Destination>,
-    folderAnalyzer: FolderAnalyzer,
     viewModel: HomeViewModel,
     audioPlayerViewModel: AudioPlayerViewModel
 ) {
@@ -94,7 +92,6 @@ fun HomeView(
     Scaffold(
         topBar = {
             TopBar(
-                folderAnalyzer,
                 navController,
                 searchText,
                 viewModel,
@@ -153,7 +150,6 @@ fun HomeView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
-    folderAnalyzer: FolderAnalyzer,
     navController: NavController<Destination>,
     searchText: String,
     viewModel: HomeViewModel,
@@ -203,7 +199,7 @@ private fun TopBar(
             }
 
             ActionIconButton(R.drawable.ic_reset) {
-                viewModel.initTrackList(folderAnalyzer, null)
+                viewModel.initTrackList(null)
             }
         }
     )

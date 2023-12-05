@@ -25,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -48,13 +47,11 @@ fun PlaylistsView(
     viewMode: PlaylistViewMode,
     viewModel: PlaylistsViewModel
 ) {
-    val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
     val playlistViewMode by viewModel.playlistViewMode.collectAsState()
     val showAddPlaylist = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.initUserStorage(context)
         viewModel.initPlaylistViewMode(viewMode)
     }
 

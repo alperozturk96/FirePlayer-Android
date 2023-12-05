@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.viewModel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.coolnexttech.fireplayer.extensions.add
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
@@ -20,8 +19,7 @@ class PlaylistsViewModel: ViewModel() {
 
     private var storage: UserStorage? = null
 
-    fun initUserStorage(context: Context) {
-        storage = UserStorage(context)
+    init {
         readPlaylists()
     }
 
@@ -33,7 +31,7 @@ class PlaylistsViewModel: ViewModel() {
 
     private fun readPlaylists() {
         _playlists.update {
-            storage?.readPlaylists() ?: hashMapOf()
+            UserStorage.readPlaylists()
         }
     }
 

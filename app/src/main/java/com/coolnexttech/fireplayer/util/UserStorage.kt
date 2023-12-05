@@ -1,20 +1,18 @@
 package com.coolnexttech.fireplayer.util
 
-import android.content.Context
 import androidx.activity.ComponentActivity
+import com.coolnexttech.fireplayer.app.FirePlayer
 import com.coolnexttech.fireplayer.extensions.jsonToPlaylists
 import com.coolnexttech.fireplayer.extensions.toJson
 import com.coolnexttech.fireplayer.model.Playlists
 
-class UserStorage(
-    private val context: Context
-) {
+object UserStorage {
 
-    private val appPreferences = "FirePlayer"
-    private val playlists = "playlists"
+    private const val appPreferences = "FirePlayer"
+    private const val playlists = "playlists"
 
     private val sharedPreferences by lazy {
-        context.getSharedPreferences(appPreferences, ComponentActivity.MODE_PRIVATE)
+        FirePlayer.context.getSharedPreferences(appPreferences, ComponentActivity.MODE_PRIVATE)
     }
 
     fun readPlaylists(): Playlists {

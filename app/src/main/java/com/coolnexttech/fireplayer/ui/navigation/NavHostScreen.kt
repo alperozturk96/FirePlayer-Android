@@ -1,8 +1,6 @@
 package com.coolnexttech.fireplayer.ui.navigation
 
-import android.content.Context
 import androidx.compose.runtime.Composable
-import com.coolnexttech.fireplayer.util.FolderAnalyzer
 import com.coolnexttech.fireplayer.view.HomeView
 import com.coolnexttech.fireplayer.view.PlaylistsView
 import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
@@ -11,7 +9,7 @@ import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.rememberNavController
 
 @Composable
-fun NavHostScreen(context: Context) {
+fun NavHostScreen() {
     val navController = rememberNavController<Destination>(
         startDestination = Destination.Home(null)
     )
@@ -22,9 +20,8 @@ fun NavHostScreen(context: Context) {
         when (destination) {
             is Destination.Home -> {
                 val homeViewModel = ViewModelProvider.homeViewModel()
-                val folderAnalyzer = FolderAnalyzer(context)
-                homeViewModel.initTrackList(folderAnalyzer, destination.selectedPlaylistTitle)
-                HomeView(navController, folderAnalyzer, homeViewModel, ViewModelProvider.audioPlayerViewModel())
+                homeViewModel.initTrackList(destination.selectedPlaylistTitle)
+                HomeView(navController, homeViewModel, ViewModelProvider.audioPlayerViewModel())
             }
 
             is Destination.Playlists -> {
