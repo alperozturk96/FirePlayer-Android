@@ -125,9 +125,9 @@ class HomeViewModel: ViewModel() {
 
         _filteredTracks.update {
             if (value.isEmpty()) {
-                _tracks.sort(SortOptions.AtoZ)
+                _tracks.sort(SortOptions.AToZ)
             } else {
-                _tracks.filter(_filterOption.value, value).sort(SortOptions.AtoZ)
+                _tracks.filter(_filterOption.value, value).sort(SortOptions.AToZ)
             }
         }
     }

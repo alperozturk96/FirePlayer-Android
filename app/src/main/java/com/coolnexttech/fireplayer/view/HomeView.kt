@@ -124,7 +124,12 @@ fun HomeView(
                             .combinedClickable(
                                 onClick = { viewModel.selectTrack(index) },
                                 onLongClick = {
-                                    navController.navigate(Destination.Playlists(track.title,  PlaylistViewMode.Add))
+                                    navController.navigate(
+                                        Destination.Playlists(
+                                            track.title,
+                                            PlaylistViewMode.Add
+                                        )
+                                    )
                                 },
                             ),
                         color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
@@ -137,7 +142,7 @@ fun HomeView(
             if (showSortOptions.value) {
                 SortOptionsAlertDialog(
                     dismiss = { showSortOptions.value = false },
-                    sortByTitle = { sortOption ->
+                    sort = { sortOption ->
                         viewModel.sort(sortOption)
                         showSortOptions.value = false
                     })
@@ -183,7 +188,7 @@ private fun TopBar(
         },
         actions = {
             ActionIconButton(R.drawable.ic_playlists) {
-                navController.navigate(Destination.Playlists(null,  PlaylistViewMode.Select))
+                navController.navigate(Destination.Playlists(null, PlaylistViewMode.Select))
             }
 
             ActionIconButton(filterOption.filterOptionIconId()) {
@@ -208,7 +213,7 @@ private fun TopBar(
 @Composable
 private fun SortOptionsAlertDialog(
     dismiss: () -> Unit,
-    sortByTitle: (SortOptions) -> Unit,
+    sort: (SortOptions) -> Unit,
 ) {
     Dialog({ dismiss() }) {
         Column(
@@ -230,12 +235,20 @@ private fun SortOptionsAlertDialog(
 
             VSpacing8()
 
-            DialogButton(R.string.home_sort_dialog_sort_by_title_a_z_title) {
-                sortByTitle(SortOptions.AtoZ)
+            DialogButton(R.string.home_sort_dialog_sort_by_title_a_z) {
+                sort(SortOptions.AToZ)
             }
 
-            DialogButton(R.string.home_sort_dialog_sort_by_title_z_a_title) {
-                sortByTitle(SortOptions.ZtoA)
+            DialogButton(R.string.home_sort_dialog_sort_by_title_z_a) {
+                sort(SortOptions.ZToA)
+            }
+
+            DialogButton(R.string.home_sort_dialog_sort_by_new_to_old_title) {
+                sort(SortOptions.NewToOld)
+            }
+
+            DialogButton(R.string.home_sort_dialog_sort_by_old_to_new_title) {
+                sort(SortOptions.OldToNew)
             }
 
             DialogButton(R.string.common_cancel) {

@@ -10,5 +10,6 @@ data class Track(
     var path: Uri,
     var duration: Long,
     var pathExtension: String? = null,
-    var playlist: String? = null
+    var playlist: String? = null,
+    var dateAdded: Long,
 )

@@ -19,21 +19,17 @@ object FolderAnalyzer {
     var tracks: ArrayList<Track> = arrayListOf()
 
     init {
-        fetchTrackList()
+        tracks = getTracksFromMusicFolder()
     }
 
     fun getTracksFromPlaylist(selectedPlaylistTitle: String): List<Track> {
         val playlists = UserStorage.readPlaylists()
         val selectedPlaylist = playlists[selectedPlaylistTitle]
         return if (selectedPlaylist != null) {
-            tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AtoZ)
+            tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AToZ)
         } else {
             listOf()
         }
-    }
-
-    fun fetchTrackList() {
-        tracks = getTracksFromMusicFolder()
     }
 
     private fun getTracksFromMusicFolder(): ArrayList<Track> {
@@ -46,6 +42,7 @@ object FolderAnalyzer {
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.MIME_TYPE,
+            MediaStore.Audio.Media.DATE_MODIFIED,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.DURATION
         )
@@ -65,18 +62,31 @@ object FolderAnalyzer {
                 val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
                 val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
                 val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val dateModifiedColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idColumn)
-                    val title = cursor.getString(titleColumn)
-                    val artist = cursor.getString(artistColumn)
-                    val album = cursor.getString(albumColumn)
+                    val title = cursor.getString(titleColumn).trimStart()
+                    val artist = cursor.getString(artistColumn).trimStart()
+                    val album = cursor.getString(albumColumn).trimStart()
                     val duration = cursor.getLong(durationColumn)
-                    val path = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                    val dateModified = cursor.getLong(dateModifiedColumn)
+                    val path =
+                        ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
                     val pathExtension = getFileMimeType(path)
 
                     if (!unsupportedFileFormats.contains(pathExtension)) {
-                        val track = Track(id, title, artist, album, path, duration, pathExtension)
+                        val track = Track(
+                            id,
+                            title,
+                            artist,
+                            album,
+                            path,
+                            duration,
+                            pathExtension,
+                            dateAdded = dateModified
+                        )
                         result.add(track)
                     }
                 }

@@ -7,8 +7,10 @@ import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 
 fun List<Track>.sort(sortOption: SortOptions): List<Track> {
     return when(sortOption) {
-        SortOptions.AtoZ -> sortedBy { it.title }
-        SortOptions.ZtoA -> sortedByDescending { it.title }
+        SortOptions.AToZ -> sortedBy { it.title }
+        SortOptions.ZToA -> sortedByDescending { it.title }
+        SortOptions.OldToNew -> sortedBy { it.dateAdded }
+        SortOptions.NewToOld -> sortedByDescending { it.dateAdded }
     }
 }
 
