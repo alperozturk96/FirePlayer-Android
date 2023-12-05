@@ -188,7 +188,7 @@ private fun TopBar(
         },
         actions = {
             ActionIconButton(R.drawable.ic_playlists) {
-                navController.navigate(Destination.Playlists(null,  PlaylistViewMode.Add))
+                navController.navigate(Destination.Playlists(null,  PlaylistViewMode.Select))
             }
 
             ActionIconButton(filterOption.filterOptionIconId()) {
