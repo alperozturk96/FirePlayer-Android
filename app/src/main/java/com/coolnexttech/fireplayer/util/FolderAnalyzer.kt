@@ -26,6 +26,7 @@ object FolderAnalyzer {
         val playlists = UserStorage.readPlaylists()
         val selectedPlaylist = playlists[selectedPlaylistTitle]
         return if (selectedPlaylist != null) {
+            // FIXME
             tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AToZ)
         } else {
             listOf()

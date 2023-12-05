@@ -1,8 +1,6 @@
 package com.coolnexttech.fireplayer.view
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -15,11 +13,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +45,8 @@ import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.DialogButton
 import com.coolnexttech.fireplayer.ui.components.Drawable
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
+import com.coolnexttech.fireplayer.ui.components.ListItemText
+import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
@@ -57,7 +56,6 @@ import dev.olshevski.navigation.reimagined.navigate
 
 private var prevIndex: Int? = null
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeView(
     navController: NavController<Destination>,
@@ -70,6 +68,8 @@ fun HomeView(
     val showSortOptions = remember { mutableStateOf(false) }
     val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
     val listState = rememberLazyListState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var selectedTrackTitle by remember { mutableStateOf("") }
 
     LaunchedEffect(selectedTrackIndex) {
         if (prevIndex == selectedTrackIndex) {
@@ -116,26 +116,24 @@ fun HomeView(
         } else {
             LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                 itemsIndexed(filteredTracks) { index, track ->
-                    Text(
-                        text = track.title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .padding(all = 8.dp)
-                            .combinedClickable(
-                                onClick = { viewModel.selectTrack(index) },
-                                onLongClick = {
-                                    navController.navigate(
-                                        Destination.Playlists(
-                                            track.title,
-                                            PlaylistViewMode.Add
-                                        )
-                                    )
-                                },
-                            ),
-                        color = if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
-                    )
+                    ListItemText(track.title, action = { viewModel.selectTrack(index) }) {
+                        selectedTrackTitle = track.title
+                        showBottomSheet = true
+                    }
+                }
+            }
 
-                    Divider()
+            if (showBottomSheet) {
+                MoreActionsBottomSheet(
+                    R.string.home_bottom_sheet_add_to_playlist_action_title,
+                    dismiss = { showBottomSheet = false }) {
+                    navController.navigate(
+                        Destination.Playlists(
+                            selectedTrackTitle,
+                            PlaylistViewMode.Add
+                        )
+                    )
+                    showBottomSheet = false
                 }
             }
 

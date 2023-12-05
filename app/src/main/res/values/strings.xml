@@ -8,7 +8,7 @@
     <string name="home_filter_by_artist_section_title">Filtered By Artist</string>
     <string name="home_filter_by_title_section_title">Filtered By Title</string>
 
-    <string name="home_list_swipe_action_title">Add To Playlist</string>
+    <string name="home_bottom_sheet_add_to_playlist_action_title">Add To Playlist</string>
 
     <string name="home_search_in_titles_text">Search Track In Titles</string>
     <string name="home_search_in_albums_text">Search Track In Albums</string>

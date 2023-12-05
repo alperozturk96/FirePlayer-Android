@@ -1,11 +1,5 @@
 package com.coolnexttech.fireplayer.view
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -13,26 +7,20 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,15 +30,15 @@ import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
+import com.coolnexttech.fireplayer.ui.components.ListItemText
+import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.pop
 import dev.olshevski.navigation.reimagined.replaceAll
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistsView(
     navController: NavController<Destination>,
@@ -63,8 +51,6 @@ fun PlaylistsView(
     val showAddPlaylist = remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlaylistTitle by remember { mutableStateOf("") }
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.initPlaylistViewMode(viewMode)
@@ -80,68 +66,30 @@ fun PlaylistsView(
             itemsIndexed(sortedPlaylists) { _, entry ->
                 val (playlistTitle, _) = entry
 
-                Row {
-                    Text(
-                        text = playlistTitle,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .padding(all = 8.dp)
-                            .clickable {
-                                if (playlistViewMode == PlaylistViewMode.Add) {
-                                    if (trackTitle != null) {
-                                        viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
-                                    }
-                                    navController.pop()
-                                } else {
-                                    navController.replaceAll(Destination.Home(playlistTitle))
-                                }
-                            },
-                        color = AppColors.textColor
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    ActionIconButton(R.drawable.ic_more) {
-                        selectedPlaylistTitle = playlistTitle
-                        showBottomSheet = true
-                    }
+                ListItemText(
+                    playlistTitle,
+                    action = {
+                        playlistAction(
+                            playlistViewMode,
+                            trackTitle,
+                            viewModel,
+                            navController,
+                            playlistTitle
+                        )
+                    }) {
+                    selectedPlaylistTitle = playlistTitle
+                    showBottomSheet = true
                 }
-
-                Divider()
             }
         }
     }
 
     if (showBottomSheet) {
-        ModalBottomSheet(
-            containerColor = AppColors.alternateBackground,
-            onDismissRequest = {
-                showBottomSheet = false
-            },
-            sheetState = sheetState
-        ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 16.dp)) {
-                Text(
-                    text = stringResource(id = R.string.playlist_bottom_sheet_delete_action_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .padding(all = 8.dp)
-                        .clickable {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    viewModel.removePlaylist(selectedPlaylistTitle)
-                                    showBottomSheet = false
-                                }
-                            }
-                        },
-                    color = AppColors.textColor
-                )
-            }
+        MoreActionsBottomSheet(
+            R.string.playlist_bottom_sheet_delete_action_title,
+            dismiss = { showBottomSheet = false }) {
+            viewModel.removePlaylist(selectedPlaylistTitle)
+            showBottomSheet = false
         }
     }
 
@@ -149,6 +97,23 @@ fun PlaylistsView(
         AddPlaylistAlertDialog(viewModel) {
             showAddPlaylist.value = false
         }
+    }
+}
+
+private fun playlistAction(
+    playlistViewMode: PlaylistViewMode,
+    trackTitle: String?,
+    viewModel: PlaylistsViewModel,
+    navController: NavController<Destination>,
+    playlistTitle: String
+) {
+    if (playlistViewMode == PlaylistViewMode.Add) {
+        if (trackTitle != null) {
+            viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
+        }
+        navController.pop()
+    } else {
+        navController.replaceAll(Destination.Home(playlistTitle))
     }
 }
 
