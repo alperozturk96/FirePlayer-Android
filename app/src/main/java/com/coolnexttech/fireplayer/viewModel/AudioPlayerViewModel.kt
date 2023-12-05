@@ -71,13 +71,17 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
     }
 
     fun play(uri: Uri) {
-        player?.apply {
-            stop()
-            clearMediaItems()
-            val mediaItem: MediaItem = MediaItem.fromUri(uri)
-            setMediaItem(mediaItem)
-            prepare()
-            play()
+        try {
+            player?.apply {
+                stop()
+                clearMediaItems()
+                val mediaItem: MediaItem = MediaItem.fromUri(uri)
+                setMediaItem(mediaItem)
+                prepare()
+                play()
+            }
+        } catch (e: Exception) {
+            homeViewModel.selectNextTrack()
         }
     }
 

@@ -1,6 +1,7 @@
 package com.coolnexttech.fireplayer.service
 
 import android.app.Notification
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -18,6 +19,11 @@ import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
 class PlayerService : Service() {
     private val homeViewModel = ViewModelProvider.homeViewModel()
     private val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel()
+
+    private val previousTrackIntent: PendingIntent by lazy { createPreviousTrackPendingIntent() }
+    private val toggleTrackIntent: PendingIntent by lazy { createTogglePlayerPendingIntent() }
+    private val nextTrackIntent: PendingIntent by lazy { createNextTrackPendingIntent() }
+    private val returnToAppIntent: PendingIntent by lazy { createReturnToAppPendingIntent() }
 
     companion object {
         const val notificationId = 1
@@ -59,11 +65,6 @@ class PlayerService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val previousTrackIntent = createPreviousTrackPendingIntent()
-        val toggleTrackIntent = createTogglePlayerPendingIntent()
-        val nextTrackIntent = createNextTrackPendingIntent()
-        val returnToAppIntent = createReturnToAppPendingIntent()
-
         return NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentTitle(homeViewModel.currentTrackTitle())
