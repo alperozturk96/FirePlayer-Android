@@ -25,7 +25,7 @@
 
     <string name="playlists_title">Playlists</string>
     <string name="playlist_add_playlist_placeholder">Add Playlist Title</string>
-    <string name="playlist_item_swipe_action_title">Delete</string>
+    <string name="playlist_bottom_sheet_delete_action_title">Delete</string>
     <string name="playlists_content_unavailable_text">You dont have any playlist yet</string>
     <string name="playlists_content_unavailable_title">No playlists</string>
 
