@@ -39,7 +39,6 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.pop
-import dev.olshevski.navigation.reimagined.popUpTo
 import dev.olshevski.navigation.reimagined.replaceAll
 
 @Composable

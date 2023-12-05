@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.view
 
-import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
