@@ -68,7 +68,7 @@ class PlayerService : Service() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentTitle(homeViewModel.currentTrackTitle())
             .setContentIntent(returnToAppIntent)
-            .setSmallIcon(R.drawable.im_app_icon)
+            .setSmallIcon(R.drawable.ic_fire)
             .addAction(
                 R.drawable.ic_previous,
                 getString(R.string.media_control_previous_text),
