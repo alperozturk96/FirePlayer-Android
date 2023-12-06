@@ -91,7 +91,7 @@ private fun MediaSlider(
             colors = SliderDefaults.colors(
                 thumbColor = AppColors.unhighlight,
                 activeTickColor = AppColors.unhighlight,
-                activeTrackColor = AppColors.slider,
+                activeTrackColor = AppColors.red,
                 inactiveTickColor = AppColors.unhighlight
             ),
             value = currentTime.toFloat(),

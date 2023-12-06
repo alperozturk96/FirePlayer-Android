@@ -116,7 +116,10 @@ fun HomeView(
         } else {
             LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                 itemsIndexed(filteredTracks) { index, track ->
-                    ListItemText(track.title, action = { viewModel.selectTrack(index) }) {
+                    val textColor =
+                        if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
+
+                    ListItemText(track.title, textColor, action = { viewModel.selectTrack(index) }) {
                         selectedTrackTitle = track.title
                         showBottomSheet = true
                     }
@@ -225,7 +228,7 @@ private fun SortOptionsAlertDialog(
         ) {
             VSpacing16()
 
-            Drawable(R.drawable.ic_fire)
+            Drawable(R.drawable.ic_fire, tint = AppColors.red)
 
             VSpacing16()
 

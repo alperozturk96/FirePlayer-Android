@@ -9,12 +9,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @Composable
-fun ListItemText(text: String, action: () -> Unit, moreAction: () -> Unit) {
+fun ListItemText(
+    text: String,
+    color: Color = AppColors.textColor,
+    action: () -> Unit,
+    moreAction: () -> Unit
+) {
     Row {
         Text(
             text = text,
@@ -24,7 +30,7 @@ fun ListItemText(text: String, action: () -> Unit, moreAction: () -> Unit) {
                 .clickable {
                     action()
                 },
-            color = AppColors.textColor
+            color = color
         )
 
         Spacer(modifier = Modifier.weight(1f))
