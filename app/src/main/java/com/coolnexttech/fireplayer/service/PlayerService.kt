@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.coolnexttech.fireplayer.R
@@ -57,11 +58,18 @@ class PlayerService : Service() {
 
     private fun updateNotification() {
         val notification = createNotification()
-        startForeground(
-            notificationId,
-            notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                notificationId,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            )
+        } else {
+            startForeground(
+                notificationId,
+                notification
+            )
+        }
     }
 
     private fun createNotification(): Notification {

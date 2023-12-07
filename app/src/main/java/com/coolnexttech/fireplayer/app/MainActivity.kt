@@ -88,7 +88,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkPermissions() {
-        permissionManager.askStoragePermission()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            permissionManager.askStoragePermission()
+        }
+
         permissionManager.askNotificationPermission()
     }
 }
