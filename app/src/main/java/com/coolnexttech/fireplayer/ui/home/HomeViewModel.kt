@@ -36,6 +36,8 @@ class HomeViewModel: ViewModel() {
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
 
+    var prevIndex: Int? = null
+
     fun initTrackList(selectedPlaylistTitle: String?) {
         _tracks = if (selectedPlaylistTitle == null) {
             FolderAnalyzer.tracks
@@ -109,13 +111,27 @@ class HomeViewModel: ViewModel() {
             return
         }
 
-        val nextIndex = when (_playMode.value) {
-            PlayMode.Shuffle -> _filteredTracks.value.indices.random()
-            PlayMode.Sequential -> (_selectedTrackIndex.value!! + 1).takeIf { it < _filteredTracks.value.size } ?: 0
+        if (_filteredTracks.value.size == 1) {
+            selectTrack(0)
         }
 
-        _selectedTrackIndex.update {
-            nextIndex
+        val nextIndex = getNextIndex()
+
+        if (prevIndex == nextIndex) {
+            selectTrack(nextIndex)
+        } else {
+            prevIndex = nextIndex
+
+            _selectedTrackIndex.update {
+                nextIndex
+            }
+        }
+    }
+
+    private fun getNextIndex(): Int {
+        return when (_playMode.value) {
+            PlayMode.Shuffle -> _filteredTracks.value.indices.random()
+            PlayMode.Sequential -> (_selectedTrackIndex.value!! + 1).takeIf { it < _filteredTracks.value.size } ?: 0
         }
     }
 

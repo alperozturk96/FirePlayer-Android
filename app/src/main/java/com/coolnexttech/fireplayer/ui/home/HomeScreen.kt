@@ -55,8 +55,6 @@ import com.coolnexttech.fireplayer.utils.extensions.startPlayerServiceWithDelay
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 
-private var prevIndex: Int? = null
-
 @Composable
 fun HomeScreen(
     navController: NavController<Destination>,
@@ -72,12 +70,7 @@ fun HomeScreen(
     var selectedTrackId by remember { mutableLongStateOf(-1L) }
 
     LaunchedEffect(selectedTrackIndex) {
-        if (prevIndex == selectedTrackIndex) {
-            return@LaunchedEffect
-        }
-
         val currentIndex = selectedTrackIndex ?: return@LaunchedEffect
-        prevIndex = currentIndex
 
         if (filteredTracks.isTrackAvailable()) {
             audioPlayerViewModel.play(filteredTracks[currentIndex].path)
