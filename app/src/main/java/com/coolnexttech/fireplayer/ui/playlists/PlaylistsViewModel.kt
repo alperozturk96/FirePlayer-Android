@@ -12,8 +12,6 @@ class PlaylistsViewModel: ViewModel() {
     private val _playlists = MutableStateFlow<Playlists>(hashMapOf())
     val playlists: StateFlow<Playlists> = _playlists
 
-    private var storage: UserStorage? = null
-
     init {
         readPlaylists()
     }
@@ -27,7 +25,7 @@ class PlaylistsViewModel: ViewModel() {
     fun addPlaylist(title: String) {
         _playlists.update {
             it[title] = arrayListOf()
-            storage?.savePlaylists(it)
+            UserStorage.savePlaylists(it)
             it
         }
     }
@@ -35,7 +33,7 @@ class PlaylistsViewModel: ViewModel() {
     fun addTrackToPlaylist(trackId: Long, playlistTitle: String) {
         _playlists.update {
             it[playlistTitle]?.add(trackId)
-            storage?.savePlaylists(it)
+            UserStorage.savePlaylists(it)
             it
         }
     }
@@ -44,7 +42,7 @@ class PlaylistsViewModel: ViewModel() {
     fun removePlaylist(title: String) {
         _playlists.update {
             it.remove(title)
-            storage?.savePlaylists(it)
+            UserStorage.savePlaylists(it)
             it
         }
     }
