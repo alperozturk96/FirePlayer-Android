@@ -1,18 +1,13 @@
 package com.coolnexttech.fireplayer.ui.playlists
 
 import androidx.lifecycle.ViewModel
-import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.Playlists
 import com.coolnexttech.fireplayer.utils.UserStorage
-import com.coolnexttech.fireplayer.utils.extensions.add
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
 class PlaylistsViewModel: ViewModel() {
-
-    private val _playlistViewMode = MutableStateFlow(PlaylistViewMode.Add)
-    val playlistViewMode: StateFlow<PlaylistViewMode> = _playlistViewMode
 
     private val _playlists = MutableStateFlow<Playlists>(hashMapOf())
     val playlists: StateFlow<Playlists> = _playlists
@@ -23,12 +18,6 @@ class PlaylistsViewModel: ViewModel() {
         readPlaylists()
     }
 
-    fun initPlaylistViewMode(playlistViewMode: PlaylistViewMode) {
-        _playlistViewMode.update {
-            playlistViewMode
-        }
-    }
-
     private fun readPlaylists() {
         _playlists.update {
             UserStorage.readPlaylists()
@@ -37,15 +26,15 @@ class PlaylistsViewModel: ViewModel() {
 
     fun addPlaylist(title: String) {
         _playlists.update {
-            it.add(title)
+            it[title] = arrayListOf()
             storage?.savePlaylists(it)
             it
         }
     }
 
-    fun addTrackToPlaylist(trackTitle: String, playlistTitle: String) {
+    fun addTrackToPlaylist(trackId: Long, playlistTitle: String) {
         _playlists.update {
-            it[playlistTitle]?.add(trackTitle)
+            it[playlistTitle]?.add(trackId)
             storage?.savePlaylists(it)
             it
         }

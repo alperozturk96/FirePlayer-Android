@@ -41,19 +41,13 @@ import dev.olshevski.navigation.reimagined.replaceAll
 @Composable
 fun PlaylistsScreen(
     navController: NavController<Destination>,
-    trackTitle: String?,
-    viewMode: PlaylistViewMode,
+    mode: PlaylistViewMode,
     viewModel: PlaylistsViewModel
 ) {
     val playlists by viewModel.playlists.collectAsState()
-    val playlistViewMode by viewModel.playlistViewMode.collectAsState()
     val showAddPlaylist = remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlaylistTitle by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        viewModel.initPlaylistViewMode(viewMode)
-    }
 
     Scaffold(topBar = {
         TopBar {
@@ -69,8 +63,7 @@ fun PlaylistsScreen(
                     playlistTitle,
                     action = {
                         playlistAction(
-                            playlistViewMode,
-                            trackTitle,
+                            mode,
                             viewModel,
                             navController,
                             playlistTitle
@@ -100,16 +93,13 @@ fun PlaylistsScreen(
 }
 
 private fun playlistAction(
-    playlistViewMode: PlaylistViewMode,
-    trackTitle: String?,
+    mode: PlaylistViewMode,
     viewModel: PlaylistsViewModel,
     navController: NavController<Destination>,
     playlistTitle: String
 ) {
-    if (playlistViewMode == PlaylistViewMode.Add) {
-        if (trackTitle != null) {
-            viewModel.addTrackToPlaylist(trackTitle, playlistTitle)
-        }
+    if (mode is PlaylistViewMode.Add) {
+        viewModel.addTrackToPlaylist(mode.trackId, playlistTitle)
         navController.pop()
     } else {
         navController.replaceAll(Destination.Home(playlistTitle))

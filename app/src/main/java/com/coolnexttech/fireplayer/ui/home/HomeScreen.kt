@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,8 +69,7 @@ fun HomeScreen(
     val showSortOptions = remember { mutableStateOf(false) }
     val selectedTrackIndex by viewModel.selectedTrackIndex.collectAsState()
     val listState = rememberLazyListState()
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedTrackTitle by remember { mutableStateOf("") }
+    var selectedTrackId by remember { mutableLongStateOf(-1L) }
 
     LaunchedEffect(selectedTrackIndex) {
         if (prevIndex == selectedTrackIndex) {
@@ -120,23 +120,21 @@ fun HomeScreen(
                         if (selectedTrackIndex == index) AppColors.highlight else AppColors.textColor
 
                     ListItemText(track.title, textColor, action = { viewModel.selectTrack(index) }) {
-                        selectedTrackTitle = track.title
-                        showBottomSheet = true
+                        selectedTrackId = track.id
                     }
                 }
             }
 
-            if (showBottomSheet) {
+            if (selectedTrackId != -1L) {
                 MoreActionsBottomSheet(
                     R.string.home_bottom_sheet_add_to_playlist_action_title,
-                    dismiss = { showBottomSheet = false }) {
+                    dismiss = { selectedTrackId = -1 }) {
                     navController.navigate(
                         Destination.Playlists(
-                            selectedTrackTitle,
-                            PlaylistViewMode.Add
+                            PlaylistViewMode.Add(selectedTrackId)
                         )
                     )
-                    showBottomSheet = false
+                    selectedTrackId = -1
                 }
             }
 
@@ -189,7 +187,7 @@ private fun TopBar(
         },
         actions = {
             ActionIconButton(R.drawable.ic_playlists) {
-                navController.navigate(Destination.Playlists(null, PlaylistViewMode.Select))
+                navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
             }
 
             ActionIconButton(filterOption.filterOptionIconId()) {

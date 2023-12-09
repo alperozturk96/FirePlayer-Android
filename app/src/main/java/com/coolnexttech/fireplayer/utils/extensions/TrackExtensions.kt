@@ -23,8 +23,8 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
     }
 }
 
-fun List<Track>.filterByPlaylist(titles: ArrayList<String>): List<Track> {
-    return this.filter { track -> track.title in titles }
+fun List<Track>.filterByPlaylist(titles: ArrayList<Long>): List<Track> {
+    return this.filter { track -> track.id in titles }
 }
 
 fun List<Track>.isTrackAvailable(): Boolean {

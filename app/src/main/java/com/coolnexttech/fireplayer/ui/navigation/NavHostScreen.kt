@@ -27,8 +27,7 @@ fun NavHostScreen() {
             is Destination.Playlists -> {
                 PlaylistsScreen(
                     navController,
-                    trackTitle = destination.trackTitle,
-                    viewMode = destination.playlistViewMode,
+                    mode = destination.playlistViewMode,
                     viewModel = ViewModelProvider.playlistViewModel()
                 )
             }

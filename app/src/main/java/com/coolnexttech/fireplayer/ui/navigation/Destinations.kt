@@ -9,5 +9,5 @@ sealed class Destination : Parcelable {
     data class Home(val selectedPlaylistTitle: String?) : Destination()
 
     @Parcelize
-    data class Playlists(val trackTitle: String?, val playlistViewMode: PlaylistViewMode) : Destination()
+    data class Playlists(val playlistViewMode: PlaylistViewMode) : Destination()
 }
