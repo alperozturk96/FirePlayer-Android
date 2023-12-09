@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.util
+package com.coolnexttech.fireplayer.utils
 
 import android.app.Activity
 import android.content.Intent

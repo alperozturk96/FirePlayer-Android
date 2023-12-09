@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.util
+package com.coolnexttech.fireplayer.utils.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context

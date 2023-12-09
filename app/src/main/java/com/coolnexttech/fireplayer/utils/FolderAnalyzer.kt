@@ -1,15 +1,15 @@
-package com.coolnexttech.fireplayer.util
+package com.coolnexttech.fireplayer.utils
 
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import com.coolnexttech.fireplayer.app.FirePlayer
-import com.coolnexttech.fireplayer.extensions.filterByPlaylist
-import com.coolnexttech.fireplayer.extensions.sort
+import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.utils.extensions.filterByPlaylist
+import com.coolnexttech.fireplayer.utils.extensions.sort
 import java.io.File
 
 object FolderAnalyzer {

@@ -1,15 +1,16 @@
-package com.coolnexttech.fireplayer.viewModel
+package com.coolnexttech.fireplayer.ui.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.coolnexttech.fireplayer.extensions.filter
-import com.coolnexttech.fireplayer.extensions.isTrackAvailable
-import com.coolnexttech.fireplayer.extensions.sort
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
-import com.coolnexttech.fireplayer.util.FolderAnalyzer
+import com.coolnexttech.fireplayer.utils.FolderAnalyzer
+import com.coolnexttech.fireplayer.utils.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.extensions.filter
+import com.coolnexttech.fireplayer.utils.extensions.isTrackAvailable
+import com.coolnexttech.fireplayer.utils.extensions.sort
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.extensions
+package com.coolnexttech.fireplayer.utils.extensions
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarColors

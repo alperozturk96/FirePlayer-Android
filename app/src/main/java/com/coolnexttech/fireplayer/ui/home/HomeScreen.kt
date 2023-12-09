@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.view
+package com.coolnexttech.fireplayer.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,31 +33,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.extensions.VSpacing16
-import com.coolnexttech.fireplayer.extensions.VSpacing8
-import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
-import com.coolnexttech.fireplayer.extensions.isTrackAvailable
-import com.coolnexttech.fireplayer.extensions.startPlayerServiceWithDelay
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
+import com.coolnexttech.fireplayer.ui.components.ContentUnavailableView
 import com.coolnexttech.fireplayer.ui.components.DialogButton
 import com.coolnexttech.fireplayer.ui.components.Drawable
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
+import com.coolnexttech.fireplayer.ui.components.SeekbarView
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
-import com.coolnexttech.fireplayer.viewModel.HomeViewModel
+import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
+import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
+import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
+import com.coolnexttech.fireplayer.utils.extensions.isTrackAvailable
+import com.coolnexttech.fireplayer.utils.extensions.startPlayerServiceWithDelay
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 
 private var prevIndex: Int? = null
 
 @Composable
-fun HomeView(
+fun HomeScreen(
     navController: NavController<Destination>,
     viewModel: HomeViewModel,
     audioPlayerViewModel: AudioPlayerViewModel

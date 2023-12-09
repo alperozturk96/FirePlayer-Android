@@ -1,10 +1,10 @@
-package com.coolnexttech.fireplayer.util
+package com.coolnexttech.fireplayer.utils.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager
-import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.ViewModelProvider
 
 class CallReceiver : BroadcastReceiver() {
     private val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel()

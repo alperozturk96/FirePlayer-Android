@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.view
+package com.coolnexttech.fireplayer.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,12 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.extensions.VSpacing16
-import com.coolnexttech.fireplayer.extensions.VSpacing8
-import com.coolnexttech.fireplayer.ui.components.Drawable
-import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
-import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
+import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
 
 @Composable
 fun ContentUnavailableView(titleSuffix: String?, title: String? = null) {

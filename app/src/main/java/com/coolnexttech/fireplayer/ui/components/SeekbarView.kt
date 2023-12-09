@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.view
+package com.coolnexttech.fireplayer.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,15 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.extensions.HSpacing16
-import com.coolnexttech.fireplayer.extensions.HSpacing8
-import com.coolnexttech.fireplayer.extensions.VSpacing8
-import com.coolnexttech.fireplayer.extensions.convertToReadableTime
-import com.coolnexttech.fireplayer.ui.components.ActionImageButton
-import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
+import com.coolnexttech.fireplayer.ui.home.AudioPlayerViewModel
+import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.viewModel.AudioPlayerViewModel
-import com.coolnexttech.fireplayer.viewModel.HomeViewModel
+import com.coolnexttech.fireplayer.utils.extensions.HSpacing16
+import com.coolnexttech.fireplayer.utils.extensions.HSpacing8
+import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
+import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 
 @Composable
 fun SeekbarView(

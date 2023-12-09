@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.extensions
+package com.coolnexttech.fireplayer.utils.extensions
 
 fun Long.convertToReadableTime(): String {
     val totalSeconds = this.toInt() / 1000

@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.viewModel
+package com.coolnexttech.fireplayer.ui.home
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,6 +10,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.utils.ViewModelProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

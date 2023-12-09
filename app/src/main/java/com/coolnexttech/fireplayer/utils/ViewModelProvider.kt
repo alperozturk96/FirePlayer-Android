@@ -1,6 +1,9 @@
-package com.coolnexttech.fireplayer.viewModel
+package com.coolnexttech.fireplayer.utils
 
-import com.coolnexttech.fireplayer.app.FirePlayer
+import com.coolnexttech.fireplayer.FirePlayer
+import com.coolnexttech.fireplayer.ui.home.AudioPlayerViewModel
+import com.coolnexttech.fireplayer.ui.home.HomeViewModel
+import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
 
 object ViewModelProvider {
     private var homeViewModel: HomeViewModel? = null

@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.extensions
+package com.coolnexttech.fireplayer.utils.extensions
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height

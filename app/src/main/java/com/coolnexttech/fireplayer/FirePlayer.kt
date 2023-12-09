@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.app
+package com.coolnexttech.fireplayer
 
 import android.annotation.SuppressLint
 import android.app.Application

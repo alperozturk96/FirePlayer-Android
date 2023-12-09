@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.extensions
+package com.coolnexttech.fireplayer.utils.extensions
 
 import com.coolnexttech.fireplayer.model.Playlists
 import com.google.gson.Gson

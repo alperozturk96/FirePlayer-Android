@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.app
+package com.coolnexttech.fireplayer.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -17,9 +17,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.coolnexttech.fireplayer.ui.navigation.NavHostScreen
 import com.coolnexttech.fireplayer.ui.theme.FirePlayerTheme
-import com.coolnexttech.fireplayer.util.CallReceiver
-import com.coolnexttech.fireplayer.util.MediaButtonReceiver
-import com.coolnexttech.fireplayer.util.PermissionManager
+import com.coolnexttech.fireplayer.utils.PermissionManager
+import com.coolnexttech.fireplayer.utils.receivers.CallReceiver
+import com.coolnexttech.fireplayer.utils.receivers.MediaButtonReceiver
 
 class MainActivity : ComponentActivity() {
     private val permissionManager = PermissionManager(this)

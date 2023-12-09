@@ -9,12 +9,12 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.extensions.createNextTrackPendingIntent
-import com.coolnexttech.fireplayer.extensions.createPreviousTrackPendingIntent
-import com.coolnexttech.fireplayer.extensions.createReturnToAppPendingIntent
-import com.coolnexttech.fireplayer.extensions.createTogglePlayerPendingIntent
 import com.coolnexttech.fireplayer.model.PlayerEvents
-import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.extensions.createNextTrackPendingIntent
+import com.coolnexttech.fireplayer.utils.extensions.createPreviousTrackPendingIntent
+import com.coolnexttech.fireplayer.utils.extensions.createReturnToAppPendingIntent
+import com.coolnexttech.fireplayer.utils.extensions.createTogglePlayerPendingIntent
 
 
 class PlayerService : Service() {

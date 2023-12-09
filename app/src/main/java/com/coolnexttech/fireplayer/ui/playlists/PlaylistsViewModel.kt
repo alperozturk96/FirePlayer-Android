@@ -1,10 +1,10 @@
-package com.coolnexttech.fireplayer.viewModel
+package com.coolnexttech.fireplayer.ui.playlists
 
 import androidx.lifecycle.ViewModel
-import com.coolnexttech.fireplayer.extensions.add
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.Playlists
-import com.coolnexttech.fireplayer.util.UserStorage
+import com.coolnexttech.fireplayer.utils.UserStorage
+import com.coolnexttech.fireplayer.utils.extensions.add
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

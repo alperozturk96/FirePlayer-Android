@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.view
+package com.coolnexttech.fireplayer.ui.playlists
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
@@ -34,13 +33,13 @@ import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.viewModel.PlaylistsViewModel
+import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.pop
 import dev.olshevski.navigation.reimagined.replaceAll
 
 @Composable
-fun PlaylistsView(
+fun PlaylistsScreen(
     navController: NavController<Destination>,
     trackTitle: String?,
     viewMode: PlaylistViewMode,

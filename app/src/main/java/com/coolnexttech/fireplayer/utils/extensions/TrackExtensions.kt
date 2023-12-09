@@ -1,9 +1,9 @@
-package com.coolnexttech.fireplayer.extensions
+package com.coolnexttech.fireplayer.utils.extensions
 
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
-import com.coolnexttech.fireplayer.viewModel.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.ViewModelProvider
 
 fun List<Track>.sort(sortOption: SortOptions): List<Track> {
     return when(sortOption) {

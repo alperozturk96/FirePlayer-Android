@@ -1,10 +1,10 @@
-package com.coolnexttech.fireplayer.util
+package com.coolnexttech.fireplayer.utils
 
 import androidx.activity.ComponentActivity
-import com.coolnexttech.fireplayer.app.FirePlayer
-import com.coolnexttech.fireplayer.extensions.jsonToPlaylists
-import com.coolnexttech.fireplayer.extensions.toJson
+import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.Playlists
+import com.coolnexttech.fireplayer.utils.extensions.jsonToPlaylists
+import com.coolnexttech.fireplayer.utils.extensions.toJson
 
 object UserStorage {
 

@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.extensions
+package com.coolnexttech.fireplayer.utils.extensions
 
 import android.app.PendingIntent
 import android.content.Context
@@ -6,9 +6,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import com.coolnexttech.fireplayer.app.MainActivity
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.service.PlayerService
+import com.coolnexttech.fireplayer.ui.MainActivity
 
 fun Context.startPlayerServiceWithDelay(delay: Long = 1500L) {
     Handler(Looper.getMainLooper()).postDelayed({
