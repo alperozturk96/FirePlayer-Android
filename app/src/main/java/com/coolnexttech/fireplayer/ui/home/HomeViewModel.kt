@@ -10,7 +10,6 @@ import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.ViewModelProvider
 import com.coolnexttech.fireplayer.utils.extensions.filter
 import com.coolnexttech.fireplayer.utils.extensions.getNextTrack
-import com.coolnexttech.fireplayer.utils.extensions.getTrackById
 import com.coolnexttech.fireplayer.utils.extensions.sort
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,19 +28,13 @@ class HomeViewModel : ViewModel() {
     private val _playMode = MutableStateFlow(PlayMode.Shuffle)
     val playMode: StateFlow<PlayMode> = _playMode
 
-    // TODO only use selected track
-    private val _selectedTrackIndex: MutableStateFlow<Int?> = MutableStateFlow(null)
-    val selectedTrackIndex: StateFlow<Int?> = _selectedTrackIndex
+    private val _selectedTrack: MutableStateFlow<Track?> = MutableStateFlow(null)
+    val selectedTrack: StateFlow<Track?> = _selectedTrack
 
-    private val _selectedTrackId: MutableStateFlow<Long?> = MutableStateFlow(null)
-    val selectedTrackId: StateFlow<Long?> = _selectedTrackId
-
-    private val _prevTrackIdsStack = MutableStateFlow<ArrayList<Long>>(arrayListOf())
+    private val _prevTracks = MutableStateFlow<ArrayList<Track>>(arrayListOf())
 
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
-
-    private var prevTrackId: Long? = null
 
     fun initTrackList(selectedPlaylistTitle: String?) {
         _tracks = if (selectedPlaylistTitle == null) {
@@ -78,68 +71,63 @@ class HomeViewModel : ViewModel() {
     }
 
     fun updatePrevTracks() {
-        _prevTrackIdsStack.update {
-            _selectedTrackId.value?.let { index -> it.add(index) }
+        _prevTracks.update {
+            _selectedTrack.value?.let { index -> it.add(index) }
             it
         }
     }
 
     fun selectPreviousTrack() {
-        if (_prevTrackIdsStack.value.size > 1) {
-            _prevTrackIdsStack.value.removeLast()
-            _prevTrackIdsStack.value.lastOrNull()?.let { prevIndex ->
-                _selectedTrackId.update {
+        if (_prevTracks.value.size > 1) {
+            _prevTracks.value.removeLast()
+            _prevTracks.value.lastOrNull()?.let { prevIndex ->
+                _selectedTrack.update {
                     prevIndex
                 }
             }
         }
     }
 
-    fun selectTrack(trackId: Long) {
-        if (trackId == _selectedTrackId.value) {
+    fun selectTrack(track: Track) {
+        if (track.id == _selectedTrack.value?.id) {
             val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel()
-            val trackPair = _filteredTracks.value.getTrackById(trackId) ?: return
-            _selectedTrackIndex.update {
-                trackPair.second
-            }
-            audioPlayerViewModel.play(trackPair.first.path)
+            audioPlayerViewModel.play(track.path)
         } else {
-            _selectedTrackId.update {
-                trackId
+            _selectedTrack.update {
+                track
             }
         }
     }
 
     fun selectNextTrack() {
-        if (_filteredTracks.value.isEmpty()) {
-            return
-        }
-
-        if (_selectedTrackId.value == null) {
+        if (_filteredTracks.value.isEmpty() || _selectedTrack.value == null) {
             return
         }
 
         if (_filteredTracks.value.size == 1) {
-            selectTrack(0)
+            selectTrack(_filteredTracks.value.first())
         }
 
-        val nextTrackId = getNextTrackId() ?: return
+        val nextTrack = getNextTrack() ?: return
 
-        if (prevTrackId == nextTrackId) {
-            selectTrack(nextTrackId)
+        if (_prevTracks.value.last() == nextTrack) {
+            selectTrack(nextTrack)
         } else {
-            prevTrackId = nextTrackId
+            _prevTracks.update {
+                it.add(nextTrack)
+                it
+            }
 
-            _selectedTrackId.update {
-                nextTrackId
+            _selectedTrack.update {
+                nextTrack
             }
         }
     }
 
-    private fun getNextTrackId(): Long? {
+    private fun getNextTrack(): Track? {
         return when (_playMode.value) {
-            PlayMode.Shuffle -> _filteredTracks.value.random().id
-            PlayMode.Sequential -> _filteredTracks.value.getNextTrack(_selectedTrackId.value)?.id
+            PlayMode.Shuffle -> _filteredTracks.value.random()
+            PlayMode.Sequential -> _filteredTracks.value.getNextTrack(_selectedTrack.value)?.first
         }
     }
 
@@ -158,6 +146,6 @@ class HomeViewModel : ViewModel() {
     }
 
     fun currentTrackTitle(): String {
-        return _filteredTracks.value.getTrackById(_selectedTrackId.value)?.first?.title ?: return ""
+        return _selectedTrack.value?.title ?: return ""
     }
 }

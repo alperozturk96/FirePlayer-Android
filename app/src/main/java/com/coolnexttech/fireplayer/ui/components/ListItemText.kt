@@ -17,6 +17,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 @Composable
 fun ListItemText(
     text: String,
+    endActionIconId: Int = R.drawable.ic_more,
     color: Color = AppColors.textColor,
     action: () -> Unit,
     moreAction: () -> Unit
@@ -35,7 +36,7 @@ fun ListItemText(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        ActionIconButton(R.drawable.ic_more) {
+        ActionIconButton(endActionIconId) {
             moreAction()
         }
     }

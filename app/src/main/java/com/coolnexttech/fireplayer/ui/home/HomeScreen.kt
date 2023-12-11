@@ -19,11 +19,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,17 +42,18 @@ import com.coolnexttech.fireplayer.ui.components.DialogButton
 import com.coolnexttech.fireplayer.ui.components.Drawable
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.components.ListItemText
-import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.components.SeekbarView
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
+import com.coolnexttech.fireplayer.utils.extensions.getNextTrack
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
-import com.coolnexttech.fireplayer.utils.extensions.queryById
 import com.coolnexttech.fireplayer.utils.extensions.startPlayerServiceWithDelay
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -64,23 +65,20 @@ fun HomeScreen(
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
-    val selectedTrackIdForListScroll: MutableState<Int?> = remember { mutableStateOf(null) }
-    val selectedTrackIdForAddPlaylist: MutableState<Long?> = remember { mutableStateOf(null) }
-    val selectedTrackId by viewModel.selectedTrackId.collectAsState()
+    val selectedTrack by viewModel.selectedTrack.collectAsState()
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(selectedTrackId) {
-        if (selectedTrackId == null) {
-            return@LaunchedEffect
-        }
+    LaunchedEffect(selectedTrack) {
+        selectedTrack?.let {
+            audioPlayerViewModel.play(it.path)
+            viewModel.updatePrevTracks()
+            context.startPlayerServiceWithDelay()
 
-        val track = filteredTracks.queryById(selectedTrackId) ?: return@LaunchedEffect
-        audioPlayerViewModel.play(track.path)
-        viewModel.updatePrevTracks()
-        context.startPlayerServiceWithDelay()
-
-        selectedTrackIdForListScroll.value?.let {
-            listState.animateScrollToItem(it)
+            val trackIndex = filteredTracks.getNextTrack(it)?.second
+            trackIndex?.let {
+                listState.scrollToItem(trackIndex)
+            }
         }
     }
 
@@ -93,9 +91,8 @@ fun HomeScreen(
                 showSortOptions = {
                     showSortOptions.value = true
                 })
-        },
-        bottomBar = {
-            selectedTrackId?.let {
+        }, bottomBar = {
+            if (selectedTrack != null) {
                 SeekbarView(audioPlayerViewModel, viewModel)
             }
         }) {
@@ -112,27 +109,25 @@ fun HomeScreen(
             LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                 itemsIndexed(filteredTracks) { index, track ->
                     val textColor =
-                        if (selectedTrackId == track.id) AppColors.highlight else AppColors.textColor
+                        if (selectedTrack?.id == track.id) AppColors.highlight else AppColors.textColor
 
-                    ListItemText(track.title, textColor, action = {
-                        selectedTrackIdForListScroll.value = index
-                        viewModel.selectTrack(track.id)
-                    }) {
-                        selectedTrackIdForAddPlaylist.value = track.id
-                    }
-                }
-            }
+                    ListItemText(
+                        track.title,
+                        color = textColor,
+                        endActionIconId = R.drawable.ic_add_playlist,
+                        action = {
+                            coroutineScope.launch(Dispatchers.Main) {
+                                listState.animateScrollToItem(index)
+                            }
 
-            if (selectedTrackIdForAddPlaylist.value != null) {
-                MoreActionsBottomSheet(
-                    R.string.home_bottom_sheet_add_to_playlist_action_title,
-                    dismiss = { selectedTrackIdForAddPlaylist.value = null }) {
-                    navController.navigate(
-                        Destination.Playlists(
-                            PlaylistViewMode.Add(selectedTrackIdForAddPlaylist.value!!)
+                            viewModel.selectTrack(track)
+                        }) {
+                        navController.navigate(
+                            Destination.Playlists(
+                                PlaylistViewMode.Add(track.id)
+                            )
                         )
-                    )
-                    selectedTrackIdForAddPlaylist.value = null
+                    }
                 }
             }
 
@@ -144,7 +139,6 @@ fun HomeScreen(
                         showSortOptions.value = false
                     })
             }
-
         }
     }
 }

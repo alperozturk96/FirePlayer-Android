@@ -3,7 +3,6 @@ package com.coolnexttech.fireplayer.utils.extensions
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
-import com.coolnexttech.fireplayer.utils.ViewModelProvider
 
 fun List<Track>.sort(sortOption: SortOptions): List<Track> {
     return when(sortOption) {
@@ -23,27 +22,10 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
     }
 }
 
-fun List<Track>.getNextTrack(id: Long?): Track? {
-    this.forEachIndexed { index, track ->
-        if (track.id == id) {
-            val nextTrackIndex = index in this.indices
-            return if (nextTrackIndex) {
-                this[index + 1]
-            } else {
-                this[0]
-            }
-        }
-    }
-
-    return null
-}
-
-fun List<Track>.queryById(id: Long?): Track? = find { it.id == id }
-
-fun List<Track>.getTrackById(id: Long?): Pair<Track,Int>? {
-    this.forEachIndexed { index, track ->
-        if (track.id == id) {
-            return Pair(track, index)
+fun List<Track>.getNextTrack(track: Track?): Pair<Track, Int>? {
+    this.forEachIndexed { index, newTrack ->
+        if (track?.id == newTrack.id) {
+            return Pair(newTrack, index)
         }
     }
 
