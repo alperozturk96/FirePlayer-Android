@@ -23,12 +23,33 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
     }
 }
 
-fun List<Track>.filterByPlaylist(titles: ArrayList<Long>): List<Track> {
-    return this.filter { track -> track.id in titles }
+fun List<Track>.getNextTrack(id: Long?): Track? {
+    this.forEachIndexed { index, track ->
+        if (track.id == id) {
+            val nextTrackIndex = index in this.indices
+            return if (nextTrackIndex) {
+                this[index + 1]
+            } else {
+                this[0]
+            }
+        }
+    }
+
+    return null
 }
 
-fun List<Track>.isTrackAvailable(): Boolean {
-    val homeViewModel = ViewModelProvider.homeViewModel()
-    val selectedTrackIndex = homeViewModel.selectedTrackIndex.value ?: return false
-    return selectedTrackIndex >= 0 && selectedTrackIndex < this.size
+fun List<Track>.queryById(id: Long?): Track? = find { it.id == id }
+
+fun List<Track>.getTrackById(id: Long?): Pair<Track,Int>? {
+    this.forEachIndexed { index, track ->
+        if (track.id == id) {
+            return Pair(track, index)
+        }
+    }
+
+    return null
+}
+
+fun List<Track>.filterByPlaylist(titles: ArrayList<Long>): List<Track> {
+    return this.filter { track -> track.id in titles }
 }

@@ -9,13 +9,14 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.ViewModelProvider
 import com.coolnexttech.fireplayer.utils.extensions.filter
-import com.coolnexttech.fireplayer.utils.extensions.isTrackAvailable
+import com.coolnexttech.fireplayer.utils.extensions.getNextTrack
+import com.coolnexttech.fireplayer.utils.extensions.getTrackById
 import com.coolnexttech.fireplayer.utils.extensions.sort
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel : ViewModel() {
 
     private var _tracks: List<Track> = arrayListOf()
 
@@ -28,15 +29,19 @@ class HomeViewModel: ViewModel() {
     private val _playMode = MutableStateFlow(PlayMode.Shuffle)
     val playMode: StateFlow<PlayMode> = _playMode
 
+    // TODO only use selected track
     private val _selectedTrackIndex: MutableStateFlow<Int?> = MutableStateFlow(null)
     val selectedTrackIndex: StateFlow<Int?> = _selectedTrackIndex
 
-    private val _prevTrackIndexesStack = MutableStateFlow<ArrayList<Int>>(arrayListOf())
+    private val _selectedTrackId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    val selectedTrackId: StateFlow<Long?> = _selectedTrackId
+
+    private val _prevTrackIdsStack = MutableStateFlow<ArrayList<Long>>(arrayListOf())
 
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
 
-    var prevIndex: Int? = null
+    private var prevTrackId: Long? = null
 
     fun initTrackList(selectedPlaylistTitle: String?) {
         _tracks = if (selectedPlaylistTitle == null) {
@@ -73,31 +78,34 @@ class HomeViewModel: ViewModel() {
     }
 
     fun updatePrevTracks() {
-        _prevTrackIndexesStack.update {
-            _selectedTrackIndex.value?.let { index -> it.add(index) }
+        _prevTrackIdsStack.update {
+            _selectedTrackId.value?.let { index -> it.add(index) }
             it
         }
     }
 
     fun selectPreviousTrack() {
-        if (_prevTrackIndexesStack.value.size > 1) {
-            _prevTrackIndexesStack.value.removeLast()
-            _prevTrackIndexesStack.value.lastOrNull()?.let { prevIndex ->
-                _selectedTrackIndex.update {
+        if (_prevTrackIdsStack.value.size > 1) {
+            _prevTrackIdsStack.value.removeLast()
+            _prevTrackIdsStack.value.lastOrNull()?.let { prevIndex ->
+                _selectedTrackId.update {
                     prevIndex
                 }
             }
         }
     }
 
-    fun selectTrack(index: Int) {
-        if (index == _selectedTrackIndex.value) {
+    fun selectTrack(trackId: Long) {
+        if (trackId == _selectedTrackId.value) {
             val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel()
-            val track = _tracks[index]
-            audioPlayerViewModel.play(track.path)
-        } else {
+            val trackPair = _filteredTracks.value.getTrackById(trackId) ?: return
             _selectedTrackIndex.update {
-                index
+                trackPair.second
+            }
+            audioPlayerViewModel.play(trackPair.first.path)
+        } else {
+            _selectedTrackId.update {
+                trackId
             }
         }
     }
@@ -107,7 +115,7 @@ class HomeViewModel: ViewModel() {
             return
         }
 
-        if (_selectedTrackIndex.value == null) {
+        if (_selectedTrackId.value == null) {
             return
         }
 
@@ -115,23 +123,23 @@ class HomeViewModel: ViewModel() {
             selectTrack(0)
         }
 
-        val nextIndex = getNextIndex()
+        val nextTrackId = getNextTrackId() ?: return
 
-        if (prevIndex == nextIndex) {
-            selectTrack(nextIndex)
+        if (prevTrackId == nextTrackId) {
+            selectTrack(nextTrackId)
         } else {
-            prevIndex = nextIndex
+            prevTrackId = nextTrackId
 
-            _selectedTrackIndex.update {
-                nextIndex
+            _selectedTrackId.update {
+                nextTrackId
             }
         }
     }
 
-    private fun getNextIndex(): Int {
+    private fun getNextTrackId(): Long? {
         return when (_playMode.value) {
-            PlayMode.Shuffle -> _filteredTracks.value.indices.random()
-            PlayMode.Sequential -> (_selectedTrackIndex.value!! + 1).takeIf { it < _filteredTracks.value.size } ?: 0
+            PlayMode.Shuffle -> _filteredTracks.value.random().id
+            PlayMode.Sequential -> _filteredTracks.value.getNextTrack(_selectedTrackId.value)?.id
         }
     }
 
@@ -150,11 +158,6 @@ class HomeViewModel: ViewModel() {
     }
 
     fun currentTrackTitle(): String {
-        val index = _selectedTrackIndex.value ?: return ""
-        return if (_filteredTracks.value.isTrackAvailable()) {
-            _filteredTracks.value[index].title
-        } else {
-            ""
-        }
+        return _filteredTracks.value.getTrackById(_selectedTrackId.value)?.first?.title ?: return ""
     }
 }
