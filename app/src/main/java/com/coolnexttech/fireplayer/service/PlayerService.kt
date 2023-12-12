@@ -38,6 +38,14 @@ class PlayerService : Service() {
                 updateNotification()
             }
 
+            PlayerEvents.Play.name -> {
+                VMProvider.audioPlayer.start()
+            }
+
+            PlayerEvents.Pause.name -> {
+                VMProvider.audioPlayer.pause()
+            }
+
             PlayerEvents.Toggle.name -> {
                 VMProvider.audioPlayer.togglePlayPause()
             }
