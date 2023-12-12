@@ -1,9 +1,13 @@
 package com.coolnexttech.fireplayer.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,11 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
@@ -63,16 +70,33 @@ fun HomeScreen(
     val selectedTrack by viewModel.selectedTrack.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val characterList = remember(filteredTracks) {
+        filteredTracks.groupBy { it.title.first().uppercaseChar() }
+            .mapValues { (_, tracks) -> filteredTracks.indexOf(tracks.first()) }
+    }
 
     Scaffold(
         topBar = {
-            TopBar(
-                navController,
-                searchText,
-                viewModel,
-                showSortOptions = {
-                    showSortOptions.value = true
-                })
+            Column {
+                Options(
+                    navController,
+                    searchText,
+                    viewModel
+                ) { showSortOptions.value = true }
+
+                AlphabeticalScroller(
+                    characterList = characterList,
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .background(AppColors.background)
+                        .padding(all = 16.dp),
+                    onLetterSelected = { index ->
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(index)
+                        }
+                    }
+                )
+            }
         }, bottomBar = {
             if (selectedTrack != null) {
                 SeekbarView(audioPlayer, viewModel)
@@ -88,27 +112,29 @@ fun HomeScreen(
                 )
             }
         } else {
-            LazyColumn(state = listState, modifier = Modifier.padding(it)) {
-                itemsIndexed(filteredTracks) { index, track ->
-                    val textColor =
-                        if (selectedTrack?.id == track.id) AppColors.highlight else AppColors.textColor
+            Box {
+                LazyColumn(state = listState, modifier = Modifier.padding(it)) {
+                    itemsIndexed(filteredTracks) { index, track ->
+                        val textColor =
+                            if (selectedTrack?.id == track.id) AppColors.highlight else AppColors.textColor
 
-                    ListItemText(
-                        track.title,
-                        color = textColor,
-                        endActionIconId = R.drawable.ic_add_playlist,
-                        action = {
-                            coroutineScope.launch(Dispatchers.Main) {
-                                listState.animateScrollToItem(index)
-                            }
+                        ListItemText(
+                            track.title,
+                            color = textColor,
+                            endActionIconId = R.drawable.ic_add_playlist,
+                            action = {
+                                coroutineScope.launch(Dispatchers.Main) {
+                                    listState.animateScrollToItem(index)
+                                }
 
-                            viewModel.playTrack(track)
-                        }) {
-                        navController.navigate(
-                            Destination.Playlists(
-                                PlaylistViewMode.Add(track.id)
+                                viewModel.playTrack(track)
+                            }) {
+                            navController.navigate(
+                                Destination.Playlists(
+                                    PlaylistViewMode.Add(track.id)
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -125,9 +151,30 @@ fun HomeScreen(
     }
 }
 
+@Composable
+private fun AlphabeticalScroller(
+    characterList: Map<Char, Int>,
+    modifier: Modifier = Modifier,
+    onLetterSelected: (index: Int) -> Unit
+) {
+    Row(modifier = modifier) {
+        characterList.keys.sorted().forEach { letter ->
+            Text(
+                text = letter.toString(),
+                style = MaterialTheme.typography.headlineSmall,
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .padding(all = 8.dp)
+                    .clickable { onLetterSelected(characterList[letter] ?: 0) },
+                color = AppColors.textColor
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(
+private fun Options(
     navController: NavController<Destination>,
     searchText: String,
     viewModel: HomeViewModel,
