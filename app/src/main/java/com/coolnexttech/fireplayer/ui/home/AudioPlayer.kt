@@ -10,7 +10,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.utils.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.VMProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @SuppressLint("StaticFieldLeak")
-class AudioPlayerViewModel(context: Context): ViewModel() {
+class AudioPlayer(context: Context): ViewModel() {
 
     private var player: ExoPlayer? = null
 
@@ -37,8 +37,6 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
-
-    private val homeViewModel = ViewModelProvider.homeViewModel()
 
     private val audioAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
@@ -61,7 +59,7 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
                         _totalTime.value = duration
                         _currentTime.value = currentPosition
                     } else if (playbackState == Player.STATE_ENDED) {
-                        homeViewModel.selectNextTrack()
+                        VMProvider.homeViewModel.playNextTrack()
                     }
                  }
             })
@@ -82,7 +80,7 @@ class AudioPlayerViewModel(context: Context): ViewModel() {
                 play()
             }
         } catch (e: Exception) {
-            homeViewModel.selectNextTrack()
+            VMProvider.homeViewModel.playNextTrack()
         }
     }
 

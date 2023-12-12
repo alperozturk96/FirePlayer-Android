@@ -2,15 +2,17 @@ package com.coolnexttech.fireplayer.ui.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
-import com.coolnexttech.fireplayer.utils.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.filter
 import com.coolnexttech.fireplayer.utils.extensions.getNextTrack
 import com.coolnexttech.fireplayer.utils.extensions.sort
+import com.coolnexttech.fireplayer.utils.extensions.startPlayerServiceWithDelay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -70,65 +72,42 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun updatePrevTracks() {
-        _prevTracks.update {
-            _selectedTrack.value?.let { index -> it.add(index) }
-            it
-        }
-    }
-
-    fun selectPreviousTrack() {
+    fun playPreviousTrack() {
         if (_prevTracks.value.size > 1) {
             _prevTracks.value.removeLast()
-            _prevTracks.value.lastOrNull()?.let { prevIndex ->
-                _selectedTrack.update {
-                    prevIndex
-                }
+            _prevTracks.value.lastOrNull()?.let { prevTrack ->
+                VMProvider.audioPlayer.play(prevTrack.path)
             }
         }
     }
 
-    fun selectTrack(track: Track) {
-        if (track.id == _selectedTrack.value?.id) {
-            val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel()
-            audioPlayerViewModel.play(track.path)
-        } else {
-            _selectedTrack.update {
-                track
-            }
+    fun playTrack(track: Track) {
+        _selectedTrack.update {
+            track
         }
+        VMProvider.audioPlayer.play(track.path)
+        _prevTracks.update {
+            it.add(track)
+            it
+        }
+        FirePlayer.context.startPlayerServiceWithDelay()
     }
 
-    fun selectNextTrack() {
+    fun playNextTrack() {
         if (_filteredTracks.value.isEmpty() || _selectedTrack.value == null) {
             return
         }
 
         if (_filteredTracks.value.size == 1) {
-            selectTrack(_filteredTracks.value.first())
+            playTrack(_filteredTracks.value.first())
         }
 
-        val nextTrack = getNextTrack() ?: return
-
-        if (_prevTracks.value.last() == nextTrack) {
-            selectTrack(nextTrack)
-        } else {
-            _prevTracks.update {
-                it.add(nextTrack)
-                it
-            }
-
-            _selectedTrack.update {
-                nextTrack
-            }
-        }
-    }
-
-    private fun getNextTrack(): Track? {
-        return when (_playMode.value) {
+        val nextTrack = when (_playMode.value) {
             PlayMode.Shuffle -> _filteredTracks.value.random()
             PlayMode.Sequential -> _filteredTracks.value.getNextTrack(_selectedTrack.value)?.first
-        }
+        } ?: return
+
+        playTrack(nextTrack)
     }
 
     fun search(value: String) {

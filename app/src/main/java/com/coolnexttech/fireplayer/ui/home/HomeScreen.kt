@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -47,9 +45,7 @@ import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
-import com.coolnexttech.fireplayer.utils.extensions.getNextTrack
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
-import com.coolnexttech.fireplayer.utils.extensions.startPlayerServiceWithDelay
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.Dispatchers
@@ -59,28 +55,14 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavController<Destination>,
     viewModel: HomeViewModel,
-    audioPlayerViewModel: AudioPlayerViewModel
+    audioPlayer: AudioPlayer
 ) {
-    val context = LocalContext.current
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
     val selectedTrack by viewModel.selectedTrack.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(selectedTrack) {
-        selectedTrack?.let {
-            audioPlayerViewModel.play(it.path)
-            viewModel.updatePrevTracks()
-            context.startPlayerServiceWithDelay()
-
-            val trackIndex = filteredTracks.getNextTrack(it)?.second
-            trackIndex?.let {
-                listState.scrollToItem(trackIndex)
-            }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -93,7 +75,7 @@ fun HomeScreen(
                 })
         }, bottomBar = {
             if (selectedTrack != null) {
-                SeekbarView(audioPlayerViewModel, viewModel)
+                SeekbarView(audioPlayer, viewModel)
             }
         }) {
         if (filteredTracks.isEmpty()) {
@@ -120,7 +102,7 @@ fun HomeScreen(
                                 listState.animateScrollToItem(index)
                             }
 
-                            viewModel.selectTrack(track)
+                            viewModel.playTrack(track)
                         }) {
                         navController.navigate(
                             Destination.Playlists(

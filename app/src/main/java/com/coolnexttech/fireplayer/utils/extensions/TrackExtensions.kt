@@ -25,7 +25,11 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
 fun List<Track>.getNextTrack(track: Track?): Pair<Track, Int>? {
     this.forEachIndexed { index, newTrack ->
         if (track?.id == newTrack.id) {
-            return Pair(newTrack, index)
+            return if (index + 1 in this.indices) {
+                Pair(this[index + 1], index)
+            } else {
+                Pair(this[0], index)
+            }
         }
     }
 

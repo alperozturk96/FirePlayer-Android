@@ -10,17 +10,13 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.PlayerEvents
-import com.coolnexttech.fireplayer.utils.ViewModelProvider
+import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.createNextTrackPendingIntent
 import com.coolnexttech.fireplayer.utils.extensions.createPreviousTrackPendingIntent
 import com.coolnexttech.fireplayer.utils.extensions.createReturnToAppPendingIntent
 import com.coolnexttech.fireplayer.utils.extensions.createTogglePlayerPendingIntent
 
-
 class PlayerService : Service() {
-    private val homeViewModel = ViewModelProvider.homeViewModel()
-    private val audioPlayerViewModel = ViewModelProvider.audioPlayerViewModel()
-
     private val previousTrackIntent: PendingIntent by lazy { createPreviousTrackPendingIntent() }
     private val toggleTrackIntent: PendingIntent by lazy { createTogglePlayerPendingIntent() }
     private val nextTrackIntent: PendingIntent by lazy { createNextTrackPendingIntent() }
@@ -38,16 +34,16 @@ class PlayerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             PlayerEvents.Previous.name -> {
-                homeViewModel.selectPreviousTrack()
+                VMProvider.homeViewModel.playPreviousTrack()
                 updateNotification()
             }
 
             PlayerEvents.Toggle.name -> {
-                audioPlayerViewModel.togglePlayPause()
+                VMProvider.audioPlayer.togglePlayPause()
             }
 
             PlayerEvents.Next.name -> {
-                homeViewModel.selectNextTrack()
+                VMProvider.homeViewModel.playNextTrack()
                 updateNotification()
             }
         }
@@ -75,7 +71,7 @@ class PlayerService : Service() {
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentTitle(homeViewModel.currentTrackTitle())
+            .setContentTitle(VMProvider.homeViewModel.currentTrackTitle())
             .setContentIntent(returnToAppIntent)
             .setSmallIcon(R.drawable.ic_fire)
             .addAction(
@@ -85,7 +81,7 @@ class PlayerService : Service() {
             )
             .addAction(
                 R.drawable.ic_pause,
-                getString(audioPlayerViewModel.toggleIconTextId()),
+                getString(VMProvider.audioPlayer.toggleIconTextId()),
                 toggleTrackIntent
             )
             .addAction(

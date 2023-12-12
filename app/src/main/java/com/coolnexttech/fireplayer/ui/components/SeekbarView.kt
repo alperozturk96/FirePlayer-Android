@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.ui.home.AudioPlayerViewModel
+import com.coolnexttech.fireplayer.ui.home.AudioPlayer
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing16
@@ -29,12 +29,12 @@ import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 
 @Composable
 fun SeekbarView(
-    audioPlayerViewModel: AudioPlayerViewModel,
+    audioPlayer: AudioPlayer,
     homeViewModel: HomeViewModel,
 ) {
-    val currentTime by audioPlayerViewModel.currentTime.collectAsState()
-    val totalTime by audioPlayerViewModel.totalTime.collectAsState()
-    val isPlaying by audioPlayerViewModel.isPlaying.collectAsState()
+    val currentTime by audioPlayer.currentTime.collectAsState()
+    val totalTime by audioPlayer.totalTime.collectAsState()
+    val isPlaying by audioPlayer.isPlaying.collectAsState()
 
     Column(
         modifier = Modifier
@@ -43,16 +43,16 @@ fun SeekbarView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (audioPlayerViewModel.isTotalTimeValid()) {
-            MediaSlider(audioPlayerViewModel, currentTime, totalTime)
+        if (audioPlayer.isTotalTimeValid()) {
+            MediaSlider(audioPlayer, currentTime, totalTime)
         } else {
             MediaSliderNotAvailable()
         }
 
         VSpacing8()
 
-        MediaControl(audioPlayerViewModel, isPlaying, { homeViewModel.selectPreviousTrack() }) {
-            homeViewModel.selectNextTrack()
+        MediaControl(audioPlayer, isPlaying, { homeViewModel.playPreviousTrack() }) {
+            homeViewModel.playNextTrack()
         }
     }
 }
@@ -67,7 +67,7 @@ private fun MediaSliderNotAvailable() {
 
 @Composable
 private fun MediaSlider(
-    audioPlayerViewModel: AudioPlayerViewModel,
+    audioPlayer: AudioPlayer,
     currentTime: Long,
     totalTime: Long
 ) {
@@ -94,10 +94,10 @@ private fun MediaSlider(
             ),
             value = currentTime.toFloat(),
             onValueChange = { newPosition ->
-                audioPlayerViewModel.updateCurrentTime(newPosition.toLong())
+                audioPlayer.updateCurrentTime(newPosition.toLong())
             },
             onValueChangeFinished = {
-                audioPlayerViewModel.seekTo(currentTime)
+                audioPlayer.seekTo(currentTime)
             },
             valueRange = 0f..totalTime.toFloat(),
             modifier = Modifier.weight(0.85f)
@@ -115,7 +115,7 @@ private fun MediaSlider(
 
 @Composable
 private fun MediaControl(
-    audioPlayerViewModel: AudioPlayerViewModel,
+    audioPlayer: AudioPlayer,
     isPlaying: Boolean,
     selectPreviousTrack: () -> Unit,
     selectNextTrack: () -> Unit
@@ -134,7 +134,7 @@ private fun MediaControl(
         HSpacing16()
 
         ActionImageButton(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play, size = 40.dp) {
-            audioPlayerViewModel.togglePlayPause()
+            audioPlayer.togglePlayPause()
         }
 
         HSpacing16()
