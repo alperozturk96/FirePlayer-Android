@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.service.PlayerService
 import com.coolnexttech.fireplayer.ui.MainActivity
@@ -39,6 +40,14 @@ fun Context.createTogglePlayerPendingIntent(): PendingIntent {
     } else {
         PendingIntent.getService(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
+}
+
+fun Context.showToast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
+
+fun Context.showToast(messageId: Int) {
+    Toast.makeText(this, getString(messageId), Toast.LENGTH_SHORT).show()
 }
 
 fun Context.createReturnToAppPendingIntent(): PendingIntent {

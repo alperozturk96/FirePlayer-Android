@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.ui.playlists
 
+import android.content.Context
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
+import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.pop
 import dev.olshevski.navigation.reimagined.replaceAll
@@ -43,6 +46,7 @@ fun PlaylistsScreen(
     mode: PlaylistViewMode,
     viewModel: PlaylistsViewModel
 ) {
+    val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
     val showAddPlaylist = remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -62,6 +66,7 @@ fun PlaylistsScreen(
                     playlistTitle,
                     action = {
                         playlistAction(
+                            context,
                             mode,
                             viewModel,
                             navController,
@@ -92,6 +97,7 @@ fun PlaylistsScreen(
 }
 
 private fun playlistAction(
+    context: Context,
     mode: PlaylistViewMode,
     viewModel: PlaylistsViewModel,
     navController: NavController<Destination>,
@@ -100,8 +106,10 @@ private fun playlistAction(
     if (mode is PlaylistViewMode.Add) {
         viewModel.addTrackToPlaylist(mode.trackId, playlistTitle)
         navController.pop()
+        context.showToast(context.getString(R.string.playlist_screen_add, mode.trackTitle, playlistTitle))
     } else {
         navController.replaceAll(Destination.Home(playlistTitle))
+        context.showToast(context.getString(R.string.playlist_screen_selected_playlist, playlistTitle))
     }
 }
 

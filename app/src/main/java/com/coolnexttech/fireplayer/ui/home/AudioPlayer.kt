@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("StaticFieldLeak")
 class AudioPlayer(context: Context): ViewModel() {
 
-    private var player: ExoPlayer? = null
+    var player: ExoPlayer? = null
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -38,13 +38,16 @@ class AudioPlayer(context: Context): ViewModel() {
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
-    private val audioAttributes = AudioAttributes.Builder()
+    private val playerAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
         .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
         .build()
 
     init {
         player = ExoPlayer.Builder(context).build().apply {
+            volume = 1.0f
+            setAudioAttributes(playerAttributes, true)
+            setHandleAudioBecomingNoisy(true)
             addListener(object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     _isPlaying.value = isPlaying
@@ -64,9 +67,6 @@ class AudioPlayer(context: Context): ViewModel() {
                  }
             })
         }
-
-        player?.volume = 1.0f
-        player?.setAudioAttributes(audioAttributes, true)
     }
 
     fun play(uri: Uri) {

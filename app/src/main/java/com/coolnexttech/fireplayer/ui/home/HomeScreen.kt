@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.ui.home
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,6 +55,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
+import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.Dispatchers
@@ -64,9 +67,16 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     audioPlayer: AudioPlayer
 ) {
+    val context = LocalContext.current
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
+    val showAlphabeticalScroller = remember { mutableStateOf(false) }
+    val alphabeticalScrollerIconId = if (showAlphabeticalScroller.value) {
+        R.drawable.ic_arrow_up
+    } else {
+        R.drawable.ic_arrow_down
+    }
     val selectedTrack by viewModel.selectedTrack.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -79,23 +89,33 @@ fun HomeScreen(
         topBar = {
             Column {
                 Options(
+                    context,
+                    alphabeticalScrollerIconId,
                     navController,
                     searchText,
-                    viewModel
-                ) { showSortOptions.value = true }
-
-                AlphabeticalScroller(
-                    characterList = characterList,
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .background(AppColors.background)
-                        .padding(all = 16.dp),
-                    onLetterSelected = { index ->
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(index)
-                        }
-                    }
+                    viewModel,
+                    showSortOptions = {
+                        showSortOptions.value = true
+                    },
+                    toggleVisibilityOfAlphabeticalScroller = {
+                        showAlphabeticalScroller.value = !showAlphabeticalScroller.value
+                    },
                 )
+
+                if (showAlphabeticalScroller.value) {
+                    AlphabeticalScroller(
+                        characterList = characterList,
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .background(AppColors.background)
+                            .padding(all = 16.dp),
+                        onLetterSelected = { index ->
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(index)
+                            }
+                        }
+                    )
+                }
             }
         }, bottomBar = {
             if (selectedTrack != null) {
@@ -131,7 +151,7 @@ fun HomeScreen(
                             }) {
                             navController.navigate(
                                 Destination.Playlists(
-                                    PlaylistViewMode.Add(track.id)
+                                    PlaylistViewMode.Add(track.id, track.title)
                                 )
                             )
                         }
@@ -155,7 +175,7 @@ fun HomeScreen(
 private fun AlphabeticalScroller(
     characterList: Map<Char, Int>,
     modifier: Modifier = Modifier,
-    onLetterSelected: (index: Int) -> Unit
+    onLetterSelected: (index: Int) -> Unit,
 ) {
     Row(modifier = modifier) {
         characterList.keys.sorted().forEach { letter ->
@@ -175,10 +195,13 @@ private fun AlphabeticalScroller(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Options(
+    context: Context,
+    alphabeticalScrollerIconId: Int,
     navController: NavController<Destination>,
     searchText: String,
     viewModel: HomeViewModel,
     showSortOptions: () -> Unit,
+    toggleVisibilityOfAlphabeticalScroller: () -> Unit
 ) {
     val filterOption by viewModel.filterOption.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
@@ -207,12 +230,17 @@ private fun Options(
             )
         },
         actions = {
+            ActionIconButton(alphabeticalScrollerIconId) {
+                toggleVisibilityOfAlphabeticalScroller()
+            }
+
             ActionIconButton(R.drawable.ic_playlists) {
                 navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
             }
 
             ActionIconButton(filterOption.filterOptionIconId()) {
                 viewModel.changeFilterOption(searchText)
+                context.showToast(filterOption.selectNextFilterOption().searchTitleId())
             }
 
             ActionIconButton(playMode.getIconId()) {
@@ -225,6 +253,7 @@ private fun Options(
 
             ActionIconButton(R.drawable.ic_reset) {
                 viewModel.initTrackList(null)
+                context.showToast(R.string.home_screen_reset_button_description)
             }
         }
     )

@@ -10,7 +10,8 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.filter
-import com.coolnexttech.fireplayer.utils.extensions.getNextTrack
+import com.coolnexttech.fireplayer.utils.extensions.getNextRandomTrack
+import com.coolnexttech.fireplayer.utils.extensions.getNextTrackAndIndex
 import com.coolnexttech.fireplayer.utils.extensions.sort
 import com.coolnexttech.fireplayer.utils.extensions.startPlayerServiceWithDelay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,15 +83,28 @@ class HomeViewModel : ViewModel() {
     }
 
     fun playTrack(track: Track) {
+        updateSelectedTrack(track)
+        VMProvider.audioPlayer.play(track.path)
+        updatePrevTracks(track)
+        FirePlayer.context.startPlayerServiceWithDelay()
+    }
+
+    private fun updateSelectedTrack(track: Track) {
         _selectedTrack.update {
             track
         }
-        VMProvider.audioPlayer.play(track.path)
+    }
+
+    private fun updatePrevTracks(track: Track) {
         _prevTracks.update {
-            it.add(track)
-            it
+            if (it.size == _filteredTracks.value.size) {
+                it.clear()
+                it
+            } else {
+                it.add(track)
+                it
+            }
         }
-        FirePlayer.context.startPlayerServiceWithDelay()
     }
 
     fun playNextTrack() {
@@ -103,8 +117,8 @@ class HomeViewModel : ViewModel() {
         }
 
         val nextTrack = when (_playMode.value) {
-            PlayMode.Shuffle -> _filteredTracks.value.random()
-            PlayMode.Sequential -> _filteredTracks.value.getNextTrack(_selectedTrack.value)?.first
+            PlayMode.Shuffle -> _filteredTracks.value.getNextRandomTrack(excludedTracks = _prevTracks.value)
+            PlayMode.Sequential -> _filteredTracks.value.getNextTrackAndIndex(_selectedTrack.value)?.first
         } ?: return
 
         playTrack(nextTrack)

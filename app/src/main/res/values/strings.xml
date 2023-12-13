@@ -8,6 +8,8 @@
     <string name="home_filter_by_artist_section_title">Filtered By Artist</string>
     <string name="home_filter_by_title_section_title">Filtered By Title</string>
 
+    <string name="home_screen_reset_button_description">Track list reset</string>
+
     <string name="home_bottom_sheet_add_to_playlist_action_title">Add To Playlist</string>
 
     <string name="home_search_in_titles_text">Search Track In Titles</string>
@@ -20,7 +22,6 @@
     <string name="home_sort_dialog_sort_by_new_to_old_title">Sort New To Old</string>
     <string name="home_sort_dialog_sort_by_old_to_new_title">Sort Old To New</string>
 
-
     <string name="home_content_not_available_text">Add Your Tracks To Music Folder</string>
 
     <string name="playlists_title">Playlists</string>
@@ -28,11 +29,11 @@
     <string name="playlist_bottom_sheet_delete_action_title">Delete</string>
     <string name="playlists_content_unavailable_text">You dont have any playlist yet</string>
     <string name="playlists_content_unavailable_title">No playlists</string>
+    <string name="playlist_screen_add">%s track added to %s</string>
+    <string name="playlist_screen_selected_playlist">%s playlist selected</string>
 
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
-
-
 
     <string name="media_control_play_text">Play</string>
     <string name="media_control_pause_text">Pause</string>

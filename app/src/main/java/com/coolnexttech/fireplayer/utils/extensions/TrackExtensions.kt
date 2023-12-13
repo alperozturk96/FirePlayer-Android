@@ -22,7 +22,7 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
     }
 }
 
-fun List<Track>.getNextTrack(track: Track?): Pair<Track, Int>? {
+fun List<Track>.getNextTrackAndIndex(track: Track?): Pair<Track, Int>? {
     this.forEachIndexed { index, newTrack ->
         if (track?.id == newTrack.id) {
             return if (index + 1 in this.indices) {
@@ -34,6 +34,16 @@ fun List<Track>.getNextTrack(track: Track?): Pair<Track, Int>? {
     }
 
     return null
+}
+
+fun List<Track>.getNextRandomTrack(excludedTracks: List<Track>): Track? {
+    val availableTracks = this.filterNot { it in excludedTracks }
+
+    return if (availableTracks.isEmpty()) {
+        this.random()
+    } else {
+        availableTracks.random()
+    }
 }
 
 fun List<Track>.filterByPlaylist(titles: ArrayList<Long>): List<Track> {
