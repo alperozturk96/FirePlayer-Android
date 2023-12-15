@@ -29,7 +29,7 @@
     <string name="playlist_bottom_sheet_delete_action_title">Delete</string>
     <string name="playlists_content_unavailable_text">You dont have any playlist yet</string>
     <string name="playlists_content_unavailable_title">No playlists</string>
-    <string name="playlist_screen_add">%s track added to %s</string>
+    <string name="playlist_screen_add">%s track added to %s playlist</string>
     <string name="playlist_screen_selected_playlist">%s playlist selected</string>
 
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>

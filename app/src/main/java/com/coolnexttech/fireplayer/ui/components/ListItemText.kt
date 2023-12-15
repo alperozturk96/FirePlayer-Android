@@ -22,15 +22,12 @@ fun ListItemText(
     action: () -> Unit,
     moreAction: () -> Unit
 ) {
-    Row {
+    Row(Modifier.clickable { action() }) {
         Text(
             text = text,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
-                .padding(all = 8.dp)
-                .clickable {
-                    action()
-                },
+                .padding(all = 8.dp),
             color = color
         )
 

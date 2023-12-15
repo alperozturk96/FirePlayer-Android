@@ -52,6 +52,7 @@ import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.SeekbarView
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
@@ -252,6 +253,7 @@ private fun Options(
             }
 
             ActionIconButton(R.drawable.ic_reset) {
+                FolderAnalyzer.initTracksFromMusicFolder()
                 viewModel.initTrackList(null)
                 context.showToast(R.string.home_screen_reset_button_description)
             }

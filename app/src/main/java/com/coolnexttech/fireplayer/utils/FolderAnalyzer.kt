@@ -19,7 +19,7 @@ object FolderAnalyzer {
     var tracks: ArrayList<Track> = arrayListOf()
 
     init {
-        tracks = getTracksFromMusicFolder()
+        initTracksFromMusicFolder()
     }
 
     fun getTracksFromPlaylist(selectedPlaylistTitle: String): List<Track> {
@@ -31,6 +31,10 @@ object FolderAnalyzer {
         } else {
             listOf()
         }
+    }
+
+    fun initTracksFromMusicFolder() {
+        tracks = getTracksFromMusicFolder()
     }
 
     private fun getTracksFromMusicFolder(): ArrayList<Track> {
