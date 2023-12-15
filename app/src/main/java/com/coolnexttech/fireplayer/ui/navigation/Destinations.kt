@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 sealed class Destination : Parcelable {
     @Parcelize
-    data class Home(val selectedPlaylistTitle: String?) : Destination()
+    data object Home : Destination()
 
     @Parcelize
     data class Playlists(val playlistViewMode: PlaylistViewMode) : Destination()

@@ -11,7 +11,7 @@ import dev.olshevski.navigation.reimagined.rememberNavController
 @Composable
 fun NavHostScreen() {
     val navController = rememberNavController<Destination>(
-        startDestination = Destination.Home(null)
+        startDestination = Destination.Home
     )
 
     NavBackHandler(navController)
@@ -19,9 +19,7 @@ fun NavHostScreen() {
     NavHost(navController) { destination ->
         when (destination) {
             is Destination.Home -> {
-                val homeViewModel = VMProvider.homeViewModel
-                homeViewModel.initTrackList(destination.selectedPlaylistTitle)
-                HomeScreen(navController, homeViewModel, VMProvider.audioPlayer)
+                HomeScreen(navController, VMProvider.homeViewModel, VMProvider.audioPlayer)
             }
 
             is Destination.Playlists -> {

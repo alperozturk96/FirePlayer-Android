@@ -34,11 +34,11 @@ import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.pop
-import dev.olshevski.navigation.reimagined.replaceAll
 
 @Composable
 fun PlaylistsScreen(
@@ -105,12 +105,13 @@ private fun playlistAction(
 ) {
     if (mode is PlaylistViewMode.Add) {
         viewModel.addTrackToPlaylist(mode.trackId, playlistTitle)
-        navController.pop()
         context.showToast(context.getString(R.string.playlist_screen_add, mode.trackTitle, playlistTitle))
     } else {
-        navController.replaceAll(Destination.Home(playlistTitle))
+        VMProvider.homeViewModel.initTrackList(playlistTitle)
         context.showToast(context.getString(R.string.playlist_screen_selected_playlist, playlistTitle))
     }
+
+    navController.pop()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
