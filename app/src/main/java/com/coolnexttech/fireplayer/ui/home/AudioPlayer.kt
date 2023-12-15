@@ -9,7 +9,6 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.utils.VMProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +22,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("StaticFieldLeak")
 class AudioPlayer(context: Context): ViewModel() {
 
-    var player: ExoPlayer? = null
+    private var player: ExoPlayer? = null
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -95,10 +94,6 @@ class AudioPlayer(context: Context): ViewModel() {
         player?.pause()
     }
 
-    fun stop() {
-        player?.stop()
-    }
-
     fun start() {
         player?.play()
     }
@@ -118,14 +113,6 @@ class AudioPlayer(context: Context): ViewModel() {
 
     fun isTotalTimeValid(): Boolean = totalTime.value > 2L
 
-    fun toggleIconTextId(): Int {
-        return if (_isPlaying.value) {
-            R.string.media_control_pause_text
-        } else {
-            R.string.media_control_play_text
-        }
-    }
-
     private fun startPeriodicUpdateJob() {
         periodicUpdateJob?.cancel()
         periodicUpdateJob = coroutineScope.launch {
@@ -133,7 +120,6 @@ class AudioPlayer(context: Context): ViewModel() {
                  delay(1000)
                 _currentTime.value = player?.currentPosition ?: 0
                 _totalTime.value = player?.duration ?: 0
-
             }
         }
     }

@@ -4,18 +4,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.service.PlayerService
 import com.coolnexttech.fireplayer.ui.MainActivity
 
-fun Context.startPlayerServiceWithDelay(delay: Long = 1500L) {
-    Handler(Looper.getMainLooper()).postDelayed({
-        val intent = Intent(this, PlayerService::class.java)
-        startForegroundService(intent)
-    }, delay)
+fun Context.startPlayerService() {
+    val intent = Intent(this, PlayerService::class.java)
+    startForegroundService(intent)
 }
 
 fun Context.createPreviousTrackPendingIntent(): PendingIntent {

@@ -13,7 +13,7 @@ import com.coolnexttech.fireplayer.utils.extensions.filter
 import com.coolnexttech.fireplayer.utils.extensions.getNextRandomTrack
 import com.coolnexttech.fireplayer.utils.extensions.getNextTrackAndIndex
 import com.coolnexttech.fireplayer.utils.extensions.sort
-import com.coolnexttech.fireplayer.utils.extensions.startPlayerServiceWithDelay
+import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -81,16 +81,20 @@ class HomeViewModel : ViewModel() {
         if (_prevTracks.value.size > 1) {
             _prevTracks.value.removeLast()
             _prevTracks.value.lastOrNull()?.let { prevTrack ->
-                VMProvider.audioPlayer.play(prevTrack.path)
+                playTrack(prevTrack, false)
             }
         }
     }
 
-    fun playTrack(track: Track) {
+    fun playTrack(track: Track, updatePrevStack: Boolean = true) {
         updateSelectedTrack(track)
         VMProvider.audioPlayer.play(track.path)
-        updatePrevTracks(track)
-        FirePlayer.context.startPlayerServiceWithDelay()
+
+        if (updatePrevStack) {
+            updatePrevTracks(track)
+        }
+
+        FirePlayer.context.startPlayerService()
     }
 
     private fun updateSelectedTrack(track: Track) {

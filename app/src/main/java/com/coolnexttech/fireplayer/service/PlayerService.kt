@@ -22,6 +22,8 @@ class PlayerService : Service() {
     private val nextTrackIntent: PendingIntent by lazy { createNextTrackPendingIntent() }
     private val returnToAppIntent: PendingIntent by lazy { createReturnToAppPendingIntent() }
 
+    private var isPlaying = true
+
     companion object {
         const val notificationId = 1
         const val channelId = "MediaControlChannel"
@@ -35,7 +37,6 @@ class PlayerService : Service() {
         when (intent?.action) {
             PlayerEvents.Previous.name -> {
                 VMProvider.homeViewModel.playPreviousTrack()
-                updateNotification()
             }
 
             PlayerEvents.Play.name -> {
@@ -44,15 +45,16 @@ class PlayerService : Service() {
 
             PlayerEvents.Pause.name -> {
                 VMProvider.audioPlayer.pause()
+                isPlaying = false
             }
 
             PlayerEvents.Toggle.name -> {
                 VMProvider.audioPlayer.togglePlayPause()
+                isPlaying = !isPlaying
             }
 
             PlayerEvents.Next.name -> {
                 VMProvider.homeViewModel.playNextTrack()
-                updateNotification()
             }
         }
 
@@ -62,6 +64,7 @@ class PlayerService : Service() {
 
     private fun updateNotification() {
         val notification = createNotification()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
                 notificationId,
@@ -77,6 +80,12 @@ class PlayerService : Service() {
     }
 
     private fun createNotification(): Notification {
+        val toggleTextId = if (isPlaying) {
+            R.string.media_control_pause_text
+        } else {
+            R.string.media_control_play_text
+        }
+
         return NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentTitle(VMProvider.homeViewModel.currentTrackTitle())
@@ -89,7 +98,7 @@ class PlayerService : Service() {
             )
             .addAction(
                 R.drawable.ic_pause,
-                getString(VMProvider.audioPlayer.toggleIconTextId()),
+                getString(toggleTextId),
                 toggleTrackIntent
             )
             .addAction(
