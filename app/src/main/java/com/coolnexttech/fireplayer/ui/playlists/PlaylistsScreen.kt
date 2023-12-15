@@ -34,6 +34,7 @@ import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.utils.UserStorage
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.utils.extensions.showToast
@@ -53,7 +54,7 @@ fun PlaylistsScreen(
     var selectedPlaylistTitle by remember { mutableStateOf("") }
 
     Scaffold(topBar = {
-        TopBar {
+        TopBar(viewModel) {
             showAddPlaylist.value = true
         }
     }) {
@@ -116,7 +117,7 @@ private fun playlistAction(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(showAddPlaylist: () -> Unit) {
+private fun TopBar(viewModel: PlaylistsViewModel, showAddPlaylist: () -> Unit) {
     TopAppBar(
         colors = getTopAppBarColor(),
         title = {
@@ -125,6 +126,15 @@ private fun TopBar(showAddPlaylist: () -> Unit) {
         actions = {
             ActionIconButton(R.drawable.ic_add_playlist) {
                 showAddPlaylist()
+            }
+
+            ActionIconButton(R.drawable.ic_import) {
+                UserStorage.importPlaylists()
+                viewModel.readPlaylists()
+            }
+
+            ActionIconButton(R.drawable.ic_export) {
+                UserStorage.exportPlaylists()
             }
         }
     )

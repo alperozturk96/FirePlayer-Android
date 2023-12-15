@@ -16,7 +16,7 @@ class PlaylistsViewModel: ViewModel() {
         readPlaylists()
     }
 
-    private fun readPlaylists() {
+    fun readPlaylists() {
         _playlists.update {
             UserStorage.readPlaylists()
         }
@@ -38,7 +38,6 @@ class PlaylistsViewModel: ViewModel() {
         }
     }
 
-    // FIXME
     fun removePlaylist(title: String) {
         _playlists.update {
             it.remove(title)
