@@ -140,7 +140,7 @@ fun HomeScreen(
                             if (selectedTrack?.id == track.id) AppColors.highlight else AppColors.textColor
 
                         ListItemText(
-                            track.title,
+                            track.titleRepresentation(),
                             color = textColor,
                             action = {
                                 listItemAction(

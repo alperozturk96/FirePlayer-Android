@@ -30,9 +30,9 @@ fun ListItemText(
             color = color
         )
 
-        endAction?.let {
-            Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
+        endAction?.let {
             ActionIconButton(it.iconId) {
                 it.action()
             }

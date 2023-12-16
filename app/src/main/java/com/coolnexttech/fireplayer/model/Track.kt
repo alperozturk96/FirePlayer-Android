@@ -11,4 +11,14 @@ data class Track(
     var duration: Long,
     var pathExtension: String? = null,
     var dateAdded: Long,
-)
+) {
+    private val maxTitleCharSize = 20
+
+    fun titleRepresentation(): String {
+        return if (title.length > maxTitleCharSize) {
+            title.take(maxTitleCharSize) + "..."
+        } else {
+            title
+        }
+    }
+}
