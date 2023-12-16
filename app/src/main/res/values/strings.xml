@@ -22,6 +22,7 @@
     <string name="home_sort_dialog_sort_by_new_to_old_title">Sort New To Old</string>
     <string name="home_sort_dialog_sort_by_old_to_new_title">Sort Old To New</string>
 
+    <string name="home_add_track_to_playlist_hint">Select track to add playlist</string>
     <string name="home_content_not_available_text">Add Your Tracks To Music Folder</string>
 
     <string name="playlists_title">Playlists</string>

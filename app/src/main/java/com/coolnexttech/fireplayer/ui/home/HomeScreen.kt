@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.ui.home
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,12 +10,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,8 +44,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.model.FilterOptions
+import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.SortOptions
+import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.ContentUnavailableView
@@ -56,12 +61,12 @@ import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
-import com.coolnexttech.fireplayer.utils.extensions.VSpacing32
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -103,38 +108,16 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            Column {
-                Options(
-                    alphabeticalScrollerIconId,
-                    filterOption.searchTitleId(),
-                    searchText,
-                    viewModel,
-
-                    ) {
-                    showAlphabeticalScroller.value = !showAlphabeticalScroller.value
-                }
-
-                AnimatedVisibility(showAlphabeticalScroller.value) {
-                    Column(
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        AlphabeticalScroller(
-                            characterList = characterList,
-                            modifier = Modifier
-                                .horizontalScroll(rememberScrollState())
-                                .background(AppColors.background),
-                            onLetterSelected = { index ->
-                                coroutineScope.launch {
-                                    listState.animateScrollToItem(index)
-                                }
-                            }
-                        )
-
-                        Divider()
-                    }
-                }
-            }
+            TopBar(
+                alphabeticalScrollerIconId,
+                filterOption,
+                searchText,
+                viewModel,
+                showAlphabeticalScroller,
+                characterList,
+                coroutineScope,
+                listState
+            )
         }, bottomBar = {
             if (selectedTrack != null) {
                 SeekbarView(audioPlayer, viewModel)
@@ -160,68 +143,34 @@ fun HomeScreen(
                             track.title,
                             color = textColor,
                             action = {
-                                if (addTrackToPlaylist.value) {
-                                    navController.navigate(
-                                        Destination.Playlists(
-                                            PlaylistViewMode.Add(track.id, track.title)
-                                        )
-                                    )
-
-                                    addTrackToPlaylist.value = false
-                                } else {
-                                    coroutineScope.launch(Dispatchers.Main) {
-                                        listState.animateScrollToItem(index)
-                                    }
-
-                                    viewModel.playTrack(track)
-                                }
+                                listItemAction(
+                                    addTrackToPlaylist,
+                                    navController,
+                                    track,
+                                    coroutineScope,
+                                    listState,
+                                    index,
+                                    viewModel
+                                )
                             })
                     }
                 }
 
-                Column(
+                SideControls(
+                    context,
+                    viewModel,
+                    navController,
                     modifier = Modifier
                         .background(AppColors.background)
-                        .align(Alignment.CenterEnd)
-                ) {
-                    ActionIconButton(optionsIconId) {
-                        showOptions.value = !showOptions.value
-                    }
-
-                    AnimatedVisibility(showOptions.value) {
-                        Column {
-                            ActionIconButton(R.drawable.ic_playlists) {
-                                navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
-                            }
-
-                            ActionIconButton(filterOption.filterOptionIconId()) {
-                                viewModel.changeFilterOption(searchText)
-                                context.showToast(
-                                    filterOption.selectNextFilterOption().searchTitleId()
-                                )
-                            }
-
-                            ActionIconButton(playMode.getIconId()) {
-                                viewModel.changePlayMode()
-                            }
-
-                            ActionIconButton(R.drawable.ic_sort) {
-                                showSortOptions.value = true
-                            }
-
-                            ActionIconButton(R.drawable.ic_add_playlist) {
-                                addTrackToPlaylist.value = true
-                            }
-
-                            ActionIconButton(R.drawable.ic_reset) {
-                                viewModel.clearSearch()
-                                FolderAnalyzer.initTracksFromMusicFolder()
-                                viewModel.initTrackList(null)
-                                context.showToast(R.string.home_screen_reset_button_description)
-                            }
-                        }
-                    }
-                }
+                        .align(Alignment.CenterEnd),
+                    optionsIconId,
+                    searchText ,
+                    filterOption,
+                    playMode,
+                    showOptions.value,
+                    addTrackToPlaylist = { addTrackToPlaylist.value = true },
+                    showSortOptions = { showSortOptions.value = true },
+                    showOptions = { showOptions.value = !showOptions.value })
             }
 
             if (showSortOptions.value) {
@@ -231,6 +180,138 @@ fun HomeScreen(
                         viewModel.sort(sortOption)
                         showSortOptions.value = false
                     })
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopBar(
+    alphabeticalScrollerIconId: Int,
+    filterOption: FilterOptions,
+    searchText: String,
+    viewModel: HomeViewModel,
+    showAlphabeticalScroller: MutableState<Boolean>,
+    characterList: Map<Char, Int>,
+    coroutineScope: CoroutineScope,
+    listState: LazyListState
+) {
+    Column {
+        Options(
+            alphabeticalScrollerIconId,
+            filterOption.searchTitleId(),
+            searchText,
+            viewModel,
+
+            ) {
+            showAlphabeticalScroller.value = !showAlphabeticalScroller.value
+        }
+
+        AnimatedVisibility(showAlphabeticalScroller.value) {
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                AlphabeticalScroller(
+                    characterList = characterList,
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .background(AppColors.background),
+                    onLetterSelected = { index ->
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(index)
+                        }
+                    }
+                )
+
+                Divider()
+            }
+        }
+    }
+}
+
+private fun listItemAction(
+    addTrackToPlaylist: MutableState<Boolean>,
+    navController: NavController<Destination>,
+    track: Track,
+    coroutineScope: CoroutineScope,
+    listState: LazyListState,
+    index: Int,
+    viewModel: HomeViewModel
+) {
+    if (addTrackToPlaylist.value) {
+        navController.navigate(
+            Destination.Playlists(
+                PlaylistViewMode.Add(track.id, track.title)
+            )
+        )
+
+        addTrackToPlaylist.value = false
+    } else {
+        coroutineScope.launch(Dispatchers.Main) {
+            listState.animateScrollToItem(index)
+        }
+
+        viewModel.playTrack(track)
+    }
+}
+
+@Composable
+private fun SideControls(
+    context: Context,
+    viewModel: HomeViewModel,
+    navController: NavController<Destination>,
+    modifier: Modifier,
+    optionsIconId: Int,
+    searchText: String,
+    filterOption: FilterOptions,
+    playMode: PlayMode,
+    showAllOptions: Boolean,
+    addTrackToPlaylist: () -> Unit,
+    showSortOptions: () -> Unit,
+    showOptions: () -> Unit
+) {
+    Column(
+        modifier = modifier
+    ) {
+        ActionIconButton(optionsIconId) {
+            showOptions()
+        }
+
+        AnimatedVisibility(showAllOptions) {
+            Column {
+                ActionIconButton(R.drawable.ic_playlists) {
+                    navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
+                }
+
+                ActionIconButton(filterOption.filterOptionIconId()) {
+                    viewModel.changeFilterOption(searchText)
+                    context.showToast(
+                        filterOption.selectNextFilterOption().searchTitleId()
+                    )
+                }
+
+                ActionIconButton(playMode.getIconId()) {
+                    viewModel.changePlayMode()
+                }
+
+                ActionIconButton(R.drawable.ic_sort) {
+                    showSortOptions()
+                }
+
+                ActionIconButton(R.drawable.ic_add_playlist) {
+                    addTrackToPlaylist()
+                    context.showToast(
+                        R.string.home_add_track_to_playlist_hint
+                    )
+                }
+
+                ActionIconButton(R.drawable.ic_reset) {
+                    viewModel.clearSearch()
+                    FolderAnalyzer.initTracksFromMusicFolder()
+                    viewModel.initTrackList(null)
+                    context.showToast(R.string.home_screen_reset_button_description)
+                }
             }
         }
     }
