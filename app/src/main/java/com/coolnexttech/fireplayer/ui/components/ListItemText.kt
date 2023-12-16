@@ -11,16 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.model.ActionIcon
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @Composable
 fun ListItemText(
     text: String,
-    endActionIconId: Int = R.drawable.ic_more,
     color: Color = AppColors.textColor,
     action: () -> Unit,
-    moreAction: () -> Unit
+    endAction: ActionIcon? = null,
 ) {
     Row(Modifier.clickable { action() }) {
         Text(
@@ -31,10 +30,12 @@ fun ListItemText(
             color = color
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        endAction?.let {
+            Spacer(modifier = Modifier.weight(1f))
 
-        ActionIconButton(endActionIconId) {
-            moreAction()
+            ActionIconButton(it.iconId) {
+                it.action()
+            }
         }
     }
 

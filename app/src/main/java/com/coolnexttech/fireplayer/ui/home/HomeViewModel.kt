@@ -132,6 +132,12 @@ class HomeViewModel : ViewModel() {
         playTrack(nextTrack)
     }
 
+    fun clearSearch() {
+        _searchText.update {
+            ""
+        }
+    }
+
     fun search(value: String) {
         _searchText.update {
             value

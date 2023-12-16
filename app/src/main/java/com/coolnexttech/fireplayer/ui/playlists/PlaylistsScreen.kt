@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.model.ActionIcon
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ActionIconButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
@@ -65,6 +66,10 @@ fun PlaylistsScreen(
 
                 ListItemText(
                     playlistTitle,
+                    endAction = ActionIcon(R.drawable.ic_more) {
+                        selectedPlaylistTitle = playlistTitle
+                        showBottomSheet = true
+                    },
                     action = {
                         playlistAction(
                             context,
@@ -73,10 +78,7 @@ fun PlaylistsScreen(
                             navController,
                             playlistTitle
                         )
-                    }) {
-                    selectedPlaylistTitle = playlistTitle
-                    showBottomSheet = true
-                }
+                    })
             }
         }
     }

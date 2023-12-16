@@ -1,6 +1,6 @@
 package com.coolnexttech.fireplayer.ui.home
 
-import android.content.Context
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -54,6 +56,7 @@ import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
+import com.coolnexttech.fireplayer.utils.extensions.VSpacing32
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.utils.extensions.showToast
@@ -70,14 +73,26 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val filteredTracks by viewModel.filteredTracks.collectAsState()
+    val filterOption by viewModel.filterOption.collectAsState()
+    val playMode by viewModel.playMode.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
+    val addTrackToPlaylist = remember { mutableStateOf(false) }
+
     val showAlphabeticalScroller = remember { mutableStateOf(false) }
     val alphabeticalScrollerIconId = if (showAlphabeticalScroller.value) {
         R.drawable.ic_arrow_up
     } else {
         R.drawable.ic_arrow_down
     }
+
+    val showOptions = remember { mutableStateOf(false) }
+    val optionsIconId = if (showOptions.value) {
+        R.drawable.ic_arrow_right
+    } else {
+        R.drawable.ic_arrow_left
+    }
+
     val selectedTrack by viewModel.selectedTrack.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -90,32 +105,34 @@ fun HomeScreen(
         topBar = {
             Column {
                 Options(
-                    context,
                     alphabeticalScrollerIconId,
-                    navController,
+                    filterOption.searchTitleId(),
                     searchText,
                     viewModel,
-                    showSortOptions = {
-                        showSortOptions.value = true
-                    },
-                    toggleVisibilityOfAlphabeticalScroller = {
-                        showAlphabeticalScroller.value = !showAlphabeticalScroller.value
-                    },
-                )
 
-                if (showAlphabeticalScroller.value) {
-                    AlphabeticalScroller(
-                        characterList = characterList,
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState())
-                            .background(AppColors.background)
-                            .padding(all = 16.dp),
-                        onLetterSelected = { index ->
-                            coroutineScope.launch {
-                                listState.animateScrollToItem(index)
+                    ) {
+                    showAlphabeticalScroller.value = !showAlphabeticalScroller.value
+                }
+
+                AnimatedVisibility(showAlphabeticalScroller.value) {
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        AlphabeticalScroller(
+                            characterList = characterList,
+                            modifier = Modifier
+                                .horizontalScroll(rememberScrollState())
+                                .background(AppColors.background),
+                            onLetterSelected = { index ->
+                                coroutineScope.launch {
+                                    listState.animateScrollToItem(index)
+                                }
                             }
-                        }
-                    )
+                        )
+
+                        Divider()
+                    }
                 }
             }
         }, bottomBar = {
@@ -142,19 +159,66 @@ fun HomeScreen(
                         ListItemText(
                             track.title,
                             color = textColor,
-                            endActionIconId = R.drawable.ic_add_playlist,
                             action = {
-                                coroutineScope.launch(Dispatchers.Main) {
-                                    listState.animateScrollToItem(index)
-                                }
+                                if (addTrackToPlaylist.value) {
+                                    navController.navigate(
+                                        Destination.Playlists(
+                                            PlaylistViewMode.Add(track.id, track.title)
+                                        )
+                                    )
 
-                                viewModel.playTrack(track)
-                            }) {
-                            navController.navigate(
-                                Destination.Playlists(
-                                    PlaylistViewMode.Add(track.id, track.title)
+                                    addTrackToPlaylist.value = false
+                                } else {
+                                    coroutineScope.launch(Dispatchers.Main) {
+                                        listState.animateScrollToItem(index)
+                                    }
+
+                                    viewModel.playTrack(track)
+                                }
+                            })
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .background(AppColors.background)
+                        .align(Alignment.CenterEnd)
+                ) {
+                    ActionIconButton(optionsIconId) {
+                        showOptions.value = !showOptions.value
+                    }
+
+                    AnimatedVisibility(showOptions.value) {
+                        Column {
+                            ActionIconButton(R.drawable.ic_playlists) {
+                                navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
+                            }
+
+                            ActionIconButton(filterOption.filterOptionIconId()) {
+                                viewModel.changeFilterOption(searchText)
+                                context.showToast(
+                                    filterOption.selectNextFilterOption().searchTitleId()
                                 )
-                            )
+                            }
+
+                            ActionIconButton(playMode.getIconId()) {
+                                viewModel.changePlayMode()
+                            }
+
+                            ActionIconButton(R.drawable.ic_sort) {
+                                showSortOptions.value = true
+                            }
+
+                            ActionIconButton(R.drawable.ic_add_playlist) {
+                                addTrackToPlaylist.value = true
+                            }
+
+                            ActionIconButton(R.drawable.ic_reset) {
+                                viewModel.clearSearch()
+                                FolderAnalyzer.initTracksFromMusicFolder()
+                                viewModel.initTrackList(null)
+                                context.showToast(R.string.home_screen_reset_button_description)
+                            }
                         }
                     }
                 }
@@ -196,17 +260,12 @@ private fun AlphabeticalScroller(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Options(
-    context: Context,
     alphabeticalScrollerIconId: Int,
-    navController: NavController<Destination>,
+    searchPlaceholderId: Int,
     searchText: String,
     viewModel: HomeViewModel,
-    showSortOptions: () -> Unit,
-    toggleVisibilityOfAlphabeticalScroller: () -> Unit
+    toggleAlphabeticalScroller: () -> Unit,
 ) {
-    val filterOption by viewModel.filterOption.collectAsState()
-    val playMode by viewModel.playMode.collectAsState()
-
     TopAppBar(
         colors = getTopAppBarColor(),
         title = {
@@ -218,44 +277,27 @@ private fun Options(
                 singleLine = true,
                 decorationBox = { innerTextField ->
                     if (searchText.isEmpty()) {
-                        BodyMediumText(id = filterOption.searchTitleId())
+                        BodyMediumText(id = searchPlaceholderId)
                     }
                     innerTextField()
                 },
                 modifier = Modifier
-                    .height(intrinsicSize = IntrinsicSize.Min)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .height(intrinsicSize = IntrinsicSize.Max)
+                    .fillMaxWidth(),
                 textStyle = MaterialTheme.typography.bodyMedium.copy(AppColors.unhighlight),
                 cursorBrush = SolidColor(AppColors.unhighlight)
             )
         },
         actions = {
+            AnimatedVisibility(searchText.isNotEmpty()) {
+                ActionIconButton(R.drawable.ic_cancel) {
+                    viewModel.clearSearch()
+                    viewModel.initTrackList(null)
+                }
+            }
+
             ActionIconButton(alphabeticalScrollerIconId) {
-                toggleVisibilityOfAlphabeticalScroller()
-            }
-
-            ActionIconButton(R.drawable.ic_playlists) {
-                navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
-            }
-
-            ActionIconButton(filterOption.filterOptionIconId()) {
-                viewModel.changeFilterOption(searchText)
-                context.showToast(filterOption.selectNextFilterOption().searchTitleId())
-            }
-
-            ActionIconButton(playMode.getIconId()) {
-                viewModel.changePlayMode()
-            }
-
-            ActionIconButton(R.drawable.ic_sort) {
-                showSortOptions()
-            }
-
-            ActionIconButton(R.drawable.ic_reset) {
-                FolderAnalyzer.initTracksFromMusicFolder()
-                viewModel.initTrackList(null)
-                context.showToast(R.string.home_screen_reset_button_description)
+                toggleAlphabeticalScroller()
             }
         }
     )
