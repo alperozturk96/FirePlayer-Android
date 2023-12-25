@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.home.AudioPlayer
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
@@ -29,6 +30,7 @@ import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 
 @Composable
 fun SeekbarView(
+    selectedTrack: Track,
     audioPlayer: AudioPlayer,
     homeViewModel: HomeViewModel,
 ) {
@@ -43,6 +45,10 @@ fun SeekbarView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        HeadlineSmallText(selectedTrack.seekBarTitleRepresentation())
+
+        VSpacing8()
+
         if (audioPlayer.isTotalTimeValid()) {
             MediaSlider(audioPlayer, currentTime, totalTime)
         } else {

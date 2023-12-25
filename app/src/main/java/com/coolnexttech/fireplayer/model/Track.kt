@@ -1,7 +1,9 @@
 package com.coolnexttech.fireplayer.model
 
 import android.net.Uri
+import androidx.compose.runtime.Immutable
 
+@Immutable
 data class Track(
     var id: Long,
     var title: String,
@@ -13,6 +15,10 @@ data class Track(
     var dateAdded: Long,
 ) {
     private val maxTitleCharSize = 30
+
+    fun seekBarTitleRepresentation(): String {
+        return titleRepresentation() + "-" + artist + "-" + album
+    }
 
     fun titleRepresentation(): String {
         return if (title.length > maxTitleCharSize) {

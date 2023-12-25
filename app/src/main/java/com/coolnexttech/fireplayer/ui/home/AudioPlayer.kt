@@ -9,6 +9,8 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.MediaSession
+import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.utils.VMProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +25,7 @@ import kotlinx.coroutines.launch
 class AudioPlayer(context: Context): ViewModel() {
 
     private var player: ExoPlayer? = null
+    var mediaSession: MediaSession? = null
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -66,6 +69,20 @@ class AudioPlayer(context: Context): ViewModel() {
                  }
             })
         }
+
+        initMediaSession()
+    }
+
+    private fun initMediaSession() {
+        mediaSession = if (player != null) {
+            MediaSession.Builder(FirePlayer.context, player!!).build()
+        } else {
+            null
+        }
+    }
+
+    fun releaseMediaSession() {
+        mediaSession = null
     }
 
     fun play(uri: Uri) {

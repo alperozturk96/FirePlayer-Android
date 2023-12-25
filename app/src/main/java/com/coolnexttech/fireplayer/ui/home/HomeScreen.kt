@@ -59,7 +59,6 @@ import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.SeekbarView
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
@@ -91,13 +90,6 @@ fun HomeScreen(
         R.drawable.ic_arrow_down
     }
 
-    val showOptions = remember { mutableStateOf(false) }
-    val optionsIconId = if (showOptions.value) {
-        R.drawable.ic_arrow_right
-    } else {
-        R.drawable.ic_arrow_left
-    }
-
     val selectedTrack by viewModel.selectedTrack.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -109,6 +101,9 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopBar(
+                context,
+                navController,
+                playMode,
                 alphabeticalScrollerIconId,
                 filterOption,
                 searchText,
@@ -116,12 +111,11 @@ fun HomeScreen(
                 showAlphabeticalScroller,
                 characterList,
                 coroutineScope,
-                listState
-            )
+                listState,
+                addTrackToPlaylist = { addTrackToPlaylist.value = true },
+                showSortOptions = { showSortOptions.value = true })
         }, bottomBar = {
-            if (selectedTrack != null) {
-                SeekbarView(audioPlayer, viewModel)
-            }
+            selectedTrack?.let { SeekbarView(it, audioPlayer, viewModel) }
         }) {
         if (filteredTracks.isEmpty()) {
             if (searchText.isNotEmpty()) {
@@ -135,7 +129,7 @@ fun HomeScreen(
         } else {
             Box {
                 LazyColumn(state = listState, modifier = Modifier.padding(it)) {
-                    itemsIndexed(filteredTracks) { index, track ->
+                    itemsIndexed(filteredTracks, key = { _, track -> track.id }) { index, track ->
                         val textColor =
                             if (selectedTrack?.id == track.id) AppColors.highlight else AppColors.textColor
 
@@ -155,22 +149,6 @@ fun HomeScreen(
                             })
                     }
                 }
-
-                SideControls(
-                    context,
-                    viewModel,
-                    navController,
-                    modifier = Modifier
-                        .background(AppColors.background)
-                        .align(Alignment.CenterEnd),
-                    optionsIconId,
-                    searchText ,
-                    filterOption,
-                    playMode,
-                    showOptions.value,
-                    addTrackToPlaylist = { addTrackToPlaylist.value = true },
-                    showSortOptions = { showSortOptions.value = true },
-                    showOptions = { showOptions.value = !showOptions.value })
             }
 
             if (showSortOptions.value) {
@@ -187,6 +165,9 @@ fun HomeScreen(
 
 @Composable
 private fun TopBar(
+    context: Context,
+    navController: NavController<Destination>,
+    playMode: PlayMode,
     alphabeticalScrollerIconId: Int,
     filterOption: FilterOptions,
     searchText: String,
@@ -194,10 +175,13 @@ private fun TopBar(
     showAlphabeticalScroller: MutableState<Boolean>,
     characterList: Map<Char, Int>,
     coroutineScope: CoroutineScope,
-    listState: LazyListState
+    listState: LazyListState,
+    addTrackToPlaylist: () -> Unit,
+    showSortOptions: () -> Unit,
 ) {
     Column {
         Options(
+            context,
             alphabeticalScrollerIconId,
             filterOption.searchTitleId(),
             searchText,
@@ -212,6 +196,16 @@ private fun TopBar(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
+                Controls(
+                    context,
+                    viewModel,
+                    navController,
+                    searchText,
+                    filterOption,
+                    playMode,
+                    addTrackToPlaylist = addTrackToPlaylist,
+                    showSortOptions = showSortOptions)
+
                 AlphabeticalScroller(
                     characterList = characterList,
                     modifier = Modifier
@@ -257,62 +251,41 @@ private fun listItemAction(
 }
 
 @Composable
-private fun SideControls(
+private fun Controls(
     context: Context,
     viewModel: HomeViewModel,
     navController: NavController<Destination>,
-    modifier: Modifier,
-    optionsIconId: Int,
     searchText: String,
     filterOption: FilterOptions,
     playMode: PlayMode,
-    showAllOptions: Boolean,
     addTrackToPlaylist: () -> Unit,
     showSortOptions: () -> Unit,
-    showOptions: () -> Unit
 ) {
-    Column(
-        modifier = modifier
-    ) {
-        ActionIconButton(optionsIconId) {
-            showOptions()
+    Row {
+        ActionIconButton(R.drawable.ic_playlists) {
+            navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
         }
 
-        AnimatedVisibility(showAllOptions) {
-            Column {
-                ActionIconButton(R.drawable.ic_playlists) {
-                    navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
-                }
+        ActionIconButton(filterOption.filterOptionIconId()) {
+            viewModel.changeFilterOption(searchText)
+            context.showToast(
+                filterOption.selectNextFilterOption().searchTitleId()
+            )
+        }
 
-                ActionIconButton(filterOption.filterOptionIconId()) {
-                    viewModel.changeFilterOption(searchText)
-                    context.showToast(
-                        filterOption.selectNextFilterOption().searchTitleId()
-                    )
-                }
+        ActionIconButton(playMode.getIconId()) {
+            viewModel.changePlayMode()
+        }
 
-                ActionIconButton(playMode.getIconId()) {
-                    viewModel.changePlayMode()
-                }
+        ActionIconButton(R.drawable.ic_sort) {
+            showSortOptions()
+        }
 
-                ActionIconButton(R.drawable.ic_sort) {
-                    showSortOptions()
-                }
-
-                ActionIconButton(R.drawable.ic_add_playlist) {
-                    addTrackToPlaylist()
-                    context.showToast(
-                        R.string.home_add_track_to_playlist_hint
-                    )
-                }
-
-                ActionIconButton(R.drawable.ic_reset) {
-                    viewModel.clearSearch()
-                    FolderAnalyzer.initTracksFromMusicFolder()
-                    viewModel.initTrackList(null)
-                    context.showToast(R.string.home_screen_reset_button_description)
-                }
-            }
+        ActionIconButton(R.drawable.ic_add_playlist) {
+            addTrackToPlaylist()
+            context.showToast(
+                R.string.home_add_track_to_playlist_hint
+            )
         }
     }
 }
@@ -341,6 +314,7 @@ private fun AlphabeticalScroller(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Options(
+    context: Context,
     alphabeticalScrollerIconId: Int,
     searchPlaceholderId: Int,
     searchText: String,
@@ -375,6 +349,11 @@ private fun Options(
                     viewModel.clearSearch()
                     viewModel.initTrackList(null)
                 }
+            }
+
+            ActionIconButton(R.drawable.ic_reset) {
+                viewModel.reset()
+                context.showToast(R.string.home_screen_reset_button_description)
             }
 
             ActionIconButton(alphabeticalScrollerIconId) {

@@ -132,6 +132,19 @@ class HomeViewModel : ViewModel() {
         playTrack(nextTrack)
     }
 
+    fun reset() {
+        clearSearch()
+        _filterOption.update {
+            FilterOptions.Title
+        }
+        _playMode.update {
+            PlayMode.Shuffle
+        }
+
+        FolderAnalyzer.initTracksFromMusicFolder()
+        initTrackList(null)
+    }
+
     fun clearSearch() {
         _searchText.update {
             ""

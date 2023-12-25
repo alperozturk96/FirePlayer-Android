@@ -2,12 +2,12 @@ package com.coolnexttech.fireplayer.service
 
 import android.app.Notification
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.utils.VMProvider
@@ -16,7 +16,7 @@ import com.coolnexttech.fireplayer.utils.extensions.createPreviousTrackPendingIn
 import com.coolnexttech.fireplayer.utils.extensions.createReturnToAppPendingIntent
 import com.coolnexttech.fireplayer.utils.extensions.createTogglePlayerPendingIntent
 
-class PlayerService : Service() {
+class PlayerService : MediaSessionService() {
     private val previousTrackIntent: PendingIntent by lazy { createPreviousTrackPendingIntent() }
     private val toggleTrackIntent: PendingIntent by lazy { createTogglePlayerPendingIntent() }
     private val nextTrackIntent: PendingIntent by lazy { createNextTrackPendingIntent() }
@@ -29,11 +29,29 @@ class PlayerService : Service() {
         const val channelId = "MediaControlChannel"
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
+        return VMProvider.audioPlayer.mediaSession
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        val player = VMProvider.audioPlayer.mediaSession?.player
+        if (player?.playWhenReady == false || player?.mediaItemCount == 0) {
+            stopSelf()
+        }
+    }
+
+    override fun onDestroy() {
+        VMProvider.audioPlayer.mediaSession?.run {
+            player.release()
+            release()
+            VMProvider.audioPlayer.mediaSession = null
+        }
+        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+
         when (intent?.action) {
             PlayerEvents.Previous.name -> {
                 VMProvider.homeViewModel.playPreviousTrack()

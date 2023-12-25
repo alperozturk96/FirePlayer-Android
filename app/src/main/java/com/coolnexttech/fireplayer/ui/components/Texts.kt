@@ -27,6 +27,16 @@ fun HeadlineMediumText(text: String, color: Color = AppColors.textColor) {
 }
 
 @Composable
+fun HeadlineSmallText(text: String, color: Color = AppColors.textColor) {
+    Text(
+        text = text,
+        color = color,
+        style = MaterialTheme.typography.headlineSmall,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
 fun HeadlineSmallText(id: Int, color: Color = AppColors.textColor) {
     Text(
         text = stringResource(id),
