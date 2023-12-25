@@ -40,15 +40,6 @@ class PlayerService : MediaSessionService() {
         }
     }
 
-    override fun onDestroy() {
-        VMProvider.audioPlayer.mediaSession?.run {
-            player.release()
-            release()
-            VMProvider.audioPlayer.mediaSession = null
-        }
-        super.onDestroy()
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
@@ -107,6 +98,7 @@ class PlayerService : MediaSessionService() {
         return NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentTitle(VMProvider.homeViewModel.currentTrackTitle())
+            .setContentText(VMProvider.homeViewModel.currentTrackDetail())
             .setContentIntent(returnToAppIntent)
             .setSmallIcon(R.drawable.ic_fire)
             .addAction(

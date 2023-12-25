@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 @SuppressLint("StaticFieldLeak")
 class AudioPlayer(context: Context): ViewModel() {
 
-    private var player: ExoPlayer? = null
     var mediaSession: MediaSession? = null
 
     private val _isPlaying = MutableStateFlow(false)
@@ -46,7 +45,7 @@ class AudioPlayer(context: Context): ViewModel() {
         .build()
 
     init {
-        player = ExoPlayer.Builder(context).build().apply {
+        val player = ExoPlayer.Builder(context).build().apply {
             volume = 1.0f
             setAudioAttributes(playerAttributes, true)
             setHandleAudioBecomingNoisy(true)
@@ -70,24 +69,12 @@ class AudioPlayer(context: Context): ViewModel() {
             })
         }
 
-        initMediaSession()
-    }
-
-    private fun initMediaSession() {
-        mediaSession = if (player != null) {
-            MediaSession.Builder(FirePlayer.context, player!!).build()
-        } else {
-            null
-        }
-    }
-
-    fun releaseMediaSession() {
-        mediaSession = null
+        mediaSession = MediaSession.Builder(FirePlayer.context, player).build()
     }
 
     fun play(uri: Uri) {
         try {
-            player?.apply {
+            mediaSession?.player?.apply {
                 stop()
                 clearMediaItems()
                 val mediaItem: MediaItem = MediaItem.fromUri(uri)
@@ -101,18 +88,18 @@ class AudioPlayer(context: Context): ViewModel() {
     }
 
     fun togglePlayPause() {
-        player?.apply {
+        mediaSession?.player?.apply {
             if (isPlaying) pause() else start()
             _isPlaying.update { isPlaying }
         }
     }
 
     fun pause() {
-        player?.pause()
+        mediaSession?.player?.pause()
     }
 
     fun start() {
-        player?.play()
+        mediaSession?.player?.play()
     }
 
     fun updateCurrentTime(value: Long) {
@@ -122,7 +109,7 @@ class AudioPlayer(context: Context): ViewModel() {
     }
 
     fun seekTo(time: Long) {
-        player?.let {
+        mediaSession?.player?.let {
             it.seekTo(time)
             _currentTime.value = time
         }
@@ -135,8 +122,8 @@ class AudioPlayer(context: Context): ViewModel() {
         periodicUpdateJob = coroutineScope.launch {
             while (true) {
                  delay(1000)
-                _currentTime.value = player?.currentPosition ?: 0
-                _totalTime.value = player?.duration ?: 0
+                _currentTime.value = mediaSession?.player?.currentPosition ?: 0
+                _totalTime.value = mediaSession?.player?.duration ?: 0
             }
         }
     }

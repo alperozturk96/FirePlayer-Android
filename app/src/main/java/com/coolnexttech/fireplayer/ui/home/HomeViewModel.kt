@@ -168,4 +168,8 @@ class HomeViewModel : ViewModel() {
     fun currentTrackTitle(): String {
         return _selectedTrack.value?.title ?: return ""
     }
+
+    fun currentTrackDetail(): String {
+        return _selectedTrack.value?.trackDetail() ?: return ""
+    }
 }

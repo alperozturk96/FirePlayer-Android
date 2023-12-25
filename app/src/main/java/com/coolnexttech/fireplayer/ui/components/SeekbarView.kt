@@ -17,7 +17,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.home.AudioPlayer
@@ -45,7 +47,12 @@ fun SeekbarView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        HeadlineSmallText(selectedTrack.seekBarTitleRepresentation())
+        Text(
+            text = selectedTrack.seekBarTitleRepresentation(),
+            color = AppColors.textColor,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center
+        )
 
         VSpacing8()
 

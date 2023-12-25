@@ -17,7 +17,11 @@ data class Track(
     private val maxTitleCharSize = 30
 
     fun seekBarTitleRepresentation(): String {
-        return titleRepresentation() + "-" + artist + "-" + album
+        return titleRepresentation() + " · " + trackDetail()
+    }
+
+    fun trackDetail(): String {
+        return "$artist · $album"
     }
 
     fun titleRepresentation(): String {
