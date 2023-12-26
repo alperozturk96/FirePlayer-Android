@@ -1,28 +1,17 @@
 package com.coolnexttech.fireplayer.service
 
-import android.app.Notification
-import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
-import androidx.core.app.NotificationCompat
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.PlayerEvents
+import com.coolnexttech.fireplayer.ui.notification.MediaSessionNotificationManager
 import com.coolnexttech.fireplayer.utils.VMProvider
-import com.coolnexttech.fireplayer.utils.extensions.createNextTrackPendingIntent
-import com.coolnexttech.fireplayer.utils.extensions.createPreviousTrackPendingIntent
-import com.coolnexttech.fireplayer.utils.extensions.createReturnToAppPendingIntent
-import com.coolnexttech.fireplayer.utils.extensions.createTogglePlayerPendingIntent
 
 class PlayerService : MediaSessionService() {
-    private val previousTrackIntent: PendingIntent by lazy { createPreviousTrackPendingIntent() }
-    private val toggleTrackIntent: PendingIntent by lazy { createTogglePlayerPendingIntent() }
-    private val nextTrackIntent: PendingIntent by lazy { createNextTrackPendingIntent() }
-    private val returnToAppIntent: PendingIntent by lazy { createReturnToAppPendingIntent() }
-
     private var isPlaying = true
+    private val notificationManager = MediaSessionNotificationManager(this)
 
     companion object {
         const val notificationId = 1
@@ -72,7 +61,7 @@ class PlayerService : MediaSessionService() {
     }
 
     private fun updateNotification() {
-        val notification = createNotification()
+        val notification = notificationManager.createNotification(isPlaying)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
@@ -86,37 +75,5 @@ class PlayerService : MediaSessionService() {
                 notification
             )
         }
-    }
-
-    private fun createNotification(): Notification {
-        val toggleTextId = if (isPlaying) {
-            R.string.media_control_pause_text
-        } else {
-            R.string.media_control_play_text
-        }
-
-        return NotificationCompat.Builder(this, channelId)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentTitle(VMProvider.homeViewModel.currentTrackTitle())
-            .setContentText(VMProvider.homeViewModel.currentTrackDetail())
-            .setContentIntent(returnToAppIntent)
-            .setSmallIcon(R.drawable.ic_fire)
-            .addAction(
-                R.drawable.ic_previous,
-                getString(R.string.media_control_previous_text),
-                previousTrackIntent
-            )
-            .addAction(
-                R.drawable.ic_pause,
-                getString(toggleTextId),
-                toggleTrackIntent
-            )
-            .addAction(
-                R.drawable.ic_next,
-                getString(R.string.media_control_next_text),
-                nextTrackIntent
-            )
-            .setSilent(true)
-            .build()
     }
 }

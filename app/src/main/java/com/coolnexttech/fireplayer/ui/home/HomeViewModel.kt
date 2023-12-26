@@ -88,7 +88,7 @@ class HomeViewModel : ViewModel() {
 
     fun playTrack(track: Track, updatePrevStack: Boolean = true) {
         updateSelectedTrack(track)
-        VMProvider.audioPlayer.play(track.path)
+        VMProvider.audioPlayer.play(track)
 
         if (updatePrevStack) {
             updatePrevTracks(track)
