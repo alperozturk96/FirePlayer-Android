@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.ui.components
+package com.coolnexttech.fireplayer.ui.components.bottomSheet
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

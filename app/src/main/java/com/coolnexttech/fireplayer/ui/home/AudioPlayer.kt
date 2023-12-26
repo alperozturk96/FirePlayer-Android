@@ -6,12 +6,12 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
-import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.utils.VMProvider
+import com.coolnexttech.fireplayer.utils.extensions.play
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -74,14 +74,7 @@ class AudioPlayer(context: Context): ViewModel() {
 
     fun play(uri: Uri) {
         try {
-            mediaSession?.player?.apply {
-                stop()
-                clearMediaItems()
-                val mediaItem: MediaItem = MediaItem.fromUri(uri)
-                setMediaItem(mediaItem)
-                prepare()
-                play()
-            }
+            mediaSession.play(uri)
         } catch (e: Exception) {
             VMProvider.homeViewModel.playNextTrack()
         }

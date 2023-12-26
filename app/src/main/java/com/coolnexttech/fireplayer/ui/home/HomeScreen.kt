@@ -1,32 +1,12 @@
 package com.coolnexttech.fireplayer.ui.home
 
-import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -34,35 +14,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.FilterOptions
-import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
-import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
-import com.coolnexttech.fireplayer.ui.components.ActionIconButton
-import com.coolnexttech.fireplayer.ui.components.BodyMediumText
-import com.coolnexttech.fireplayer.ui.components.ContentUnavailableView
-import com.coolnexttech.fireplayer.ui.components.DialogButton
-import com.coolnexttech.fireplayer.ui.components.Drawable
-import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.components.ListItemText
-import com.coolnexttech.fireplayer.ui.components.SeekbarView
+import com.coolnexttech.fireplayer.ui.components.dialog.SortOptionsAlertDialog
+import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
+import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
+import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
-import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
-import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
-import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.CoroutineScope
@@ -100,7 +64,7 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopBar(
+            HomeTopBar(
                 context,
                 navController,
                 playMode,
@@ -163,67 +127,6 @@ fun HomeScreen(
     }
 }
 
-@Composable
-private fun TopBar(
-    context: Context,
-    navController: NavController<Destination>,
-    playMode: PlayMode,
-    alphabeticalScrollerIconId: Int,
-    filterOption: FilterOptions,
-    searchText: String,
-    viewModel: HomeViewModel,
-    showAlphabeticalScroller: MutableState<Boolean>,
-    characterList: Map<Char, Int>,
-    coroutineScope: CoroutineScope,
-    listState: LazyListState,
-    addTrackToPlaylist: () -> Unit,
-    showSortOptions: () -> Unit,
-) {
-    Column {
-        Options(
-            context,
-            alphabeticalScrollerIconId,
-            filterOption.searchTitleId(),
-            searchText,
-            viewModel,
-
-            ) {
-            showAlphabeticalScroller.value = !showAlphabeticalScroller.value
-        }
-
-        AnimatedVisibility(showAlphabeticalScroller.value) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Controls(
-                    context,
-                    viewModel,
-                    navController,
-                    searchText,
-                    filterOption,
-                    playMode,
-                    addTrackToPlaylist = addTrackToPlaylist,
-                    showSortOptions = showSortOptions)
-
-                AlphabeticalScroller(
-                    characterList = characterList,
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .background(AppColors.background),
-                    onLetterSelected = { index ->
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(index)
-                        }
-                    }
-                )
-
-                Divider()
-            }
-        }
-    }
-}
-
 private fun listItemAction(
     addTrackToPlaylist: MutableState<Boolean>,
     navController: NavController<Destination>,
@@ -247,168 +150,5 @@ private fun listItemAction(
         }
 
         viewModel.playTrack(track)
-    }
-}
-
-@Composable
-private fun Controls(
-    context: Context,
-    viewModel: HomeViewModel,
-    navController: NavController<Destination>,
-    searchText: String,
-    filterOption: FilterOptions,
-    playMode: PlayMode,
-    addTrackToPlaylist: () -> Unit,
-    showSortOptions: () -> Unit,
-) {
-    Row {
-        ActionIconButton(R.drawable.ic_playlists) {
-            navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
-        }
-
-        ActionIconButton(filterOption.filterOptionIconId()) {
-            viewModel.changeFilterOption(searchText)
-            context.showToast(
-                filterOption.selectNextFilterOption().searchTitleId()
-            )
-        }
-
-        ActionIconButton(playMode.getIconId()) {
-            viewModel.changePlayMode()
-        }
-
-        ActionIconButton(R.drawable.ic_sort) {
-            showSortOptions()
-        }
-
-        ActionIconButton(R.drawable.ic_add_playlist) {
-            addTrackToPlaylist()
-            context.showToast(
-                R.string.home_add_track_to_playlist_hint
-            )
-        }
-    }
-}
-
-@Composable
-private fun AlphabeticalScroller(
-    characterList: Map<Char, Int>,
-    modifier: Modifier = Modifier,
-    onLetterSelected: (index: Int) -> Unit,
-) {
-    Row(modifier = modifier) {
-        characterList.keys.sorted().forEach { letter ->
-            Text(
-                text = letter.toString(),
-                style = MaterialTheme.typography.headlineSmall,
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .clickable { onLetterSelected(characterList[letter] ?: 0) },
-                color = AppColors.textColor
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun Options(
-    context: Context,
-    alphabeticalScrollerIconId: Int,
-    searchPlaceholderId: Int,
-    searchText: String,
-    viewModel: HomeViewModel,
-    toggleAlphabeticalScroller: () -> Unit,
-) {
-    TopAppBar(
-        colors = getTopAppBarColor(),
-        title = {
-            BasicTextField(
-                value = searchText,
-                onValueChange = {
-                    viewModel.search(it)
-                },
-                singleLine = true,
-                decorationBox = { innerTextField ->
-                    if (searchText.isEmpty()) {
-                        BodyMediumText(id = searchPlaceholderId)
-                    }
-                    innerTextField()
-                },
-                modifier = Modifier
-                    .height(intrinsicSize = IntrinsicSize.Max)
-                    .fillMaxWidth(),
-                textStyle = MaterialTheme.typography.bodyMedium.copy(AppColors.unhighlight),
-                cursorBrush = SolidColor(AppColors.unhighlight)
-            )
-        },
-        actions = {
-            AnimatedVisibility(searchText.isNotEmpty()) {
-                ActionIconButton(R.drawable.ic_cancel) {
-                    viewModel.clearSearch()
-                    viewModel.initTrackList(null)
-                }
-            }
-
-            ActionIconButton(R.drawable.ic_reset) {
-                viewModel.reset()
-                context.showToast(R.string.home_screen_reset_button_description)
-            }
-
-            ActionIconButton(alphabeticalScrollerIconId) {
-                toggleAlphabeticalScroller()
-            }
-        }
-    )
-}
-
-@Composable
-private fun SortOptionsAlertDialog(
-    dismiss: () -> Unit,
-    sort: (SortOptions) -> Unit,
-) {
-    Dialog({ dismiss() }) {
-        Column(
-            modifier = Modifier
-                .width(400.dp)
-                .padding(16.dp)
-                .clip(RoundedCornerShape(30.dp))
-                .background(AppColors.alternateBackground),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            VSpacing16()
-
-            Drawable(R.drawable.ic_fire, tint = AppColors.red)
-
-            VSpacing16()
-
-            HeadlineSmallText(R.string.home_sort_dialog_title)
-
-            VSpacing8()
-
-            DialogButton(R.string.home_sort_dialog_sort_by_title_a_z) {
-                sort(SortOptions.AToZ)
-            }
-
-            DialogButton(R.string.home_sort_dialog_sort_by_title_z_a) {
-                sort(SortOptions.ZToA)
-            }
-
-            DialogButton(R.string.home_sort_dialog_sort_by_new_to_old_title) {
-                sort(SortOptions.NewToOld)
-            }
-
-            DialogButton(R.string.home_sort_dialog_sort_by_old_to_new_title) {
-                sort(SortOptions.OldToNew)
-            }
-
-            DialogButton(R.string.common_cancel) {
-                dismiss()
-            }
-
-            VSpacing16()
-        }
     }
 }

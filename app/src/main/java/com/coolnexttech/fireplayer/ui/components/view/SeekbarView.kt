@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.ui.components
+package com.coolnexttech.fireplayer.ui.components.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.ui.components.ActionImageButton
+import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.home.AudioPlayer
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
