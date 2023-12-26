@@ -1,13 +1,10 @@
 package com.coolnexttech.fireplayer.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,8 +29,6 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 checkPermissions()
-                keepScreenOn()
-                acquireWakeLock(this@MainActivity)
                 registerCallReceiver()
             }
 
@@ -72,19 +67,6 @@ class MainActivity : ComponentActivity() {
         } else {
             registerReceiver(callReceiver, filter)
         }
-    }
-
-    private fun acquireWakeLock(context: Context) {
-        val wakeLock = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock.run {
-            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FirePlayer::WakeLock").apply {
-                acquire(60 * 60 * 1000L)
-            }
-        }
-    }
-
-    private fun keepScreenOn() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     private fun checkPermissions() {
