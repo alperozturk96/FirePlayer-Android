@@ -8,8 +8,11 @@ import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
 import com.coolnexttech.fireplayer.FirePlayer
+import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.ui.notification.MediaSessionNotificationManager
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.play
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +41,7 @@ class AudioPlayer(context: Context): ViewModel() {
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+    private val notificationManager = MediaSessionNotificationManager(context)
 
     private val playerAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
@@ -80,6 +84,24 @@ class AudioPlayer(context: Context): ViewModel() {
         }
     }
 
+    fun startService(service: MediaSessionService) {
+        notificationManager.startService(_isPlaying.value, service)
+    }
+
+    fun handlePlayerEvent(action: String?) {
+        when (action) {
+            PlayerEvents.Play.name -> {
+                start()
+            }
+            PlayerEvents.Pause.name -> {
+               pause()
+            }
+            PlayerEvents.Toggle.name -> {
+               togglePlayPause()
+            }
+        }
+    }
+
     fun togglePlayPause() {
         mediaSession?.player?.apply {
             if (isPlaying) pause() else start()
@@ -89,6 +111,7 @@ class AudioPlayer(context: Context): ViewModel() {
 
     fun pause() {
         mediaSession?.player?.pause()
+        _isPlaying.update { false }
     }
 
     fun start() {

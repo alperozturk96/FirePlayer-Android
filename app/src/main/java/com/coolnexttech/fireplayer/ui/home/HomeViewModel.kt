@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
+import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
@@ -111,6 +112,17 @@ class HomeViewModel : ViewModel() {
             } else {
                 it.add(track)
                 it
+            }
+        }
+    }
+
+    fun handlePlayerEvent(action: String?) {
+        when (action) {
+            PlayerEvents.Previous.name -> {
+               playPreviousTrack()
+            }
+            PlayerEvents.Next.name -> {
+                playNextTrack()
             }
         }
     }
