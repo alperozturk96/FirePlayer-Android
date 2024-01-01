@@ -55,15 +55,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name=".utils.receivers.MediaButtonReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>

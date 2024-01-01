@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
@@ -16,12 +15,10 @@ import com.coolnexttech.fireplayer.ui.navigation.NavHostScreen
 import com.coolnexttech.fireplayer.ui.theme.FirePlayerTheme
 import com.coolnexttech.fireplayer.utils.PermissionManager
 import com.coolnexttech.fireplayer.utils.receivers.CallReceiver
-import com.coolnexttech.fireplayer.utils.receivers.MediaButtonReceiver
 
 class MainActivity : ComponentActivity() {
     private val permissionManager = PermissionManager(this)
     private val callReceiver = CallReceiver()
-    private val mediaButtonReceiver = MediaButtonReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,20 +40,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    override fun onResume() {
-        super.onResume()
-        val mediaButtonFilter = IntentFilter(Intent.ACTION_MEDIA_BUTTON)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(mediaButtonReceiver, mediaButtonFilter, RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(mediaButtonReceiver, mediaButtonFilter)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(mediaButtonReceiver)
         unregisterReceiver(callReceiver)
     }
 
