@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui.home
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.AudioAttributes
@@ -15,6 +14,7 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.notification.MediaSessionNotificationManager
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.play
+import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@SuppressLint("StaticFieldLeak")
 class AudioPlayer(context: Context): ViewModel() {
 
     var mediaSession: MediaSession? = null
@@ -73,14 +72,16 @@ class AudioPlayer(context: Context): ViewModel() {
             })
         }
 
-        mediaSession = MediaSession.Builder(FirePlayer.context, player).build()
+        mediaSession = MediaSession.Builder(context, player).build()
     }
 
-    fun play(track: Track) {
+    fun play(track: Track, onSuccess: () -> Unit, onFailure: () -> Unit) {
         try {
             mediaSession.play(track)
+            FirePlayer.context.startPlayerService()
+            onSuccess()
         } catch (e: Exception) {
-            VMProvider.homeViewModel.playNextTrack()
+            onFailure()
         }
     }
 

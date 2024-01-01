@@ -2,7 +2,6 @@ package com.coolnexttech.fireplayer.ui.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.PlayerEvents
@@ -14,7 +13,6 @@ import com.coolnexttech.fireplayer.utils.extensions.filter
 import com.coolnexttech.fireplayer.utils.extensions.getNextRandomTrack
 import com.coolnexttech.fireplayer.utils.extensions.getNextTrackAndIndex
 import com.coolnexttech.fireplayer.utils.extensions.sort
-import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -88,14 +86,15 @@ class HomeViewModel : ViewModel() {
     }
 
     fun playTrack(track: Track, updatePrevStack: Boolean = true) {
-        updateSelectedTrack(track)
-        VMProvider.audioPlayer.play(track)
+        VMProvider.audioPlayer.play(track, onSuccess = {
+            updateSelectedTrack(track)
 
-        if (updatePrevStack) {
-            updatePrevTracks(track)
-        }
-
-        FirePlayer.context.startPlayerService()
+            if (updatePrevStack) {
+                updatePrevTracks(track)
+            }
+        }, onFailure = {
+            playNextTrack()
+        })
     }
 
     private fun updateSelectedTrack(track: Track) {
