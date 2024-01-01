@@ -1,18 +1,20 @@
-package com.coolnexttech.fireplayer.ui.home
+package com.coolnexttech.fireplayer.service
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.notification.MediaSessionNotificationManager
-import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.play
 import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +26,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AudioPlayer(context: Context): ViewModel() {
+@OptIn(UnstableApi::class)
+class AudioPlayer(context: Context, homeViewModel: HomeViewModel): ViewModel() {
 
     var mediaSession: MediaSession? = null
 
@@ -66,13 +69,19 @@ class AudioPlayer(context: Context): ViewModel() {
                         _totalTime.value = duration
                         _currentTime.value = currentPosition
                     } else if (playbackState == Player.STATE_ENDED) {
-                        VMProvider.homeViewModel.playNextTrack()
+                        homeViewModel.playNextTrack()
                     }
                  }
             })
         }
 
-        mediaSession = MediaSession.Builder(context, player).build()
+        val forwardingPlayer = MediaSessionForwardingPlayer(
+            player,
+            { homeViewModel.playPreviousTrack() },
+            { homeViewModel.playNextTrack() }
+        )
+        mediaSession = MediaSession.Builder(context, forwardingPlayer)
+            .build()
     }
 
     fun play(track: Track, onSuccess: () -> Unit, onFailure: () -> Unit) {

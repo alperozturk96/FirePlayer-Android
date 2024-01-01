@@ -22,9 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.service.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.ActionImageButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
-import com.coolnexttech.fireplayer.ui.home.AudioPlayer
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing16
