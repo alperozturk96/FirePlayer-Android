@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
     private fun registerCallReceiver() {
         val filter = IntentFilter(Intent.ACTION_CALL)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(callReceiver, filter, RECEIVER_NOT_EXPORTED)
         } else {
@@ -58,7 +59,5 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             permissionManager.askStoragePermission()
         }
-
-        permissionManager.askNotificationPermission()
     }
 }

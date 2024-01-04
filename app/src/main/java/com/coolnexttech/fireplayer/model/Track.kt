@@ -14,21 +14,11 @@ data class Track(
     var pathExtension: String? = null,
     var dateAdded: Long,
 ) {
-    private val maxTitleCharSize = 30
-
-    fun seekBarTitleRepresentation(): String {
-        return titleRepresentation() + " · " + trackDetail()
+    fun titleRepresentation(): String {
+        return title + " · " + trackDetail()
     }
 
     fun trackDetail(): String {
         return "$artist · $album"
-    }
-
-    fun titleRepresentation(): String {
-        return if (title.length > maxTitleCharSize) {
-            title.take(maxTitleCharSize) + "..."
-        } else {
-            title
-        }
     }
 }

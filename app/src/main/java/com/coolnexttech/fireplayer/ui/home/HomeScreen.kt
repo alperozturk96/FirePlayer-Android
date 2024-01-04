@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.Track
-import com.coolnexttech.fireplayer.service.AudioPlayer
+import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.dialog.SortOptionsAlertDialog
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
@@ -99,7 +99,7 @@ fun HomeScreen(
                             if (selectedTrack?.id == track.id) AppColors.highlight else AppColors.textColor
 
                         ListItemText(
-                            track.titleRepresentation(),
+                            track.title,
                             color = textColor,
                             action = {
                                 listItemAction(

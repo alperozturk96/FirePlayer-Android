@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.service
+package com.coolnexttech.fireplayer.player
 
 import android.content.Context
 import androidx.annotation.OptIn
@@ -9,12 +9,11 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
-import androidx.media3.session.MediaSessionService
 import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.player.helper.MediaSessionForwardingPlayer
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
-import com.coolnexttech.fireplayer.ui.notification.MediaSessionNotificationManager
 import com.coolnexttech.fireplayer.utils.extensions.play
 import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
-class AudioPlayer(context: Context, homeViewModel: HomeViewModel): ViewModel() {
+class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): ViewModel() {
 
     var mediaSession: MediaSession? = null
 
@@ -43,7 +42,6 @@ class AudioPlayer(context: Context, homeViewModel: HomeViewModel): ViewModel() {
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
-    private val notificationManager = MediaSessionNotificationManager(context)
 
     private val playerAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
@@ -80,6 +78,7 @@ class AudioPlayer(context: Context, homeViewModel: HomeViewModel): ViewModel() {
             { homeViewModel.playPreviousTrack() },
             { homeViewModel.playNextTrack() }
         )
+
         mediaSession = MediaSession.Builder(context, forwardingPlayer)
             .build()
     }
@@ -92,10 +91,6 @@ class AudioPlayer(context: Context, homeViewModel: HomeViewModel): ViewModel() {
         } catch (e: Exception) {
             onFailure()
         }
-    }
-
-    fun startService(service: MediaSessionService) {
-        notificationManager.startService(_isPlaying.value, service)
     }
 
     fun handlePlayerEvent(action: String?) {

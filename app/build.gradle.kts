@@ -13,7 +13,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "0.1"
+        versionName = "0.2"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -70,6 +70,8 @@ dependencies {
     implementation("dev.olshevski.navigation:reimagined:1.5.0")
 
     // Media3 ExoPlayer
+    implementation("androidx.media:media:1.7.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
     implementation("androidx.media3:media3-exoplayer:1.2.0")
     implementation("androidx.media3:media3-session:1.2.0")
 

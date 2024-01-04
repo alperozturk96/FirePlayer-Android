@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
-import com.coolnexttech.fireplayer.service.AudioPlayer
+import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.ActionImageButton
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
@@ -50,7 +50,7 @@ fun SeekbarView(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = selectedTrack.seekBarTitleRepresentation(),
+            text = selectedTrack.titleRepresentation(),
             color = AppColors.textColor,
             fontSize = 14.sp,
             textAlign = TextAlign.Center

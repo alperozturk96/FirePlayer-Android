@@ -1,7 +1,7 @@
 package com.coolnexttech.fireplayer.utils
 
 import com.coolnexttech.fireplayer.FirePlayer
-import com.coolnexttech.fireplayer.service.AudioPlayer
+import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
 

@@ -1,14 +1,20 @@
-package com.coolnexttech.fireplayer.service
+package com.coolnexttech.fireplayer.player.service
 
 import android.content.Intent
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.coolnexttech.fireplayer.player.notification.PlayerNotificationManager
 import com.coolnexttech.fireplayer.utils.VMProvider
 
 class PlayerService : MediaSessionService() {
-    companion object {
-        const val notificationId = 1
-        const val channelId = "MediaControlChannel"
+
+    private var playerNotificationManager: PlayerNotificationManager? = null
+
+    override fun onCreate() {
+        playerNotificationManager = PlayerNotificationManager(this, VMProvider.audioPlayer.mediaSession!!.player)
+        super.onCreate()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
@@ -22,10 +28,14 @@ class PlayerService : MediaSessionService() {
         }
     }
 
+    @OptIn(UnstableApi::class)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         VMProvider.audioPlayer.handlePlayerEvent(intent?.action)
         VMProvider.homeViewModel.handlePlayerEvent(intent?.action)
-        VMProvider.audioPlayer.startService(this)
+        playerNotificationManager?.startService(
+            mediaSession = VMProvider.audioPlayer.mediaSession!!,
+            mediaSessionService = this
+        )
 
         return super.onStartCommand(intent, flags, startId)
     }

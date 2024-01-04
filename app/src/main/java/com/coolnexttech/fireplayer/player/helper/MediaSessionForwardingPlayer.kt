@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.service
+package com.coolnexttech.fireplayer.player.helper
 
 import androidx.annotation.OptIn
 import androidx.media3.common.ForwardingPlayer
