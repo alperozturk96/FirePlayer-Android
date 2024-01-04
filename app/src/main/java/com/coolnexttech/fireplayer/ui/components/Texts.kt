@@ -1,5 +1,7 @@
 package com.coolnexttech.fireplayer.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,6 +46,7 @@ fun HeadlineSmallText(id: Int, color: Color = AppColors.textColor) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListItemText(
     text: String,
@@ -55,7 +58,9 @@ fun ListItemText(
         Text(
             text = text,
             style = MaterialTheme.typography.headlineSmall,
+            maxLines = 1,
             modifier = Modifier
+                .basicMarquee()
                 .padding(all = 8.dp),
             color = color
         )
