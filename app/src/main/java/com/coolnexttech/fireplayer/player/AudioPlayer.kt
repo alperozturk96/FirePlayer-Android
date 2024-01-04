@@ -9,10 +9,12 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
 import com.coolnexttech.fireplayer.FirePlayer
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.helper.MediaSessionForwardingPlayer
+import com.coolnexttech.fireplayer.player.notification.PlayerNotificationManager
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.utils.extensions.play
 import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
@@ -42,6 +44,7 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+    private lateinit var notificationManager: PlayerNotificationManager
 
     private val playerAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
@@ -81,6 +84,12 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
 
         mediaSession = MediaSession.Builder(context, forwardingPlayer)
             .build()
+
+        notificationManager = PlayerNotificationManager(context, player)
+    }
+
+    fun startService(service: MediaSessionService) {
+        notificationManager.startService(service, mediaSession)
     }
 
     fun play(track: Track, onSuccess: () -> Unit, onFailure: () -> Unit) {

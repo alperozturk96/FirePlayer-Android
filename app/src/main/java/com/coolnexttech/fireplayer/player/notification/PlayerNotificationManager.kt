@@ -33,9 +33,11 @@ class PlayerNotificationManager(
     @UnstableApi
     fun startService(
         mediaSessionService: MediaSessionService,
-        mediaSession: MediaSession
+        mediaSession: MediaSession?
     ) {
-        createNotification(mediaSession)
+        mediaSession?.let {
+            createNotification(mediaSession)
+        }
 
         val notification = Notification.Builder(context, channelId)
             .setCategory(Notification.CATEGORY_SERVICE)

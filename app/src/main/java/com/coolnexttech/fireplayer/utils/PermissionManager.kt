@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 
 class PermissionManager(private val activity: Activity) {
 
@@ -22,15 +21,5 @@ class PermissionManager(private val activity: Activity) {
         val uri = Uri.fromParts("package", activity.packageName, null)
         intent.data = uri
         activity.startActivity(intent)
-    }
-
-    fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(
-                activity,
-                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                0
-            )
-        }
     }
 }
