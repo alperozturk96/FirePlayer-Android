@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -72,10 +71,6 @@ class PlayerNotificationManager(
             .build()
             .also {
                 it.setMediaSessionToken(mediaSession.sessionCompatToken)
-                it.setUseNextActionInCompactView(true)
-                it.setUsePlayPauseActions(true)
-                it.setUsePreviousActionInCompactView(true)
-                it.setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 it.setPlayer(player)
             }
     }
