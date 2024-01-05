@@ -4,6 +4,8 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
 
+    <string name="read_phone_state_permission_info_message">We need your permission to listen your phone state to able to stop playing music when you receive call</string>
+
     <string name="home_filter_by_album_section_title">Filtered By Album</string>
     <string name="home_filter_by_artist_section_title">Filtered By Artist</string>
     <string name="home_filter_by_title_section_title">Filtered By Title</string>
