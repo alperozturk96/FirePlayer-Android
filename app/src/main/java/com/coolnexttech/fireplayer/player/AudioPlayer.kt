@@ -44,7 +44,7 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
-    private lateinit var notificationManager: PlayerNotificationManager
+    private var notificationManager: PlayerNotificationManager
 
     private val playerAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
