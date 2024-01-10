@@ -66,17 +66,19 @@ fun HomeTopBar(
                     addTrackToPlaylist = addTrackToPlaylist,
                     showSortOptions = showSortOptions)
 
-                AlphabeticalScrollerView(
-                    characterList = characterList,
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .background(AppColors.background),
-                    onLetterSelected = { index ->
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(index)
+                if (searchText.isEmpty()) {
+                    AlphabeticalScrollerView(
+                        characterList = characterList,
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .background(AppColors.background),
+                        onLetterSelected = { index ->
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(index)
+                            }
                         }
-                    }
-                )
+                    )
+                }
 
                 Divider()
             }
