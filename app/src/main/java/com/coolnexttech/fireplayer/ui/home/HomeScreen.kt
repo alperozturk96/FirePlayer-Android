@@ -27,7 +27,6 @@ import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.navigation.Destination
-import com.coolnexttech.fireplayer.ui.theme.AppColors
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.CoroutineScope
@@ -95,12 +94,9 @@ fun HomeScreen(
             Box {
                 LazyColumn(state = listState, modifier = Modifier.padding(it)) {
                     itemsIndexed(filteredTracks, key = { _, track -> track.id }) { index, track ->
-                        val textColor =
-                            if (selectedTrack?.id == track.id) AppColors.highlight else AppColors.textColor
-
                         ListItemText(
                             track.title,
-                            color = textColor,
+                            color = track.color(selectedTrack?.id),
                             action = {
                                 listItemAction(
                                     addTrackToPlaylist,

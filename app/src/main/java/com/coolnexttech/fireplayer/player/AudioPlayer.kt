@@ -99,7 +99,7 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
         try {
             mediaSession.play(track)
 
-            val savedTrackPosition = UserStorage.readTrackPlaybackPosition(track.id)
+            val savedTrackPosition = UserStorage.readTrackPlaybackPosition(track.id, true)
             if (savedTrackPosition != null) {
                 currentTrackIdForSavedTrackPosition = track.id
                 seekTo(savedTrackPosition)

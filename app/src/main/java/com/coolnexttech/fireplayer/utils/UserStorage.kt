@@ -47,17 +47,20 @@ object UserStorage {
     }
 
     @SuppressLint("SimpleDateFormat")
-    fun readTrackPlaybackPosition(id: Long): Long? {
+    fun readTrackPlaybackPosition(id: Long, showToast: Boolean): Long? {
         val result = sharedPreferences.getLong(id.toString(), 0L)
         return if (result == 0L) {
             null
         } else {
-            val time = SimpleDateFormat("mm:ss").format(Date(result))
-            val successMessage = FirePlayer.context.getString(
-                R.string.user_storage_read_current_track_position_success_message,
-                time
-            )
-            FirePlayer.context.showToast(successMessage)
+            if (showToast) {
+                val time = SimpleDateFormat("mm:ss").format(Date(result))
+                val successMessage = FirePlayer.context.getString(
+                    R.string.user_storage_read_current_track_position_success_message,
+                    time
+                )
+                FirePlayer.context.showToast(successMessage)
+            }
+
             result
         }
     }

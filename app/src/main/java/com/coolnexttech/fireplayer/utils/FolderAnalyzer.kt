@@ -82,6 +82,8 @@ object FolderAnalyzer {
                     val pathExtension = getFileMimeType(path)
 
                     if (!unsupportedFileFormats.contains(pathExtension)) {
+                        val isPositionSaved = UserStorage.readTrackPlaybackPosition(id, false) != null
+
                         val track = Track(
                             id,
                             title,
@@ -90,7 +92,8 @@ object FolderAnalyzer {
                             path,
                             duration,
                             pathExtension,
-                            dateAdded = dateModified
+                            dateAdded = dateModified,
+                            isPositionSaved
                         )
                         result.add(track)
                     }
