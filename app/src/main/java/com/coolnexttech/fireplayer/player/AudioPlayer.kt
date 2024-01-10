@@ -16,6 +16,7 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.helper.MediaSessionForwardingPlayer
 import com.coolnexttech.fireplayer.player.notification.PlayerNotificationManager
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
+import com.coolnexttech.fireplayer.utils.UserStorage
 import com.coolnexttech.fireplayer.utils.extensions.play
 import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
 import kotlinx.coroutines.CoroutineScope
@@ -45,6 +46,7 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
     private var notificationManager: PlayerNotificationManager
+    private var currentTrackIdForSavedTrackPosition: Long? = null
 
     private val playerAttributes = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
@@ -70,6 +72,7 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
                         _totalTime.value = duration
                         _currentTime.value = currentPosition
                     } else if (playbackState == Player.STATE_ENDED) {
+                        checkSavedTrackPosition()
                         homeViewModel.playNextTrack()
                     }
                  }
@@ -95,10 +98,23 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
     fun play(track: Track, onSuccess: () -> Unit, onFailure: () -> Unit) {
         try {
             mediaSession.play(track)
+
+            val savedTrackPosition = UserStorage.readTrackPlaybackPosition(track.id)
+            if (savedTrackPosition != null) {
+                currentTrackIdForSavedTrackPosition = track.id
+                seekTo(savedTrackPosition)
+            }
+
             FirePlayer.context.startPlayerService()
             onSuccess()
         } catch (e: Exception) {
             onFailure()
+        }
+    }
+
+    private fun checkSavedTrackPosition() {
+        currentTrackIdForSavedTrackPosition?.let {
+            UserStorage.removeTrackPlaybackPosition(it)
         }
     }
 
@@ -143,6 +159,12 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
             it.seekTo(time)
             _currentTime.value = time
         }
+    }
+
+    fun saveCurrentTrackPlaybackPosition() {
+        val currentTrackId = homeViewModel.selectedTrack.value?.id
+        val currentTrackPosition = mediaSession?.player?.currentPosition
+        UserStorage.saveTrackPlaybackPosition(currentTrackId, currentTrackPosition)
     }
 
     fun isTotalTimeValid(): Boolean = totalTime.value > 2L

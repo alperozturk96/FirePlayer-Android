@@ -18,7 +18,7 @@ data class Track(
         return title + " · " + trackDetail()
     }
 
-    fun trackDetail(): String {
+    private fun trackDetail(): String {
         return "$artist · $album"
     }
 }

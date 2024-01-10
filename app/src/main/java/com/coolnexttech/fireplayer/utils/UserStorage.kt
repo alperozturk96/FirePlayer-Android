@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.utils
 
+import android.annotation.SuppressLint
 import android.content.ContextWrapper
 import android.os.Environment
 import androidx.activity.ComponentActivity
@@ -14,6 +15,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.OutputStreamWriter
+import java.text.SimpleDateFormat
+import java.util.Date
 
 object UserStorage {
 
@@ -30,6 +33,33 @@ object UserStorage {
 
     fun savePlaylists(value: Playlists) {
         sharedPreferences.edit().putString(playlists, value.toJson()).apply()
+    }
+
+    fun removeTrackPlaybackPosition(id: Long) {
+        sharedPreferences.edit().remove(id.toString()).apply()
+        FirePlayer.context.showToast(R.string.user_storage_reset_current_track_position_success_message)
+    }
+
+    fun saveTrackPlaybackPosition(id: Long?, position: Long?) {
+        if (id == null || position == null) return
+        sharedPreferences.edit().putLong(id.toString(), position).apply()
+        FirePlayer.context.showToast(R.string.user_storage_save_current_track_position_success_message)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun readTrackPlaybackPosition(id: Long): Long? {
+        val result = sharedPreferences.getLong(id.toString(), 0L)
+        return if (result == 0L) {
+            null
+        } else {
+            val time = SimpleDateFormat("mm:ss").format(Date(result))
+            val successMessage = FirePlayer.context.getString(
+                R.string.user_storage_read_current_track_position_success_message,
+                time
+            )
+            FirePlayer.context.showToast(successMessage)
+            result
+        }
     }
 
     fun exportPlaylists() {

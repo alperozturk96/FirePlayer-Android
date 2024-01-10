@@ -66,6 +66,13 @@ fun SeekbarView(
 
         VSpacing8()
 
+        Row {
+            Spacer(modifier = Modifier.weight(1f))
+            ActionImageButton(R.drawable.ic_save) {
+                audioPlayer.saveCurrentTrackPlaybackPosition()
+            }
+        }
+
         MediaControl(audioPlayer, isPlaying, { homeViewModel.playPreviousTrack() }) {
             homeViewModel.playNextTrack()
         }

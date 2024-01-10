@@ -38,6 +38,9 @@
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
 
+    <string name="user_storage_reset_current_track_position_success_message">Saved track position reset</string>
+    <string name="user_storage_read_current_track_position_success_message">%s track position read</string>
+    <string name="user_storage_save_current_track_position_success_message">Current track position saved</string>
     <string name="user_storage_export_success_message">Playlists exported to %s</string>
     <string name="user_storage_import_success_message">Playlists successfully imported</string>
     <string name="user_storage_export_fail_message">Fail to read the playlists. Please add playlists file inside Documents directory</string>
