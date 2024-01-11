@@ -5,7 +5,7 @@ import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import com.coolnexttech.fireplayer.FirePlayer
+import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.extensions.filterByPlaylist
@@ -40,7 +40,7 @@ object FolderAnalyzer {
     private fun getTracksFromMusicFolder(): ArrayList<Track> {
         val result = arrayListOf<Track>()
 
-        val contentResolver = FirePlayer.context.contentResolver
+        val contentResolver = appContext.get()?.contentResolver
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -54,7 +54,7 @@ object FolderAnalyzer {
         val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
         val sortOrder = "${MediaStore.Audio.Media.TITLE} ASC"
 
-        contentResolver.query(
+        contentResolver?.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             projection,
             selection,
@@ -107,7 +107,7 @@ object FolderAnalyzer {
     private fun getFileMimeType(uri: Uri): String? {
         return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
             val mime = MimeTypeMap.getSingleton()
-            mime.getExtensionFromMimeType(FirePlayer.context.contentResolver.getType(uri))
+            mime.getExtensionFromMimeType(appContext.get()?.contentResolver?.getType(uri))
         } else {
             MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(uri.path?.let { File(it) }).toString())
         }

@@ -10,7 +10,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.coolnexttech.fireplayer.FirePlayer
+import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.helper.MediaSessionForwardingPlayer
@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
-class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): ViewModel() {
+class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): ViewModel() {
 
     var mediaSession: MediaSession? = null
 
@@ -45,7 +45,7 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
     private var periodicUpdateJob: Job? = null
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
-    private var notificationManager: PlayerNotificationManager
+    private lateinit var notificationManager: PlayerNotificationManager
     private var currentTrackIdForSavedTrackPosition: Long? = null
 
     private val playerAttributes = AudioAttributes.Builder()
@@ -54,41 +54,43 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
         .build()
 
     init {
-        val player = ExoPlayer.Builder(context).build().apply {
-            volume = 1.0f
-            setAudioAttributes(playerAttributes, true)
-            setHandleAudioBecomingNoisy(true)
-            addListener(object : Player.Listener {
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    _isPlaying.value = isPlaying
-                    if (isPlaying) {
-                        startPeriodicUpdateJob()
-                    } else {
-                        periodicUpdateJob?.cancel()
+        context?.let {
+            val player = ExoPlayer.Builder(context).build().apply {
+                volume = 1.0f
+                setAudioAttributes(playerAttributes, true)
+                setHandleAudioBecomingNoisy(true)
+                addListener(object : Player.Listener {
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        _isPlaying.value = isPlaying
+                        if (isPlaying) {
+                            startPeriodicUpdateJob()
+                        } else {
+                            periodicUpdateJob?.cancel()
+                        }
                     }
-                }
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    if (playbackState == Player.STATE_READY) {
-                        _totalTime.value = duration
-                        _currentTime.value = currentPosition
-                    } else if (playbackState == Player.STATE_ENDED) {
-                        checkSavedTrackPosition()
-                        homeViewModel.playNextTrack()
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        if (playbackState == Player.STATE_READY) {
+                            _totalTime.value = duration
+                            _currentTime.value = currentPosition
+                        } else if (playbackState == Player.STATE_ENDED) {
+                            checkSavedTrackPosition()
+                            homeViewModel.playNextTrack()
+                        }
                     }
-                 }
-            })
+                })
+            }
+
+            val forwardingPlayer = MediaSessionForwardingPlayer(
+                player,
+                { homeViewModel.playPreviousTrack() },
+                { homeViewModel.playNextTrack() }
+            )
+
+            mediaSession = MediaSession.Builder(context, forwardingPlayer)
+                .build()
+
+            notificationManager = PlayerNotificationManager(context, player)
         }
-
-        val forwardingPlayer = MediaSessionForwardingPlayer(
-            player,
-            { homeViewModel.playPreviousTrack() },
-            { homeViewModel.playNextTrack() }
-        )
-
-        mediaSession = MediaSession.Builder(context, forwardingPlayer)
-            .build()
-
-        notificationManager = PlayerNotificationManager(context, player)
     }
 
     fun startService(service: MediaSessionService) {
@@ -105,7 +107,7 @@ class AudioPlayer(context: Context, private val homeViewModel: HomeViewModel): V
                 seekTo(savedTrackPosition)
             }
 
-            FirePlayer.context.startPlayerService()
+            appContext.get()?.startPlayerService()
             onSuccess()
         } catch (e: Exception) {
             onFailure()

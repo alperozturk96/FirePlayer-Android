@@ -1,22 +1,17 @@
 package com.coolnexttech.fireplayer.utils
 
-import android.annotation.SuppressLint
 import android.content.ContextWrapper
 import android.os.Environment
 import androidx.activity.ComponentActivity
-import com.coolnexttech.fireplayer.FirePlayer
-import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.model.Playlists
 import com.coolnexttech.fireplayer.utils.extensions.jsonToPlaylists
-import com.coolnexttech.fireplayer.utils.extensions.showToast
 import com.coolnexttech.fireplayer.utils.extensions.toJson
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.OutputStreamWriter
-import java.text.SimpleDateFormat
-import java.util.Date
 
 object UserStorage {
 
@@ -24,41 +19,35 @@ object UserStorage {
     private const val playlists = "playlists"
 
     private val sharedPreferences by lazy {
-        FirePlayer.context.getSharedPreferences(appPreferences, ComponentActivity.MODE_PRIVATE)
+        appContext.get()?.getSharedPreferences(appPreferences, ComponentActivity.MODE_PRIVATE)
     }
 
     fun readPlaylists(): Playlists {
-        return sharedPreferences.getString(playlists, null)?.jsonToPlaylists() ?: hashMapOf()
+        return sharedPreferences?.getString(playlists, null)?.jsonToPlaylists() ?: hashMapOf()
     }
 
     fun savePlaylists(value: Playlists) {
-        sharedPreferences.edit().putString(playlists, value.toJson()).apply()
+        sharedPreferences?.edit()?.putString(playlists, value.toJson())?.apply()
     }
 
     fun removeTrackPlaybackPosition(id: Long) {
-        sharedPreferences.edit().remove(id.toString()).apply()
-        FirePlayer.context.showToast(R.string.user_storage_reset_current_track_position_success_message)
+        sharedPreferences?.edit()?.remove(id.toString())?.apply()
+        ToastManager.showRemoveTrackPlaybackPosition()
     }
 
     fun saveTrackPlaybackPosition(id: Long?, position: Long?) {
         if (id == null || position == null) return
-        sharedPreferences.edit().putLong(id.toString(), position).apply()
-        FirePlayer.context.showToast(R.string.user_storage_save_current_track_position_success_message)
+        sharedPreferences?.edit()?.putLong(id.toString(), position)?.apply()
+        ToastManager.showSaveTrackPlaybackPositionMessage()
     }
 
-    @SuppressLint("SimpleDateFormat")
     fun readTrackPlaybackPosition(id: Long, showToast: Boolean): Long? {
-        val result = sharedPreferences.getLong(id.toString(), 0L)
+        val result = sharedPreferences?.getLong(id.toString(), 0L)
         return if (result == 0L) {
             null
         } else {
-            if (showToast) {
-                val time = SimpleDateFormat("mm:ss").format(Date(result))
-                val successMessage = FirePlayer.context.getString(
-                    R.string.user_storage_read_current_track_position_success_message,
-                    time
-                )
-                FirePlayer.context.showToast(successMessage)
+            if (showToast && result != null) {
+                ToastManager.showReadTrackPlaybackPositionMessage(result)
             }
 
             result
@@ -79,13 +68,9 @@ object UserStorage {
             osw.close()
             fos.close()
 
-            val successMessage = FirePlayer.context.getString(
-                R.string.user_storage_export_success_message,
-                file.path.substring(20)
-            )
-            FirePlayer.context.showToast(successMessage)
+            ToastManager.showSuccessExportPlaylistMessage(file.path.substring(20))
         } catch (e: Exception) {
-            FirePlayer.context.showToast(R.string.user_storage_export_fail_message)
+            ToastManager.showFailExportPlaylistMessage()
         }
     }
 
@@ -101,10 +86,10 @@ object UserStorage {
             }
             br.close()
         } catch (e: Exception) {
-            FirePlayer.context.showToast(R.string.user_storage_import_fail_message)
+            ToastManager.showFailImportPlaylistMessage()
         }
 
-        FirePlayer.context.showToast(R.string.user_storage_import_success_message)
+        ToastManager.showSuccessImportPlaylistMessage()
 
         val playlistsAsJson = stringBuilder.toString()
         val playlist = playlistsAsJson.jsonToPlaylists()
@@ -112,7 +97,7 @@ object UserStorage {
     }
 
     private fun getPlaylistFile(): File {
-        val contextWrapper = ContextWrapper(FirePlayer.context)
+        val contextWrapper = ContextWrapper(appContext.get())
         val directory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
         return File(directory, "FirePlayerPlaylists" + ".txt")
     }

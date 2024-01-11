@@ -1,6 +1,6 @@
 package com.coolnexttech.fireplayer.utils
 
-import com.coolnexttech.fireplayer.FirePlayer
+import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
@@ -8,5 +8,5 @@ import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
 object VMProvider {
     val homeViewModel = HomeViewModel()
     val playlistViewModel = PlaylistsViewModel()
-    val audioPlayer = AudioPlayer(FirePlayer.context, homeViewModel)
+    val audioPlayer = AudioPlayer(appContext.get(), homeViewModel)
 }
