@@ -107,7 +107,8 @@ fun HomeScreen(
                                     index,
                                     viewModel
                                 )
-                            })
+                            }
+                        )
                     }
                 }
             }

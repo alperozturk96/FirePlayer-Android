@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -66,12 +67,7 @@ fun SeekbarView(
 
         VSpacing8()
 
-        Row {
-            Spacer(modifier = Modifier.weight(1f))
-            ActionImageButton(R.drawable.ic_save) {
-                audioPlayer.saveCurrentTrackPlaybackPosition()
-            }
-        }
+        TrackPositionControl(audioPlayer)
 
         MediaControl(audioPlayer, isPlaying, { homeViewModel.playPreviousTrack() }) {
             homeViewModel.playNextTrack()
@@ -132,6 +128,24 @@ private fun MediaSlider(
             modifier = Modifier.wrapContentWidth(Alignment.End),
             color = AppColors.unhighlight
         )
+    }
+}
+
+@Composable
+private fun TrackPositionControl(audioPlayer: AudioPlayer) {
+    Row {
+        Spacer(modifier = Modifier.weight(1f))
+
+        ActionImageButton(R.drawable.ic_reset) {
+            audioPlayer.resetCurrentTrackPlaybackPosition()
+
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        ActionImageButton(R.drawable.ic_save) {
+            audioPlayer.saveCurrentTrackPlaybackPosition()
+        }
     }
 }
 

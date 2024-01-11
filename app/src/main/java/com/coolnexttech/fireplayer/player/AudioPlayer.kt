@@ -169,6 +169,11 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
         UserStorage.saveTrackPlaybackPosition(currentTrackId, currentTrackPosition)
     }
 
+    fun resetCurrentTrackPlaybackPosition() {
+        val currentTrackId = homeViewModel.selectedTrack.value?.id ?: return
+        UserStorage.removeTrackPlaybackPosition(currentTrackId)
+    }
+
     fun isTotalTimeValid(): Boolean = totalTime.value > 2L
 
     private fun startPeriodicUpdateJob() {
