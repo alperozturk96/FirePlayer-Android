@@ -43,6 +43,8 @@
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
 
+    <string name="playback_error_message">Cannot able to play selected track</string>
+
     <string name="user_storage_reset_current_track_position_success_message">Track position reset</string>
     <string name="user_storage_read_current_track_position_success_message">%s track position read</string>
     <string name="user_storage_save_current_track_position_success_message">Track position saved</string>

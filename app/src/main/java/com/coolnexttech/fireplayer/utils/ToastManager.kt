@@ -38,6 +38,14 @@ object ToastManager {
         }
     }
 
+    fun showPlaybackErrorMessage() {
+        appContext.get()?.getString(
+            R.string.playback_error_message,
+        )?.let {
+            appContext.get()?.showToast(it)
+        }
+    }
+
     fun showSuccessExportPlaylistMessage() {
         appContext.get()?.getString(
             R.string.user_storage_export_success_message,

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
@@ -16,6 +17,7 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.helper.MediaSessionForwardingPlayer
 import com.coolnexttech.fireplayer.player.notification.PlayerNotificationManager
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
+import com.coolnexttech.fireplayer.utils.ToastManager
 import com.coolnexttech.fireplayer.utils.UserStorage
 import com.coolnexttech.fireplayer.utils.extensions.play
 import com.coolnexttech.fireplayer.utils.extensions.startPlayerService
@@ -30,6 +32,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): ViewModel() {
+
+    private val tag = "AudioPlayer"
 
     var mediaSession: MediaSession? = null
 
@@ -110,6 +114,8 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
             appContext.get()?.startPlayerService()
             onSuccess()
         } catch (e: Exception) {
+            ToastManager.showPlaybackErrorMessage()
+            Log.d(tag, "Error caught at play: $e")
             onFailure()
         }
     }
