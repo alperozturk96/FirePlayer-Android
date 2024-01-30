@@ -10,4 +10,5 @@ object AppColors {
     val highlight = Color(0xFFD2B11B)
     val textColor = Color(0xFFFFFFFF)
     val saved = Color(0xFFFFDD95)
+    val blue = Color(0xFF0B84FF)
 }

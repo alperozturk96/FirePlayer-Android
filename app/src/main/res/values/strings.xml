@@ -18,13 +18,14 @@
     <string name="home_search_in_albums_text">Search Track In Albums</string>
     <string name="home_search_in_artists_text">Search Track In Artists</string>
 
+    <string name="home_track_action_add_to_playlist">Add To Playlist</string>
+
     <string name="home_sort_dialog_title">Sort</string>
     <string name="home_sort_dialog_sort_by_title_a_z">Sort By Title A-Z</string>
     <string name="home_sort_dialog_sort_by_title_z_a">Sort By Title Z-A</string>
     <string name="home_sort_dialog_sort_by_new_to_old_title">Sort New To Old</string>
     <string name="home_sort_dialog_sort_by_old_to_new_title">Sort Old To New</string>
 
-    <string name="home_add_track_to_playlist_hint">Select track to add playlist</string>
     <string name="home_content_not_available_text">Add Your Tracks To Music Folder</string>
 
     <string name="playlists_title">Playlists</string>

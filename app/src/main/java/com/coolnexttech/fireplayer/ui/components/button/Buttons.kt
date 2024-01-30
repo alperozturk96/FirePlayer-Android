@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.ui.components
+package com.coolnexttech.fireplayer.ui.components.button
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -28,8 +28,8 @@ fun DialogButton(id: Int, action: () -> Unit) {
 }
 
 @Composable
-fun ActionIconButton(id: Int, action: () -> Unit) {
-    IconButton(action) {
+fun ActionIconButton(id: Int, modifier: Modifier = Modifier, action: () -> Unit) {
+    IconButton(action, modifier = modifier) {
         Icon(
             imageVector = ImageVector.vectorResource(id),
             tint = AppColors.unhighlight,

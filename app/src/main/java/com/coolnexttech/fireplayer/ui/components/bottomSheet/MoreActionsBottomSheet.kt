@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MoreActionsBottomSheet(actionTextId: Int, dismiss: () -> Unit, action: () -> Unit) {
+fun MoreActionsBottomSheet(actions: List<Pair<Int, () -> Unit>>, dismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
@@ -41,22 +41,24 @@ fun MoreActionsBottomSheet(actionTextId: Int, dismiss: () -> Unit, action: () ->
                 .height(120.dp)
                 .padding(all = 16.dp)
         ) {
-            Text(
-                text = stringResource(actionTextId),
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .clickable {
-                        scope
-                            .launch { sheetState.hide() }
-                            .invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    action()
+            actions.forEach { action ->
+                Text(
+                    text = stringResource(action.first),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .padding(all = 8.dp)
+                        .clickable {
+                            scope
+                                .launch { sheetState.hide() }
+                                .invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        action.second()
+                                    }
                                 }
-                            }
-                    },
-                color = AppColors.textColor
-            )
+                        },
+                    color = AppColors.textColor
+                )
+            }
         }
     }
 }

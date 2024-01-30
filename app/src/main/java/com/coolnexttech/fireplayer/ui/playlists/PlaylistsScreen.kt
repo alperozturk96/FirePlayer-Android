@@ -15,7 +15,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.ActionIcon
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.bottomSheet.MoreActionsBottomSheet
@@ -51,10 +50,6 @@ fun PlaylistsScreen(
 
                 ListItemText(
                     playlistTitle,
-                    endAction = ActionIcon(R.drawable.ic_more) {
-                        selectedPlaylistTitle = playlistTitle
-                        showBottomSheet = true
-                    },
                     action = {
                         playlistAction(
                             context,
@@ -63,18 +58,26 @@ fun PlaylistsScreen(
                             navController,
                             playlistTitle
                         )
-                    })
+                    },
+                    longPressAction = {
+                        selectedPlaylistTitle = playlistTitle
+                        showBottomSheet = true
+                    }
+                )
             }
         }
     }
 
     if (showBottomSheet) {
-        MoreActionsBottomSheet(
-            R.string.playlist_bottom_sheet_delete_action_title,
-            dismiss = { showBottomSheet = false }) {
+        val bottomSheetAction = listOf(Pair(R.string.playlist_bottom_sheet_delete_action_title) {
             viewModel.removePlaylist(selectedPlaylistTitle)
             showBottomSheet = false
-        }
+        })
+
+        MoreActionsBottomSheet(
+            actions = bottomSheetAction,
+            dismiss = { showBottomSheet = false }
+        )
     }
 
     if (showAddPlaylist.value) {
@@ -93,10 +96,21 @@ private fun playlistAction(
 ) {
     if (mode is PlaylistViewMode.Add) {
         viewModel.addTrackToPlaylist(mode.trackId, playlistTitle)
-        context.showToast(context.getString(R.string.playlist_screen_add, mode.trackTitle, playlistTitle))
+        context.showToast(
+            context.getString(
+                R.string.playlist_screen_add,
+                mode.trackTitle,
+                playlistTitle
+            )
+        )
     } else {
         VMProvider.homeViewModel.initTrackList(playlistTitle)
-        context.showToast(context.getString(R.string.playlist_screen_selected_playlist, playlistTitle))
+        context.showToast(
+            context.getString(
+                R.string.playlist_screen_selected_playlist,
+                playlistTitle
+            )
+        )
     }
 
     navController.pop()

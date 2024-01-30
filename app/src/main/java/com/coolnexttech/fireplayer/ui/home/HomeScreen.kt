@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +21,7 @@ import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.ListItemText
+import com.coolnexttech.fireplayer.ui.components.bottomSheet.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.components.dialog.SortOptionsAlertDialog
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
@@ -45,8 +45,8 @@ fun HomeScreen(
     val playMode by viewModel.playMode.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val showSortOptions = remember { mutableStateOf(false) }
-    val addTrackToPlaylist = remember { mutableStateOf(false) }
-
+    val selectedTrackForTrackAction = remember { mutableStateOf<Track?>(null) }
+    val showTrackActionsBottomSheet = remember { mutableStateOf(false) }
     val showAlphabeticalScroller = remember { mutableStateOf(false) }
     val alphabeticalScrollerIconId = if (showAlphabeticalScroller.value) {
         R.drawable.ic_arrow_up
@@ -76,8 +76,8 @@ fun HomeScreen(
                 characterList,
                 coroutineScope,
                 listState,
-                addTrackToPlaylist = { addTrackToPlaylist.value = true },
-                showSortOptions = { showSortOptions.value = true })
+                showSortOptions = { showSortOptions.value = true }
+            )
         }, bottomBar = {
             selectedTrack?.let { SeekbarView(it, audioPlayer, viewModel) }
         }) {
@@ -99,18 +99,39 @@ fun HomeScreen(
                             color = track.color(selectedTrack?.id),
                             action = {
                                 listItemAction(
-                                    addTrackToPlaylist,
-                                    navController,
                                     track,
                                     coroutineScope,
                                     listState,
                                     index,
                                     viewModel
                                 )
+                            },
+                            longPressAction = {
+                                selectedTrackForTrackAction.value = track
+                                showTrackActionsBottomSheet.value = true
                             }
                         )
                     }
                 }
+            }
+
+            if (showTrackActionsBottomSheet.value) {
+                val bottomSheetAction = listOf(Pair(R.string.home_track_action_add_to_playlist) {
+                    selectedTrackForTrackAction.value?.let {
+                        navController.navigate(
+                            Destination.Playlists(
+                                PlaylistViewMode.Add(it.id, it.title)
+                            )
+                        )
+                    }
+
+                    showTrackActionsBottomSheet.value = false
+                })
+
+                MoreActionsBottomSheet(
+                    actions = bottomSheetAction,
+                    dismiss = { showTrackActionsBottomSheet.value = false }
+                )
             }
 
             if (showSortOptions.value) {
@@ -127,27 +148,15 @@ fun HomeScreen(
 }
 
 private fun listItemAction(
-    addTrackToPlaylist: MutableState<Boolean>,
-    navController: NavController<Destination>,
     track: Track,
     coroutineScope: CoroutineScope,
     listState: LazyListState,
     index: Int,
     viewModel: HomeViewModel
 ) {
-    if (addTrackToPlaylist.value) {
-        navController.navigate(
-            Destination.Playlists(
-                PlaylistViewMode.Add(track.id, track.title)
-            )
-        )
-
-        addTrackToPlaylist.value = false
-    } else {
-        coroutineScope.launch(Dispatchers.Main) {
-            listState.animateScrollToItem(index)
-        }
-
-        viewModel.playTrack(track)
+    coroutineScope.launch(Dispatchers.Main) {
+        listState.animateScrollToItem(index)
     }
+
+    viewModel.playTrack(track)
 }

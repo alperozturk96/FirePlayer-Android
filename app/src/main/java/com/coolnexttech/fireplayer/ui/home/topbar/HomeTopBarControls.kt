@@ -7,7 +7,7 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.PlaylistViewMode
-import com.coolnexttech.fireplayer.ui.components.ActionIconButton
+import com.coolnexttech.fireplayer.ui.components.button.ActionIconButton
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.utils.extensions.showToast
@@ -22,7 +22,6 @@ fun HomeTopBarControls(
     searchText: String,
     filterOption: FilterOptions,
     playMode: PlayMode,
-    addTrackToPlaylist: () -> Unit,
     showSortOptions: () -> Unit,
 ) {
     Row {
@@ -43,13 +42,6 @@ fun HomeTopBarControls(
 
         ActionIconButton(R.drawable.ic_sort) {
             showSortOptions()
-        }
-
-        ActionIconButton(R.drawable.ic_add_playlist) {
-            addTrackToPlaylist()
-            context.showToast(
-                R.string.home_add_track_to_playlist_hint
-            )
         }
     }
 }

@@ -36,7 +36,6 @@ fun HomeTopBar(
     characterList: Map<Char, Int>,
     coroutineScope: CoroutineScope,
     listState: LazyListState,
-    addTrackToPlaylist: () -> Unit,
     showSortOptions: () -> Unit,
 ) {
     Column {
@@ -45,9 +44,7 @@ fun HomeTopBar(
             alphabeticalScrollerIconId,
             filterOption.searchTitleId(),
             searchText,
-            viewModel,
-
-            ) {
+            viewModel) {
             showAlphabeticalScroller.value = !showAlphabeticalScroller.value
         }
 
@@ -63,7 +60,6 @@ fun HomeTopBar(
                     searchText,
                     filterOption,
                     playMode,
-                    addTrackToPlaylist = addTrackToPlaylist,
                     showSortOptions = showSortOptions)
 
                 if (searchText.isEmpty()) {
