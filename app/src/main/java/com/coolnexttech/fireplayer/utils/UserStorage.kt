@@ -1,22 +1,17 @@
 package com.coolnexttech.fireplayer.utils
 
-import android.content.ContextWrapper
-import android.os.Environment
+import android.content.Context
 import androidx.activity.ComponentActivity
 import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.model.Playlists
 import com.coolnexttech.fireplayer.utils.extensions.jsonToPlaylists
 import com.coolnexttech.fireplayer.utils.extensions.toJson
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileOutputStream
-import java.io.FileReader
-import java.io.OutputStreamWriter
 
 object UserStorage {
 
     private const val appPreferences = "FirePlayer"
     private const val playlists = "playlists"
+    private const val tag = "UserStorage"
 
     private val sharedPreferences by lazy {
         appContext.get()?.getSharedPreferences(appPreferences, ComponentActivity.MODE_PRIVATE)
@@ -54,51 +49,26 @@ object UserStorage {
         }
     }
 
-    fun exportPlaylists() {
+    fun exportPlaylists(context: Context) {
         val playlists = readPlaylists()
         val playlistsAsJson = playlists.toJson()
-
-        val file = getPlaylistFile()
-        val fos: FileOutputStream?
-        try {
-            fos = FileOutputStream(file)
-            val osw = OutputStreamWriter(fos)
-            osw.write(playlistsAsJson)
-            osw.flush()
-            osw.close()
-            fos.close()
-
-            ToastManager.showSuccessExportPlaylistMessage(file.path.substring(20))
-        } catch (e: Exception) {
+        val success = FileManager.writeToDocuments(context, "FirePlayerPlaylists", playlistsAsJson)
+        if (success) {
+            ToastManager.showSuccessExportPlaylistMessage()
+        } else {
             ToastManager.showFailExportPlaylistMessage()
         }
     }
 
-    fun importPlaylists() {
-        val playlistFile = getPlaylistFile()
-        val stringBuilder = StringBuilder()
-        try {
-            val br = BufferedReader(FileReader(playlistFile))
-            var line: String?
-            while (br.readLine().also { line = it } != null) {
-                stringBuilder.append(line)
-                stringBuilder.append("")
-            }
-            br.close()
-        } catch (e: Exception) {
+    fun importPlaylist(playlistsAsJson: String?) {
+        if (playlistsAsJson == null) {
             ToastManager.showFailImportPlaylistMessage()
+            return
         }
 
-        ToastManager.showSuccessImportPlaylistMessage()
-
-        val playlistsAsJson = stringBuilder.toString()
         val playlist = playlistsAsJson.jsonToPlaylists()
         savePlaylists(playlist)
-    }
 
-    private fun getPlaylistFile(): File {
-        val contextWrapper = ContextWrapper(appContext.get())
-        val directory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        return File(directory, "FirePlayerPlaylists" + ".txt")
+        ToastManager.showSuccessImportPlaylistMessage()
     }
 }

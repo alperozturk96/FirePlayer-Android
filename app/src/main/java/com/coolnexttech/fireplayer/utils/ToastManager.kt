@@ -18,11 +18,13 @@ object ToastManager {
     }
 
     fun showSaveTrackPlaybackPositionMessage() {
-        appContext.get()?.showToast(R.string.user_storage_save_current_track_position_success_message)
+        appContext.get()
+            ?.showToast(R.string.user_storage_save_current_track_position_success_message)
     }
 
     fun showRemoveTrackPlaybackPosition() {
-        appContext.get()?.showToast(R.string.user_storage_reset_current_track_position_success_message)
+        appContext.get()
+            ?.showToast(R.string.user_storage_reset_current_track_position_success_message)
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -36,13 +38,16 @@ object ToastManager {
         }
     }
 
-    fun showSuccessExportPlaylistMessage(argument: String) {
+    fun showSuccessExportPlaylistMessage() {
         appContext.get()?.getString(
             R.string.user_storage_export_success_message,
-            argument
         )?.let {
             appContext.get()?.showToast(it)
         }
+    }
+
+    fun showFailExportSelectedFolderPathMessage() {
+        appContext.get()?.showToast(R.string.user_storage_export_fail_to_read_selected_folder_path_message)
     }
 
     fun showFailExportPlaylistMessage() {
