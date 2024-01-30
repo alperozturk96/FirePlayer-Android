@@ -19,7 +19,6 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 
-
 @Composable
 fun AddPlaylistAlertDialog(
     viewModel: PlaylistsViewModel,

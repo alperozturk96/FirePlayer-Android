@@ -35,6 +35,10 @@
     <string name="playlist_screen_add">%s track added to %s playlist</string>
     <string name="playlist_screen_selected_playlist">%s playlist selected</string>
 
+    <string name="delete_alert_dialog_title">Delete</string>
+    <string name="delete_alert_dialog_description">Could you confirm whether you want to delete the selected item?</string>
+
+
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
 

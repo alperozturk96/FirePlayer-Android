@@ -15,6 +15,7 @@ import java.io.File
 object FolderAnalyzer {
 
     private val unsupportedFileFormats = listOf("dsf")
+    private const val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
 
     var tracks: ArrayList<Track> = arrayListOf()
 
@@ -51,7 +52,6 @@ object FolderAnalyzer {
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.DURATION
         )
-        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
         val sortOrder = "${MediaStore.Audio.Media.TITLE} ASC"
 
         contentResolver?.query(
@@ -102,6 +102,15 @@ object FolderAnalyzer {
         }
 
         return result
+    }
+
+    fun deleteTrack(track: Track) {
+        val resolver = appContext.get()?.contentResolver
+        resolver?.delete(
+            track.path,
+            selection,
+            null
+        )
     }
 
     private fun getFileMimeType(uri: Uri): String? {

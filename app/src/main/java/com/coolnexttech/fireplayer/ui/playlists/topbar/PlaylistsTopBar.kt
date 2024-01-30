@@ -1,7 +1,5 @@
 package com.coolnexttech.fireplayer.ui.playlists.topbar
 
-import android.content.ContentResolver
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,8 +13,7 @@ import com.coolnexttech.fireplayer.ui.components.HeadlineMediumText
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
 import com.coolnexttech.fireplayer.utils.UserStorage
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import com.coolnexttech.fireplayer.utils.extensions.toContentString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +24,7 @@ fun PlaylistsTopBar(viewModel: PlaylistsViewModel, showAddPlaylist: () -> Unit) 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
-            val playlistAsJson = readUri(contentResolver, it)
+            val playlistAsJson = it.toContentString(contentResolver)
             UserStorage.importPlaylist(playlistAsJson)
             viewModel.readPlaylists()
         }
@@ -52,21 +49,4 @@ fun PlaylistsTopBar(viewModel: PlaylistsViewModel, showAddPlaylist: () -> Unit) 
             }
         }
     )
-}
-
-private fun readUri(contentResolver: ContentResolver, uri: Uri?): String? {
-    if (uri == null) {
-        return null
-    }
-
-    val stringBuilder = StringBuilder()
-    contentResolver.openInputStream(uri)?.use { inputStream ->
-        val reader = BufferedReader(InputStreamReader(inputStream))
-        var line: String? = reader.readLine()
-        while (line != null) {
-            stringBuilder.append(line)
-            line = reader.readLine()
-        }
-    }
-    return stringBuilder.toString()
 }
