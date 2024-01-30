@@ -1,6 +1,7 @@
 package com.coolnexttech.fireplayer.utils.extensions
 
 import com.coolnexttech.fireplayer.model.FilterOptions
+import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 
@@ -22,7 +23,15 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
     }
 }
 
-fun List<Track>.getNextTrackAndIndex(track: Track?): Pair<Track, Int>? {
+fun List<Track>.nextTrack(playMode: PlayMode, prevTracks: List<Track>, selectedTrack: Track): Track? {
+    return when (playMode) {
+        PlayMode.Shuffle -> this.getNextRandomTrack(excludedTracks = prevTracks)
+        PlayMode.Sequential -> this.getNextTrackAndIndex(selectedTrack)?.first
+        PlayMode.Loop -> selectedTrack
+    }
+}
+
+private fun List<Track>.getNextTrackAndIndex(track: Track?): Pair<Track, Int>? {
     this.forEachIndexed { index, newTrack ->
         if (track?.id == newTrack.id) {
             return if (index + 1 in this.indices) {
@@ -36,7 +45,7 @@ fun List<Track>.getNextTrackAndIndex(track: Track?): Pair<Track, Int>? {
     return null
 }
 
-fun List<Track>.getNextRandomTrack(excludedTracks: List<Track>): Track? {
+private fun List<Track>.getNextRandomTrack(excludedTracks: List<Track>): Track {
     val availableTracks = this.filterNot { it in excludedTracks }
 
     return if (availableTracks.isEmpty()) {

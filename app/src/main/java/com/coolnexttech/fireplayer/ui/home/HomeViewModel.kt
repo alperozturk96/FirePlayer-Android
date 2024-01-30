@@ -10,8 +10,7 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.filter
-import com.coolnexttech.fireplayer.utils.extensions.getNextRandomTrack
-import com.coolnexttech.fireplayer.utils.extensions.getNextTrackAndIndex
+import com.coolnexttech.fireplayer.utils.extensions.nextTrack
 import com.coolnexttech.fireplayer.utils.extensions.sort
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -109,7 +108,10 @@ class HomeViewModel : ViewModel() {
                 it.clear()
                 it
             } else {
-                it.add(track)
+                if (!it.contains(track)) {
+                    it.add(track)
+                }
+
                 it
             }
         }
@@ -118,8 +120,9 @@ class HomeViewModel : ViewModel() {
     fun handlePlayerEvent(action: String?) {
         when (action) {
             PlayerEvents.Previous.name -> {
-               playPreviousTrack()
+                playPreviousTrack()
             }
+
             PlayerEvents.Next.name -> {
                 playNextTrack()
             }
@@ -135,10 +138,11 @@ class HomeViewModel : ViewModel() {
             playTrack(_filteredTracks.value.first())
         }
 
-        val nextTrack = when (_playMode.value) {
-            PlayMode.Shuffle -> _filteredTracks.value.getNextRandomTrack(excludedTracks = _prevTracks.value)
-            PlayMode.Sequential -> _filteredTracks.value.getNextTrackAndIndex(_selectedTrack.value)?.first
-        } ?: return
+        val nextTrack = _filteredTracks.value.nextTrack(
+            _playMode.value,
+            _prevTracks.value,
+            _selectedTrack.value!!
+        ) ?: return
 
         playTrack(nextTrack)
     }

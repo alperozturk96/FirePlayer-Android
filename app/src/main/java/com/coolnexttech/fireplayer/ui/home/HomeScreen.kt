@@ -119,7 +119,8 @@ fun HomeScreen(
                     sort = { sortOption ->
                         viewModel.sort(sortOption)
                         showSortOptions.value = false
-                    })
+                    }
+                )
             }
         }
     }
