@@ -86,6 +86,8 @@ fun MoreActionsBottomSheet(
                     Text(text = stringResource(action.second), fontSize = 16.sp, color = AppColors.textColor)
                 }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
