@@ -69,10 +69,15 @@ fun PlaylistsScreen(
     }
 
     if (showBottomSheet) {
-        val bottomSheetAction = listOf(Pair(R.string.playlist_bottom_sheet_delete_action_title) {
-            viewModel.removePlaylist(selectedPlaylistTitle)
-            showBottomSheet = false
-        })
+        val bottomSheetAction = listOf(
+            Triple(
+                R.drawable.ic_delete,
+                R.string.playlist_bottom_sheet_delete_action_title
+            ) {
+                viewModel.removePlaylist(selectedPlaylistTitle)
+                showBottomSheet = false
+            }
+        )
 
         MoreActionsBottomSheet(
             actions = bottomSheetAction,

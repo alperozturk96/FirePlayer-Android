@@ -22,11 +22,13 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.bottomSheet.MoreActionsBottomSheet
+import com.coolnexttech.fireplayer.ui.components.dialog.DeleteAlertDialog
 import com.coolnexttech.fireplayer.ui.components.dialog.SortOptionsAlertDialog
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.navigation.Destination
+import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +55,8 @@ fun HomeScreen(
     } else {
         R.drawable.ic_arrow_down
     }
+    val showDeleteTrackDialog = remember { mutableStateOf(false) }
+
 
     val selectedTrack by viewModel.selectedTrack.collectAsState()
     val listState = rememberLazyListState()
@@ -116,19 +120,31 @@ fun HomeScreen(
             }
 
             if (showTrackActionsBottomSheet.value) {
-                val bottomSheetAction = listOf(Pair(R.string.home_track_action_add_to_playlist) {
-                    selectedTrackForTrackAction.value?.let {
-                        navController.navigate(
-                            Destination.Playlists(
-                                PlaylistViewMode.Add(it.id, it.title)
+                val bottomSheetAction = listOf(
+                    Triple(R.drawable.ic_add_playlist, R.string.home_track_action_add_to_playlist) {
+                        selectedTrackForTrackAction.value?.let {
+                            navController.navigate(
+                                Destination.Playlists(
+                                    PlaylistViewMode.Add(it.id, it.title)
+                                )
                             )
-                        )
-                    }
+                        }
 
-                    showTrackActionsBottomSheet.value = false
-                })
+                        showTrackActionsBottomSheet.value = false
+                    },
+                    Triple(R.drawable.ic_delete, R.string.home_bottom_sheet_delete_track_action_title) {
+                        showDeleteTrackDialog.value = true
+                    },
+                    Triple(R.drawable.ic_save, R.string.home_bottom_sheet_save_track_position_action_title) {
+                        audioPlayer.saveCurrentTrackPlaybackPosition()
+                    },
+                    Triple(R.drawable.ic_reset, R.string.home_bottom_sheet_reset_track_position_action_title) {
+                        audioPlayer.resetCurrentTrackPlaybackPosition()
+                    }
+                )
 
                 MoreActionsBottomSheet(
+                    title = selectedTrackForTrackAction.value?.title,
                     actions = bottomSheetAction,
                     dismiss = { showTrackActionsBottomSheet.value = false }
                 )
@@ -140,6 +156,22 @@ fun HomeScreen(
                     sort = { sortOption ->
                         viewModel.sort(sortOption)
                         showSortOptions.value = false
+                    }
+                )
+            }
+
+            if (showDeleteTrackDialog.value) {
+                DeleteAlertDialog(
+                    onComplete = {
+                        selectedTrackForTrackAction.value?.let {
+                            FolderAnalyzer.deleteTrack(it)
+                            viewModel.reset()
+                            viewModel.playNextTrack()
+                        }
+                    },
+                    dismiss = {
+                        showTrackActionsBottomSheet.value = false
+                        showDeleteTrackDialog.value = false
                     }
                 )
             }

@@ -13,6 +13,9 @@
     <string name="home_screen_reset_button_description">Track list updated</string>
 
     <string name="home_bottom_sheet_add_to_playlist_action_title">Add To Playlist</string>
+    <string name="home_bottom_sheet_delete_track_action_title">Delete Track</string>
+    <string name="home_bottom_sheet_save_track_position_action_title">Save Track Position</string>
+    <string name="home_bottom_sheet_reset_track_position_action_title">Reset Track Position</string>
 
     <string name="home_search_in_titles_text">Search Track In Titles</string>
     <string name="home_search_in_albums_text">Search Track In Albums</string>
@@ -38,7 +41,6 @@
 
     <string name="delete_alert_dialog_title">Delete</string>
     <string name="delete_alert_dialog_description">Could you confirm whether you want to delete the selected item?</string>
-
 
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -16,8 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -28,10 +25,8 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.components.button.ActionImageButton
-import com.coolnexttech.fireplayer.ui.components.dialog.DeleteAlertDialog
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing16
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
@@ -43,7 +38,6 @@ fun SeekbarView(
     audioPlayer: AudioPlayer,
     homeViewModel: HomeViewModel,
 ) {
-    val showDeleteTrackDialog = remember { mutableStateOf(false) }
     val currentTime by audioPlayer.currentTime.collectAsState()
     val totalTime by audioPlayer.totalTime.collectAsState()
     val isPlaying by audioPlayer.isPlaying.collectAsState()
@@ -72,24 +66,8 @@ fun SeekbarView(
 
         VSpacing8()
 
-        TrackPositionControl(
-            audioPlayer,
-            showDeleteTrackAlertDialog = { showDeleteTrackDialog.value = true }
-        )
-
         MediaControl(audioPlayer, isPlaying, { homeViewModel.playPreviousTrack() }) {
             homeViewModel.playNextTrack()
-        }
-
-        if (showDeleteTrackDialog.value) {
-            DeleteAlertDialog(
-                onComplete = {
-                    FolderAnalyzer.deleteTrack(selectedTrack)
-                    homeViewModel.reset()
-                    homeViewModel.playNextTrack()
-                },
-                dismiss = { showDeleteTrackDialog.value = false }
-            )
         }
     }
 }
@@ -147,29 +125,6 @@ private fun MediaSlider(
             modifier = Modifier.wrapContentWidth(Alignment.End),
             color = AppColors.unhighlight
         )
-    }
-}
-
-@Composable
-private fun TrackPositionControl(audioPlayer: AudioPlayer, showDeleteTrackAlertDialog: () -> Unit) {
-    Row {
-        Spacer(modifier = Modifier.weight(1f))
-
-        ActionImageButton(R.drawable.ic_delete) {
-            showDeleteTrackAlertDialog()
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        ActionImageButton(R.drawable.ic_reset) {
-            audioPlayer.resetCurrentTrackPlaybackPosition()
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        ActionImageButton(R.drawable.ic_save) {
-            audioPlayer.saveCurrentTrackPlaybackPosition()
-        }
     }
 }
 
