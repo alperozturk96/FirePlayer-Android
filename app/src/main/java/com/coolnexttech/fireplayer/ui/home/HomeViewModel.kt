@@ -37,14 +37,23 @@ class HomeViewModel : ViewModel() {
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
 
+    private val _isPlaylistSelected = MutableStateFlow(false)
+    val isPlaylistSelected: StateFlow<Boolean> = _isPlaylistSelected
+
     init {
         initTrackList(null)
     }
 
     fun initTrackList(selectedPlaylistTitle: String?) {
         _tracks = if (selectedPlaylistTitle == null) {
+            _isPlaylistSelected.update {
+                false
+            }
             FolderAnalyzer.tracks
         } else {
+            _isPlaylistSelected.update {
+                true
+            }
             FolderAnalyzer.getTracksFromPlaylist(selectedPlaylistTitle)
         }
 

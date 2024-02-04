@@ -1,10 +1,13 @@
 package com.coolnexttech.fireplayer.model
 
 import android.net.Uri
+import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Immutable
 data class Track(
     var id: Long,
@@ -16,7 +19,7 @@ data class Track(
     var pathExtension: String? = null,
     var dateAdded: Long,
     val isPositionSaved: Boolean
-) {
+) : Parcelable {
     fun titleRepresentation(): String {
         return title + " · " + trackDetail()
     }

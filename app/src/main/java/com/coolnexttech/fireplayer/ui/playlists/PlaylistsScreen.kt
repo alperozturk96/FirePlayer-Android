@@ -1,6 +1,7 @@
 package com.coolnexttech.fireplayer.ui.playlists
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -24,6 +25,7 @@ import com.coolnexttech.fireplayer.ui.playlists.topbar.PlaylistsTopBar
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
+import dev.olshevski.navigation.reimagined.navigate
 import dev.olshevski.navigation.reimagined.pop
 
 @Composable
@@ -37,6 +39,11 @@ fun PlaylistsScreen(
     val showAddPlaylist = remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlaylistTitle by remember { mutableStateOf("") }
+
+    BackHandler {
+        VMProvider.homeViewModel.initTrackList(null)
+        navController.pop()
+    }
 
     Scaffold(topBar = {
         PlaylistsTopBar(viewModel) {
@@ -101,6 +108,7 @@ private fun playlistAction(
 ) {
     if (mode is PlaylistViewMode.Add) {
         viewModel.addTrackToPlaylist(mode.trackTitleRepresentation, playlistTitle)
+
         context.showToast(
             context.getString(
                 R.string.playlist_screen_add,
@@ -108,15 +116,10 @@ private fun playlistAction(
                 playlistTitle
             )
         )
+
+        navController.pop()
     } else {
         VMProvider.homeViewModel.initTrackList(playlistTitle)
-        context.showToast(
-            context.getString(
-                R.string.playlist_screen_selected_playlist,
-                playlistTitle
-            )
-        )
+        navController.navigate(Destination.Home)
     }
-
-    navController.pop()
 }

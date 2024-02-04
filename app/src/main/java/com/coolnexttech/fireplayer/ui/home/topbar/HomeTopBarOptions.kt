@@ -28,6 +28,7 @@ fun HomeTopBarOptions(
     searchPlaceholderId: Int,
     searchText: String,
     viewModel: HomeViewModel,
+    isPlaylistSelected: Boolean,
     toggleAlphabeticalScroller: () -> Unit,
 ) {
     TopAppBar(
@@ -56,17 +57,18 @@ fun HomeTopBarOptions(
             AnimatedVisibility(searchText.isNotEmpty()) {
                 ActionIconButton(R.drawable.ic_cancel) {
                     viewModel.clearSearch()
-                    viewModel.initTrackList(null)
                 }
             }
 
-            ActionIconButton(R.drawable.ic_reset) {
-                viewModel.reset()
-                context.showToast(R.string.home_screen_reset_button_description)
-            }
+            if (!isPlaylistSelected) {
+                ActionIconButton(R.drawable.ic_reset) {
+                    viewModel.reset()
+                    context.showToast(R.string.home_screen_reset_button_description)
+                }
 
-            ActionIconButton(alphabeticalScrollerIconId) {
-                toggleAlphabeticalScroller()
+                ActionIconButton(alphabeticalScrollerIconId) {
+                    toggleAlphabeticalScroller()
+                }
             }
         }
     )

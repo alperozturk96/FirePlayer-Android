@@ -42,6 +42,7 @@ fun HomeScreen(
     audioPlayer: AudioPlayer
 ) {
     val context = LocalContext.current
+    val isPlaylistSelected by viewModel.isPlaylistSelected.collectAsState()
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val filterOption by viewModel.filterOption.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
@@ -80,6 +81,7 @@ fun HomeScreen(
                 characterList,
                 coroutineScope,
                 listState,
+                isPlaylistSelected,
                 showSortOptions = { showSortOptions.value = true }
             )
         }, bottomBar = {
@@ -120,18 +122,7 @@ fun HomeScreen(
             }
 
             if (showTrackActionsBottomSheet.value) {
-                val bottomSheetAction = listOf(
-                    Triple(R.drawable.ic_add_playlist, R.string.home_track_action_add_to_playlist) {
-                        selectedTrackForTrackAction.value?.let {
-                            navController.navigate(
-                                Destination.Playlists(
-                                    PlaylistViewMode.Add(it.titleRepresentation(), it.title)
-                                )
-                            )
-                        }
-
-                        showTrackActionsBottomSheet.value = false
-                    },
+                val bottomSheetAction = arrayListOf(
                     Triple(R.drawable.ic_delete, R.string.home_bottom_sheet_delete_track_action_title) {
                         showDeleteTrackDialog.value = true
                     },
@@ -142,6 +133,20 @@ fun HomeScreen(
                         audioPlayer.resetCurrentTrackPlaybackPosition()
                     }
                 )
+
+                if (!isPlaylistSelected) {
+                    bottomSheetAction.add(Triple(R.drawable.ic_add_playlist, R.string.home_track_action_add_to_playlist) {
+                        selectedTrackForTrackAction.value?.let {
+                            navController.navigate(
+                                Destination.Playlists(
+                                    PlaylistViewMode.Add(it.titleRepresentation(), it.title)
+                                )
+                            )
+                        }
+
+                        showTrackActionsBottomSheet.value = false
+                    })
+                }
 
                 MoreActionsBottomSheet(
                     title = selectedTrackForTrackAction.value?.title,
