@@ -55,6 +55,6 @@ private fun List<Track>.getNextRandomTrack(excludedTracks: List<Track>): Track {
     }
 }
 
-fun List<Track>.filterByPlaylist(titles: ArrayList<Long>): List<Track> {
-    return this.filter { track -> track.id in titles }
+fun List<Track>.filterByPlaylist(titles: ArrayList<String>): List<Track> {
+    return this.filter { track -> track.titleRepresentation() in titles }
 }

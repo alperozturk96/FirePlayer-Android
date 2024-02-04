@@ -30,9 +30,9 @@ class PlaylistsViewModel: ViewModel() {
         }
     }
 
-    fun addTrackToPlaylist(trackId: Long, playlistTitle: String) {
+    fun addTrackToPlaylist(trackTitleRepresentation: String, playlistTitle: String) {
         _playlists.update {
-            it[playlistTitle]?.add(trackId)
+            it[playlistTitle]?.add(trackTitleRepresentation)
             UserStorage.savePlaylists(it)
             it
         }

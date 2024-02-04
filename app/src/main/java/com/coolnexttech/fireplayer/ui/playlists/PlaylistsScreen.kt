@@ -100,7 +100,7 @@ private fun playlistAction(
     playlistTitle: String
 ) {
     if (mode is PlaylistViewMode.Add) {
-        viewModel.addTrackToPlaylist(mode.trackId, playlistTitle)
+        viewModel.addTrackToPlaylist(mode.trackTitleRepresentation, playlistTitle)
         context.showToast(
             context.getString(
                 R.string.playlist_screen_add,

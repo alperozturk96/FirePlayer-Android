@@ -125,7 +125,7 @@ fun HomeScreen(
                         selectedTrackForTrackAction.value?.let {
                             navController.navigate(
                                 Destination.Playlists(
-                                    PlaylistViewMode.Add(it.id, it.title)
+                                    PlaylistViewMode.Add(it.titleRepresentation(), it.title)
                                 )
                             )
                         }
