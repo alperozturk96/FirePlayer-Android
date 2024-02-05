@@ -23,10 +23,15 @@ fun HomeTopBarControls(
     filterOption: FilterOptions,
     playMode: PlayMode,
     showSortOptions: () -> Unit,
+    showSleepTimerAlertDialog: () -> Unit
 ) {
     Row {
         ActionIconButton(R.drawable.ic_playlists) {
             navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
+        }
+
+        ActionIconButton(R.drawable.ic_sleep_timer) {
+            showSleepTimerAlertDialog()
         }
 
         ActionIconButton(filterOption.filterOptionIconId()) {

@@ -38,6 +38,7 @@ fun HomeTopBar(
     listState: LazyListState,
     isPlaylistSelected: Boolean,
     showSortOptions: () -> Unit,
+    showSleepTimerAlertDialog: () -> Unit
 ) {
     Column {
         HomeTopBarOptions(
@@ -63,7 +64,8 @@ fun HomeTopBar(
                     searchText,
                     filterOption,
                     playMode,
-                    showSortOptions = showSortOptions
+                    showSortOptions = showSortOptions,
+                    showSleepTimerAlertDialog = showSleepTimerAlertDialog
                 )
 
                 if (searchText.isEmpty()) {

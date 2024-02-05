@@ -42,6 +42,9 @@
     <string name="delete_alert_dialog_title">Delete</string>
     <string name="delete_alert_dialog_description">Could you confirm whether you want to delete the selected item?</string>
 
+    <string name="sleep_timer_alert_dialog_title">Sleep Timer</string>
+    <string name="sleep_timer_alert_dialog_description">Music will stop after %s minute</string>
+
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
 

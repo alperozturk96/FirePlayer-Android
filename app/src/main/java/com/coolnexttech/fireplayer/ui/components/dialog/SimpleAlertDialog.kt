@@ -1,23 +1,37 @@
 package com.coolnexttech.fireplayer.ui.components.dialog
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @Composable
-fun DeleteAlertDialog(onComplete: () -> Unit, dismiss: () -> Unit) {
+fun SimpleAlertDialog(titleId: Int, description: String,  content: @Composable (() -> Unit)? = null, onComplete: () -> Unit, dismiss: () -> Unit) {
     AlertDialog(
         containerColor = AppColors.alternateBackground,
         onDismissRequest = { dismiss() },
         title = {
-            Text(text = stringResource(id = R.string.delete_alert_dialog_title))
+            Text(text = stringResource(id = titleId))
         },
         text = {
-            Text(text = stringResource(id = R.string.delete_alert_dialog_description))
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(text = description)
+
+                content?.let {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    content()
+                }
+            }
         },
         confirmButton = {
             TextButton(onClick = {
