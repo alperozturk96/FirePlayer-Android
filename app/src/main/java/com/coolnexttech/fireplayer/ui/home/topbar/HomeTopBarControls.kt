@@ -13,7 +13,6 @@ import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeTopBarControls(
@@ -49,6 +48,10 @@ fun HomeTopBarControls(
 
         ActionIconButton(R.drawable.ic_sort) {
             showSortOptions()
+        }
+
+        ActionIconButton(R.drawable.ic_info) {
+            navController.navigate(Destination.Info)
         }
     }
 }

@@ -9,5 +9,8 @@ sealed class Destination : Parcelable {
     data object Home : Destination()
 
     @Parcelize
+    data object Info : Destination()
+
+    @Parcelize
     data class Playlists(val playlistViewMode: PlaylistViewMode) : Destination()
 }

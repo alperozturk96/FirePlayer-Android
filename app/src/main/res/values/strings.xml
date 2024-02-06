@@ -36,8 +36,6 @@
     <string name="playlist_bottom_sheet_delete_action_title">Delete</string>
     <string name="playlists_content_unavailable_text">You dont have any playlist yet</string>
     <string name="playlists_content_unavailable_title">No playlists</string>
-    <string name="playlist_screen_add">%s track added to %s playlist</string>
-    <string name="playlist_screen_selected_playlist">%s playlist selected</string>
 
     <string name="delete_alert_dialog_title">Delete</string>
     <string name="delete_alert_dialog_description">Could you confirm whether you want to delete the selected item?</string>
@@ -45,13 +43,14 @@
     <string name="sleep_timer_alert_dialog_title">Sleep Timer</string>
     <string name="sleep_timer_alert_dialog_description">Music will stop after %s minute</string>
 
+    <string name="playlist_screen_add">%s track added to %s playlist</string>
+    <string name="playlist_screen_selected_playlist">%s playlist selected</string>
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
 
     <string name="playback_error_message">Cannot able to play selected track</string>
 
     <string name="track_successfully_deleted_message">Track successfully deleted, not will be visible next launch</string>
-
 
     <string name="user_storage_reset_current_track_position_success_message">Track position reset</string>
     <string name="user_storage_read_current_track_position_success_message">%s track position read</string>
@@ -71,4 +70,25 @@
 
     <string name="content_unavailable_title_prefix">No results for </string>
     <string name="content_unavailable_description">Check the spelling or try a new search</string>
+
+    <string name="info_screen_reset_button_title">Reset</string>
+    <string name="info_screen_reset_button_description">It reset search, filter option and play mode</string>
+    <string name="info_screen_playlists_button_title">Playlists</string>
+    <string name="info_screen_playlists_button_description">It navigates to playlists</string>
+    <string name="info_screen_sleep_timer_button_title">Sleep Timer</string>
+    <string name="info_screen_sleep_timer_button_description">It open dialog to setup sleep timer after given time track automatically will stop</string>
+    <string name="info_screen_filter_mode_button_title">Filter Mode</string>
+    <string name="info_screen_filter_mode_button_description">It switches between filter modes. Therefore you can search in Title, Album or Artists.</string>
+    <string name="info_screen_play_mode_button_title">Play Mode</string>
+    <string name="info_screen_play_mode_button_description">It switches between play modes. Therefore you can play your tracks in different order such as Shuffle, Sequential or Repeat same track again in again</string>
+    <string name="info_screen_sort_button_title">Sort</string>
+    <string name="info_screen_sort_button_description">It open dialog to choose sort option. Therefore you can sort your tracks in different ways.</string>
+    <string name="info_screen_save_track_position_button_title">Save Track Position</string>
+    <string name="info_screen_save_track_position_button_description">It saves selected track position, therefore you can continue listen where you left when you reopen the app. Its useful for podcasts or long tracks.</string>
+    <string name="info_screen_reset_track_position_button_title">Reset Track Position</string>
+    <string name="info_screen_reset_track_position_button_description">It reverts track duration to initial state</string>
+    <string name="info_screen_import_playlist_button_title">Import Playlists</string>
+    <string name="info_screen_import_playlist_button_description">It opens file chooser to select playlists to import</string>
+    <string name="info_screen_export_playlist_button_title">Export Playlists</string>
+    <string name="info_screen_export_playlist_button_description">It export playlists to documents folder</string>
 </resources>
