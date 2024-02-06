@@ -10,7 +10,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import com.coolnexttech.fireplayer.R
@@ -33,17 +32,13 @@ fun HomeTopBarOptions(
     isPlaylistSelected: Boolean,
     toggleAlphabeticalScroller: () -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-
     TopAppBar(
         colors = getTopAppBarColor(),
         title = {
             BasicTextField(
                 value = searchText,
                 onValueChange = {
-                    scope.launch {
-                        viewModel.search(it)
-                    }
+                    viewModel.search(it)
                 },
                 singleLine = true,
                 decorationBox = { innerTextField ->
@@ -62,18 +57,13 @@ fun HomeTopBarOptions(
         actions = {
             AnimatedVisibility(searchText.isNotEmpty()) {
                 ActionIconButton(R.drawable.ic_cancel) {
-                    scope.launch {
-                        viewModel.clearSearch()
-                    }
+                    viewModel.clearSearch()
                 }
             }
 
             if (!isPlaylistSelected) {
                 ActionIconButton(R.drawable.ic_reset) {
-                    scope.launch {
-                        viewModel.reset()
-                    }
-
+                    viewModel.reset()
                     context.showToast(R.string.home_screen_reset_button_description)
                 }
 

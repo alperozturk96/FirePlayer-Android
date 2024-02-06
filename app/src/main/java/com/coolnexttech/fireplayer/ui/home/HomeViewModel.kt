@@ -2,6 +2,7 @@ package com.coolnexttech.fireplayer.ui.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.PlayerEvents
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeViewModel : ViewModel() {
@@ -46,30 +48,40 @@ class HomeViewModel : ViewModel() {
     }
 
     fun initTrackList(selectedPlaylistTitle: String?) {
-        _isPlaylistSelected.update {
-            selectedPlaylistTitle != null
-        }
+        viewModelScope.launch {
+            _isPlaylistSelected.update {
+                selectedPlaylistTitle != null
+            }
 
-        val tracksFromPlaylist: List<Track>? = if (selectedPlaylistTitle == null) {
-            null
-        } else {
-            FolderAnalyzer.getTracksFromPlaylist(_tracks, selectedPlaylistTitle)
-        }
+            val tracksFromPlaylist: List<Track>? = withContext(Dispatchers.IO) {
+                if (selectedPlaylistTitle == null) {
+                    null
+                } else {
+                    FolderAnalyzer.getTracksFromPlaylist(_tracks, selectedPlaylistTitle)
+                }
+            }
 
-        _filteredTracks.update {
-            tracksFromPlaylist ?: _tracks
-        }
+            _filteredTracks.update {
+                tracksFromPlaylist ?: _tracks
+            }
 
-        Log.d("Home", "Total Track Count: " + _tracks.count())
+            Log.d("Home", "Total Track Count: " + _tracks.count())
+        }
     }
 
     fun sort(sortOption: SortOptions) {
-        _filteredTracks.update {
-            it.sort(sortOption)
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                _filteredTracks.value.sort(sortOption)
+            }
+
+            _filteredTracks.update {
+                result
+            }
         }
     }
 
-    suspend fun changeFilterOption(value: String) {
+    fun changeFilterOption(value: String) {
         _filterOption.update {
             it.selectNextFilterOption()
         }
@@ -138,28 +150,34 @@ class HomeViewModel : ViewModel() {
     }
 
     fun playNextTrack() {
-        if (_filteredTracks.value.isEmpty() || _selectedTrack.value == null) {
-            return
+        viewModelScope.launch {
+            if (_filteredTracks.value.isEmpty() || _selectedTrack.value == null) {
+                return@launch
+            }
+
+            if (_filteredTracks.value.size == 1) {
+                playTrack(_filteredTracks.value.first())
+            }
+
+            val nextTrack = withContext(Dispatchers.IO) {
+                _filteredTracks.value.nextTrack(
+                    _playMode.value,
+                    _prevTracks.value,
+                    _selectedTrack.value!!
+                )
+            } ?:  return@launch
+
+            playTrack(nextTrack)
         }
-
-        if (_filteredTracks.value.size == 1) {
-            playTrack(_filteredTracks.value.first())
-        }
-
-        val nextTrack = _filteredTracks.value.nextTrack(
-            _playMode.value,
-            _prevTracks.value,
-            _selectedTrack.value!!
-        ) ?: return
-
-        playTrack(nextTrack)
     }
 
-    suspend fun reset() {
+    fun reset() {
         clearSearch()
+
         _filterOption.update {
             FilterOptions.Title
         }
+
         _playMode.update {
             PlayMode.Shuffle
         }
@@ -167,26 +185,27 @@ class HomeViewModel : ViewModel() {
         initTrackList(null)
     }
 
-    suspend fun clearSearch() {
+    fun clearSearch() {
         search("")
     }
 
-    // TODO Continue with performance update
-    suspend fun search(value: String) {
-        _searchText.update {
-            value
-        }
-
-        val result = withContext(Dispatchers.IO) {
-            if (value.isEmpty()) {
-                _tracks.sort(SortOptions.AToZ)
-            } else {
-                _tracks.filter(_filterOption.value, value).sort(SortOptions.AToZ)
+    fun search(value: String) {
+        viewModelScope.launch {
+            _searchText.update {
+                value
             }
-        }
 
-        _filteredTracks.update {
-            result
+            val result = withContext(Dispatchers.IO) {
+                if (value.isEmpty()) {
+                    _tracks.sort(SortOptions.AToZ)
+                } else {
+                    _tracks.filter(_filterOption.value, value).sort(SortOptions.AToZ)
+                }
+            }
+
+            _filteredTracks.update {
+                result
+            }
         }
     }
 }
