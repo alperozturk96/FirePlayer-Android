@@ -62,13 +62,18 @@ fun HomeTopBarOptions(
         actions = {
             AnimatedVisibility(searchText.isNotEmpty()) {
                 ActionIconButton(R.drawable.ic_cancel) {
-                    viewModel.clearSearch()
+                    scope.launch {
+                        viewModel.clearSearch()
+                    }
                 }
             }
 
             if (!isPlaylistSelected) {
                 ActionIconButton(R.drawable.ic_reset) {
-                    viewModel.reset()
+                    scope.launch {
+                        viewModel.reset()
+                    }
+
                     context.showToast(R.string.home_screen_reset_button_description)
                 }
 

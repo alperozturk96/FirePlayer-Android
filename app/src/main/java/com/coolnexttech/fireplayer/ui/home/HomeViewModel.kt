@@ -155,7 +155,7 @@ class HomeViewModel : ViewModel() {
         playTrack(nextTrack)
     }
 
-    fun reset() {
+    suspend fun reset() {
         clearSearch()
         _filterOption.update {
             FilterOptions.Title
@@ -167,12 +167,11 @@ class HomeViewModel : ViewModel() {
         initTrackList(null)
     }
 
-    fun clearSearch() {
-        _searchText.update {
-            ""
-        }
+    suspend fun clearSearch() {
+        search("")
     }
 
+    // TODO Continue with performance update
     suspend fun search(value: String) {
         _searchText.update {
             value

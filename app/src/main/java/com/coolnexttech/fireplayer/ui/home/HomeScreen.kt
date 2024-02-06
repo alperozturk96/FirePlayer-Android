@@ -34,6 +34,7 @@ import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
+import com.coolnexttech.fireplayer.utils.ToastManager
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.CoroutineScope
@@ -194,9 +195,12 @@ fun HomeScreen(
                     description = stringResource(R.string.delete_alert_dialog_description),
                     onComplete = {
                         selectedTrackForTrackAction.value?.let {
+                            if (it == selectedTrack) {
+                                viewModel.playNextTrack()
+                            }
+
                             FolderAnalyzer.deleteTrack(it)
-                            viewModel.reset()
-                            viewModel.playNextTrack()
+                            ToastManager.showDeleteSuccessMessage()
                         }
                     },
                     dismiss = {

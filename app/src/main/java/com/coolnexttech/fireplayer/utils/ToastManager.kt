@@ -46,6 +46,14 @@ object ToastManager {
         }
     }
 
+    fun showDeleteSuccessMessage() {
+        appContext.get()?.getString(
+            R.string.track_successfully_deleted_message,
+        )?.let {
+            appContext.get()?.showToast(it)
+        }
+    }
+
     fun showSuccessExportPlaylistMessage() {
         appContext.get()?.getString(
             R.string.user_storage_export_success_message,
