@@ -12,13 +12,13 @@ import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.filter
 import com.coolnexttech.fireplayer.utils.extensions.nextTrack
 import com.coolnexttech.fireplayer.utils.extensions.sort
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 
 class HomeViewModel : ViewModel() {
-
-    private var _tracks: List<Track> = arrayListOf()
 
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText
@@ -32,6 +32,7 @@ class HomeViewModel : ViewModel() {
     private val _selectedTrack: MutableStateFlow<Track?> = MutableStateFlow(null)
     val selectedTrack: StateFlow<Track?> = _selectedTrack
 
+    private val _tracks: List<Track> = FolderAnalyzer.getTracksFromMusicFolder()
     private val _prevTracks = MutableStateFlow<ArrayList<Track>>(arrayListOf())
 
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
@@ -45,20 +46,18 @@ class HomeViewModel : ViewModel() {
     }
 
     fun initTrackList(selectedPlaylistTitle: String?) {
-        _tracks = if (selectedPlaylistTitle == null) {
-            _isPlaylistSelected.update {
-                false
-            }
-            FolderAnalyzer.tracks
+        _isPlaylistSelected.update {
+            selectedPlaylistTitle != null
+        }
+
+        val tracksFromPlaylist: List<Track>? = if (selectedPlaylistTitle == null) {
+            null
         } else {
-            _isPlaylistSelected.update {
-                true
-            }
-            FolderAnalyzer.getTracksFromPlaylist(selectedPlaylistTitle)
+            FolderAnalyzer.getTracksFromPlaylist(_tracks, selectedPlaylistTitle)
         }
 
         _filteredTracks.update {
-            _tracks
+            tracksFromPlaylist ?: _tracks
         }
 
         Log.d("Home", "Total Track Count: " + _tracks.count())
@@ -70,7 +69,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun changeFilterOption(value: String) {
+    suspend fun changeFilterOption(value: String) {
         _filterOption.update {
             it.selectNextFilterOption()
         }
@@ -165,7 +164,6 @@ class HomeViewModel : ViewModel() {
             PlayMode.Shuffle
         }
 
-        FolderAnalyzer.initTracksFromMusicFolder()
         initTrackList(null)
     }
 
@@ -175,17 +173,21 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun search(value: String) {
+    suspend fun search(value: String) {
         _searchText.update {
             value
         }
 
-        _filteredTracks.update {
+        val result = withContext(Dispatchers.IO) {
             if (value.isEmpty()) {
                 _tracks.sort(SortOptions.AToZ)
             } else {
                 _tracks.filter(_filterOption.value, value).sort(SortOptions.AToZ)
             }
+        }
+
+        _filteredTracks.update {
+            result
         }
     }
 }

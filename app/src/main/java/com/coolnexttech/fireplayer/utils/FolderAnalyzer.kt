@@ -17,28 +17,17 @@ object FolderAnalyzer {
     private val unsupportedFileFormats = listOf("dsf")
     private const val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
 
-    var tracks: ArrayList<Track> = arrayListOf()
-
-    init {
-        initTracksFromMusicFolder()
-    }
-
-    fun getTracksFromPlaylist(selectedPlaylistTitle: String): List<Track> {
+    fun getTracksFromPlaylist(tracks: List<Track>, selectedPlaylistTitle: String): List<Track> {
         val playlists = UserStorage.readPlaylists()
         val selectedPlaylist = playlists[selectedPlaylistTitle]
         return if (selectedPlaylist != null) {
-            // FIXME
             tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AToZ)
         } else {
             listOf()
         }
     }
 
-    fun initTracksFromMusicFolder() {
-        tracks = getTracksFromMusicFolder()
-    }
-
-    private fun getTracksFromMusicFolder(): ArrayList<Track> {
+    fun getTracksFromMusicFolder(): ArrayList<Track> {
         val result = arrayListOf<Track>()
 
         val contentResolver = appContext.get()?.contentResolver
