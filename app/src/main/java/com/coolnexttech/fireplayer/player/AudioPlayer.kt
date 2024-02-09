@@ -8,6 +8,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -58,7 +59,10 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
 
     init {
         context?.let {
-            val player = ExoPlayer.Builder(context).build().apply {
+            val renderersFactory = DefaultRenderersFactory(context)
+            renderersFactory.setEnableAudioFloatOutput(true)
+
+            val player = ExoPlayer.Builder(context, renderersFactory).build().apply {
                 volume = 1.0f
                 setAudioAttributes(playerAttributes, true)
                 setHandleAudioBecomingNoisy(true)
