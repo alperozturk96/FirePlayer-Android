@@ -3,7 +3,6 @@ package com.coolnexttech.fireplayer.utils
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.net.Uri
-import android.os.Bundle
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import com.coolnexttech.fireplayer.appContext
@@ -11,9 +10,7 @@ import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.extensions.filterByPlaylist
 import com.coolnexttech.fireplayer.utils.extensions.sort
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
