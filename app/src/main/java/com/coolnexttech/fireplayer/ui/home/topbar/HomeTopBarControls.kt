@@ -30,16 +30,16 @@ fun HomeTopBarControls(
             navController.navigate(Destination.Playlists(PlaylistViewMode.Select))
         }
 
-        ActionIconButton(R.drawable.ic_sleep_timer) {
-            showSleepTimerAlertDialog()
-        }
-
         ActionIconButton(filterOption.filterOptionIconId()) {
             viewModel.changeFilterOption(searchText)
 
             context.showToast(
                 filterOption.selectNextFilterOption().searchTitleId()
             )
+        }
+
+        ActionIconButton(R.drawable.ic_sleep_timer) {
+            showSleepTimerAlertDialog()
         }
 
         ActionIconButton(playMode.getIconId()) {
