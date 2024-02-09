@@ -53,7 +53,6 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
     private var currentTrackIdForSavedTrackPosition: Long? = null
 
     private val playerAttributes = AudioAttributes.Builder()
-        .setUsage(C.USAGE_MEDIA)
         .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
         .build()
 
