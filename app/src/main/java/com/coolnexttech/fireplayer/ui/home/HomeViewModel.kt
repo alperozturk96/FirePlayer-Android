@@ -43,6 +43,9 @@ class HomeViewModel : ViewModel() {
     private val _isPlaylistSelected = MutableStateFlow(false)
     val isPlaylistSelected: StateFlow<Boolean> = _isPlaylistSelected
 
+    private val _showLoadingIndicator = MutableStateFlow(true)
+    val showLoadingIndicator: StateFlow<Boolean> = _showLoadingIndicator
+
     init {
         viewModelScope.launch {
             val firstTwentyTrack = FolderAnalyzer.getTracksFromMusicFolder(20)
@@ -51,6 +54,10 @@ class HomeViewModel : ViewModel() {
 
             _tracks = FolderAnalyzer.getTracksFromMusicFolder(null)
             initTrackList(null)
+
+            _showLoadingIndicator.update {
+                false
+            }
         }
     }
 

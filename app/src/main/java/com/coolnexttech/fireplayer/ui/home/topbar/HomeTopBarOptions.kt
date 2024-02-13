@@ -10,6 +10,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import com.coolnexttech.fireplayer.R
@@ -17,6 +19,7 @@ import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.button.ActionIconButton
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.utils.extensions.blink
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 
@@ -31,6 +34,8 @@ fun HomeTopBarOptions(
     isPlaylistSelected: Boolean,
     toggleAlphabeticalScroller: () -> Unit,
 ) {
+    val showLoadingIndicator by viewModel.showLoadingIndicator.collectAsState()
+
     TopAppBar(
         colors = getTopAppBarColor(),
         title = {
@@ -61,6 +66,10 @@ fun HomeTopBarOptions(
             }
 
             if (!isPlaylistSelected) {
+                if (showLoadingIndicator) {
+                    ActionIconButton(R.drawable.ic_loading, modifier = Modifier.blink()) { }
+                }
+
                 ActionIconButton(R.drawable.ic_reset) {
                     viewModel.reset()
                     context.showToast(R.string.home_screen_reset_button_description)
