@@ -40,9 +40,6 @@ class HomeViewModel : ViewModel() {
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
 
-    private val _isPlaylistSelected = MutableStateFlow(false)
-    val isPlaylistSelected: StateFlow<Boolean> = _isPlaylistSelected
-
     private val _showLoadingIndicator = MutableStateFlow(true)
     val showLoadingIndicator: StateFlow<Boolean> = _showLoadingIndicator
 
@@ -63,10 +60,6 @@ class HomeViewModel : ViewModel() {
 
     fun initTrackList(selectedPlaylistTitle: String?) {
         viewModelScope.launch {
-            _isPlaylistSelected.update {
-                selectedPlaylistTitle != null
-            }
-
             val tracksFromPlaylist: List<Track>? = withContext(Dispatchers.IO) {
                 if (selectedPlaylistTitle == null) {
                     null

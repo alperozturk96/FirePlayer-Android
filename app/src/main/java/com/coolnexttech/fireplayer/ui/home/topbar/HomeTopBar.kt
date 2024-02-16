@@ -17,16 +17,13 @@ import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.ui.components.view.AlphabeticalScrollerView
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
-import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import dev.olshevski.navigation.reimagined.NavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeTopBar(
     context: Context,
-    navController: NavController<Destination>,
     playMode: PlayMode,
     alphabeticalScrollerIconId: Int,
     filterOption: FilterOptions,
@@ -36,7 +33,6 @@ fun HomeTopBar(
     characterList: Map<Char, Int>,
     coroutineScope: CoroutineScope,
     listState: LazyListState,
-    isPlaylistSelected: Boolean,
     showSortOptions: () -> Unit,
     showSleepTimerAlertDialog: () -> Unit
 ) {
@@ -47,7 +43,6 @@ fun HomeTopBar(
             filterOption.searchTitleId(),
             searchText,
             viewModel,
-            isPlaylistSelected
         ) {
             showAlphabeticalScroller.value = !showAlphabeticalScroller.value
         }
@@ -60,7 +55,6 @@ fun HomeTopBar(
                 HomeTopBarControls(
                     context,
                     viewModel,
-                    navController,
                     searchText,
                     filterOption,
                     playMode,

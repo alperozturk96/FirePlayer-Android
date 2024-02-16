@@ -1,0 +1,92 @@
+package com.coolnexttech.fireplayer.ui.navigation
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.model.PlaylistViewMode
+import com.coolnexttech.fireplayer.ui.home.HomeScreen
+import com.coolnexttech.fireplayer.ui.info.InfoScreen
+import com.coolnexttech.fireplayer.ui.playlists.PlaylistsScreen
+import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.utils.VMProvider
+
+@Composable
+fun BottomNavigationBar() {
+    var screen by remember { mutableStateOf(Screen.Home) }
+    var playlistViewMode by remember { mutableStateOf<PlaylistViewMode>(PlaylistViewMode.Select) }
+    val items = listOf(
+        Triple(
+            R.string.bottom_navigation_bar_home,
+            Icons.Filled.Home,
+            Screen.Home
+        ),
+        Triple(
+            R.string.bottom_navigation_bar_playlist,
+            Icons.Filled.Favorite,
+            Screen.Playlist,
+        ),
+        Triple(
+            R.string.bottom_navigation_bar_info,
+            Icons.Filled.Info,
+            Screen.Info
+        )
+    )
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar(containerColor = AppColors.alternateBackground, contentColor = AppColors.red) {
+                items.forEachIndexed { _, item ->
+                    NavigationBarItem(
+                        icon = { Icon(item.second, contentDescription = item.first.toString()) },
+                        label = { Text(stringResource(id = item.first)) },
+                        selected = screen == item.third,
+                        onClick = { screen = item.third }
+                    )
+                }
+            }
+        },
+    ) {
+        Box(modifier = Modifier.fillMaxSize().padding(it)) {
+            when (screen) {
+                Screen.Home -> {
+                    HomeScreen(VMProvider.homeViewModel, VMProvider.audioPlayer) { newPlaylistMode ->
+                        screen = Screen.Playlist
+                        playlistViewMode = newPlaylistMode
+                    }
+                }
+                Screen.Playlist -> {
+                    PlaylistsScreen(
+                        mode = playlistViewMode,
+                        viewModel = VMProvider.playlistViewModel
+                    ) {
+                        if (playlistViewMode != PlaylistViewMode.Select) {
+                            playlistViewMode = PlaylistViewMode.Select
+                        }
+
+                        screen = Screen.Home
+                    }
+                }
+                else -> {
+                    InfoScreen()
+                }
+            }
+        }
+    }
+}

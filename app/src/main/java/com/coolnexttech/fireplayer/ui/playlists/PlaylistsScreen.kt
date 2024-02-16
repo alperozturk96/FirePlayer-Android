@@ -20,19 +20,15 @@ import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.bottomSheet.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.components.dialog.AddPlaylistAlertDialog
-import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.ui.playlists.topbar.PlaylistsTopBar
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.showToast
-import dev.olshevski.navigation.reimagined.NavController
-import dev.olshevski.navigation.reimagined.navigate
-import dev.olshevski.navigation.reimagined.pop
 
 @Composable
 fun PlaylistsScreen(
-    navController: NavController<Destination>,
     mode: PlaylistViewMode,
-    viewModel: PlaylistsViewModel
+    viewModel: PlaylistsViewModel,
+    changeScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
@@ -42,7 +38,7 @@ fun PlaylistsScreen(
 
     BackHandler {
         VMProvider.homeViewModel.initTrackList(null)
-        navController.pop()
+        changeScreen()
     }
 
     Scaffold(topBar = {
@@ -62,8 +58,8 @@ fun PlaylistsScreen(
                             context,
                             mode,
                             viewModel,
-                            navController,
-                            playlistTitle
+                            playlistTitle,
+                            changeScreen
                         )
                     },
                     longPressAction = {
@@ -103,8 +99,8 @@ private fun playlistAction(
     context: Context,
     mode: PlaylistViewMode,
     viewModel: PlaylistsViewModel,
-    navController: NavController<Destination>,
-    playlistTitle: String
+    playlistTitle: String,
+    changeScreen: () -> Unit
 ) {
     if (mode is PlaylistViewMode.Add) {
         viewModel.addTrackToPlaylist(mode.trackTitleRepresentation, playlistTitle)
@@ -116,10 +112,9 @@ private fun playlistAction(
                 playlistTitle
             )
         )
-
-        navController.pop()
     } else {
         VMProvider.homeViewModel.initTrackList(playlistTitle)
-        navController.navigate(Destination.Home)
     }
+
+    changeScreen()
 }

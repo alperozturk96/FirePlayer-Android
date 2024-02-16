@@ -32,12 +32,9 @@ import com.coolnexttech.fireplayer.ui.components.dialog.SortOptionsAlertDialog
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
-import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.ToastManager
 import com.coolnexttech.fireplayer.utils.extensions.showToast
-import dev.olshevski.navigation.reimagined.NavController
-import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -47,12 +44,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    navController: NavController<Destination>,
     viewModel: HomeViewModel,
-    audioPlayer: AudioPlayer
+    audioPlayer: AudioPlayer,
+    changePlaylistViewMode: (PlaylistViewMode) -> Unit
 ) {
     val context = LocalContext.current
-    val isPlaylistSelected by viewModel.isPlaylistSelected.collectAsState()
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val filterOption by viewModel.filterOption.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
@@ -81,7 +77,6 @@ fun HomeScreen(
         topBar = {
             HomeTopBar(
                 context,
-                navController,
                 playMode,
                 alphabeticalScrollerIconId,
                 filterOption,
@@ -91,7 +86,6 @@ fun HomeScreen(
                 characterList,
                 coroutineScope,
                 listState,
-                isPlaylistSelected,
                 showSortOptions = { showSortOptions.value = true },
                 showSleepTimerAlertDialog = { showSleepTimerAlertDialog.value = true }
             )
@@ -135,10 +129,14 @@ fun HomeScreen(
             if (showTrackActionsBottomSheet.value) {
                 val bottomSheetAction = arrayListOf(
                     Triple(
-                        R.drawable.ic_delete,
-                        R.string.home_bottom_sheet_delete_track_action_title
+                        R.drawable.ic_add_playlist,
+                        R.string.home_track_action_add_to_playlist
                     ) {
-                        showDeleteTrackDialog.value = true
+                        selectedTrackForTrackAction.value?.let {
+                            changePlaylistViewMode(PlaylistViewMode.Add(it.titleRepresentation(), it.title))
+                        }
+
+                        showTrackActionsBottomSheet.value = false
                     },
                     Triple(
                         R.drawable.ic_save,
@@ -151,27 +149,15 @@ fun HomeScreen(
                         R.string.home_bottom_sheet_reset_track_position_action_title
                     ) {
                         audioPlayer.resetCurrentTrackPlaybackPosition()
-                    }
+                    },
+                    Triple(
+                        R.drawable.ic_delete,
+                        R.string.home_bottom_sheet_delete_track_action_title
+                    ) {
+                        showDeleteTrackDialog.value = true
+                    },
                 )
 
-                if (!isPlaylistSelected) {
-                    bottomSheetAction.add(
-                        Triple(
-                            R.drawable.ic_add_playlist,
-                            R.string.home_track_action_add_to_playlist
-                        ) {
-                            selectedTrackForTrackAction.value?.let {
-                                navController.navigate(
-                                    Destination.Playlists(
-                                        PlaylistViewMode.Add(it.titleRepresentation(), it.title)
-                                    )
-                                )
-                            }
-
-                            showTrackActionsBottomSheet.value = false
-                        }
-                    )
-                }
 
                 MoreActionsBottomSheet(
                     title = selectedTrackForTrackAction.value?.title,
