@@ -50,7 +50,7 @@
 
     <string name="playback_error_message">Cannot able to play selected track</string>
 
-    <string name="track_successfully_deleted_message">Track successfully deleted, not will be visible next launch</string>
+    <string name="track_successfully_deleted_message">Track successfully deleted</string>
 
     <string name="user_storage_reset_current_track_position_success_message">Track position reset</string>
     <string name="user_storage_read_current_track_position_success_message">%s track position read</string>

@@ -35,6 +35,7 @@ import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.navigation.Destination
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.ToastManager
+import com.coolnexttech.fireplayer.utils.extensions.showToast
 import dev.olshevski.navigation.reimagined.NavController
 import dev.olshevski.navigation.reimagined.navigate
 import kotlinx.coroutines.CoroutineScope
@@ -200,6 +201,7 @@ fun HomeScreen(
                             }
 
                             FolderAnalyzer.deleteTrack(it)
+                            viewModel.deleteTrack(it)
                             ToastManager.showDeleteSuccessMessage()
                         }
                     },
@@ -211,9 +213,11 @@ fun HomeScreen(
             }
 
             if (showSleepTimerAlertDialog.value) {
+                val description = stringResource(id = R.string.sleep_timer_alert_dialog_description, sleepTimerDuration.toInt().toString())
+
                 SimpleAlertDialog(
                     titleId = R.string.sleep_timer_alert_dialog_title,
-                    description = stringResource(id = R.string.sleep_timer_alert_dialog_description, sleepTimerDuration.toInt().toString()),
+                    description = description,
                     content = {
                         Slider(
                             value = sleepTimerDuration,
@@ -222,6 +226,7 @@ fun HomeScreen(
                         )
                     },
                     onComplete = {
+                        context.showToast(description)
                         startSleepTimer(sleepTimerDuration.toInt()) {
                             audioPlayer.pause()
                         }

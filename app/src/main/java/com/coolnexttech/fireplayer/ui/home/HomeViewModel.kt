@@ -95,6 +95,13 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    fun deleteTrack(track: Track) {
+        _tracks = _tracks.filter { it != track }
+        _filteredTracks.update {
+            _tracks
+        }
+    }
+
     fun changeFilterOption(value: String) {
         _filterOption.update {
             it.selectNextFilterOption()
