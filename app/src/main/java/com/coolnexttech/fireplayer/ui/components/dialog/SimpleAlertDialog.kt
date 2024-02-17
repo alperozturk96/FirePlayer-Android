@@ -16,16 +16,28 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @Composable
-fun SimpleAlertDialog(titleId: Int, description: String,  content: @Composable (() -> Unit)? = null, onComplete: () -> Unit, dismiss: () -> Unit) {
+fun SimpleAlertDialog(
+    titleId: Int,
+    description: String,
+    heightFraction: Float? = null,
+    content: @Composable (() -> Unit)? = null,
+    onComplete: () -> Unit,
+    dismiss: () -> Unit
+) {
+    val modifier = if (heightFraction != null) {
+        Modifier.fillMaxWidth().fillMaxHeight(heightFraction)
+    } else {
+        Modifier.fillMaxWidth()
+    }
+
     AlertDialog(
-        modifier = Modifier.fillMaxHeight(0.5f),
         containerColor = AppColors.alternateBackground,
         onDismissRequest = { dismiss() },
         title = {
             Text(text = stringResource(id = titleId))
         },
         text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = modifier) {
                 Text(text = description)
 
                 content?.let {
