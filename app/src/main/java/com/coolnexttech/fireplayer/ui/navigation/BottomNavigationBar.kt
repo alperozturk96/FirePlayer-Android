@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.ui.navigation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,17 +21,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.home.HomeScreen
 import com.coolnexttech.fireplayer.ui.info.InfoScreen
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsScreen
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.VMProvider
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BottomNavigationBar() {
     var screen by remember { mutableStateOf(Screen.Home) }
-    var playlistViewMode by remember { mutableStateOf<PlaylistViewMode>(PlaylistViewMode.Select) }
     val items = listOf(
         Triple(
             R.string.bottom_navigation_bar_home,
@@ -66,20 +66,12 @@ fun BottomNavigationBar() {
         Box(modifier = Modifier.fillMaxSize().padding(it)) {
             when (screen) {
                 Screen.Home -> {
-                    HomeScreen(VMProvider.homeViewModel, VMProvider.audioPlayer) { newPlaylistMode ->
-                        screen = Screen.Playlist
-                        playlistViewMode = newPlaylistMode
-                    }
+                    HomeScreen(VMProvider.homeViewModel, VMProvider.playlistViewModel, VMProvider.audioPlayer)
                 }
                 Screen.Playlist -> {
                     PlaylistsScreen(
-                        mode = playlistViewMode,
                         viewModel = VMProvider.playlistViewModel
                     ) {
-                        if (playlistViewMode != PlaylistViewMode.Select) {
-                            playlistViewMode = PlaylistViewMode.Select
-                        }
-
                         screen = Screen.Home
                     }
                 }

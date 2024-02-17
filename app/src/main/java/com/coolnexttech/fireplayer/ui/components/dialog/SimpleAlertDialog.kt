@@ -2,6 +2,7 @@ package com.coolnexttech.fireplayer.ui.components.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
@@ -17,6 +18,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 @Composable
 fun SimpleAlertDialog(titleId: Int, description: String,  content: @Composable (() -> Unit)? = null, onComplete: () -> Unit, dismiss: () -> Unit) {
     AlertDialog(
+        modifier = Modifier.fillMaxHeight(0.5f),
         containerColor = AppColors.alternateBackground,
         onDismissRequest = { dismiss() },
         title = {

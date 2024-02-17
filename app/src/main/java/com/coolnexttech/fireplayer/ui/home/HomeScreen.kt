@@ -2,14 +2,21 @@ package com.coolnexttech.fireplayer.ui.home
 
 import android.os.Handler
 import android.os.Looper
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,8 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.ListItemText
@@ -32,6 +39,8 @@ import com.coolnexttech.fireplayer.ui.components.dialog.SortOptionsAlertDialog
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
+import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
+import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.ToastManager
 import com.coolnexttech.fireplayer.utils.extensions.showToast
@@ -42,11 +51,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+@ExperimentalFoundationApi
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    playlistsViewModel: PlaylistsViewModel,
     audioPlayer: AudioPlayer,
-    changePlaylistViewMode: (PlaylistViewMode) -> Unit
 ) {
     val context = LocalContext.current
     val filteredTracks by viewModel.filteredTracks.collectAsState()
@@ -56,8 +66,10 @@ fun HomeScreen(
     val showSortOptions = remember { mutableStateOf(false) }
     val showSleepTimerAlertDialog = remember { mutableStateOf(false) }
     val selectedTrackForTrackAction = remember { mutableStateOf<Track?>(null) }
+    val showAddToPlaylistDialog = remember { mutableStateOf(false) }
     val showTrackActionsBottomSheet = remember { mutableStateOf(false) }
     val showAlphabeticalScroller = remember { mutableStateOf(false) }
+    val playlists by playlistsViewModel.playlists.collectAsState()
     val alphabeticalScrollerIconId = if (showAlphabeticalScroller.value) {
         R.drawable.ic_arrow_up
     } else {
@@ -109,13 +121,11 @@ fun HomeScreen(
                             track.title,
                             color = track.color(selectedTrack?.id),
                             action = {
-                                listItemAction(
-                                    track,
-                                    coroutineScope,
-                                    listState,
-                                    index,
-                                    viewModel
-                                )
+                                coroutineScope.launch(Dispatchers.Main) {
+                                    listState.animateScrollToItem(index)
+                                }
+
+                                viewModel.playTrack(track)
                             },
                             longPressAction = {
                                 selectedTrackForTrackAction.value = track
@@ -132,10 +142,7 @@ fun HomeScreen(
                         R.drawable.ic_add_playlist,
                         R.string.home_track_action_add_to_playlist
                     ) {
-                        selectedTrackForTrackAction.value?.let {
-                            changePlaylistViewMode(PlaylistViewMode.Add(it.titleRepresentation(), it.title))
-                        }
-
+                        showAddToPlaylistDialog.value = true
                         showTrackActionsBottomSheet.value = false
                     },
                     Triple(
@@ -166,11 +173,58 @@ fun HomeScreen(
                 )
             }
 
+            if (showAddToPlaylistDialog.value) {
+                SimpleAlertDialog(
+                    titleId = R.string.add_to_playlist_alert_dialog_title,
+                    description = stringResource(id = R.string.add_to_playlist_alert_dialog_description),
+                    dismiss = {
+                        showTrackActionsBottomSheet.value = false
+                        showAddToPlaylistDialog.value = false
+                    },
+                    onComplete = {}, content = {
+                        LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
+                            val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
+                            itemsIndexed(sortedPlaylists) { _, entry ->
+                                val (playlistTitle, _) = entry
+
+                                Text(
+                                    text = playlistTitle,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    maxLines = 1,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .basicMarquee()
+                                        .padding(all = 8.dp)
+                                        .clickable {
+                                            selectedTrackForTrackAction.value?.let {
+                                                playlistsViewModel.addTrackToPlaylist(it.titleRepresentation(), playlistTitle)
+                                                showTrackActionsBottomSheet.value = false
+                                                showAddToPlaylistDialog.value = false
+                                                context.showToast(
+                                                    context.getString(
+                                                        R.string.playlist_screen_add,
+                                                        it.titleRepresentation(),
+                                                        playlistTitle
+                                                    )
+                                                )
+                                            }
+                                        },
+                                    color = AppColors.textColor,
+                                )
+
+                                HorizontalDivider()
+                            }
+                        }
+                    }
+                )
+            }
+
             if (showSortOptions.value) {
                 SortOptionsAlertDialog(
                     dismiss = { showSortOptions.value = false },
                     sort = { sortOption ->
                         viewModel.sort(sortOption)
+                        showTrackActionsBottomSheet.value = false
                         showSortOptions.value = false
                     }
                 )
@@ -199,7 +253,10 @@ fun HomeScreen(
             }
 
             if (showSleepTimerAlertDialog.value) {
-                val description = stringResource(id = R.string.sleep_timer_alert_dialog_description, sleepTimerDuration.toInt().toString())
+                val description = stringResource(
+                    id = R.string.sleep_timer_alert_dialog_description,
+                    sleepTimerDuration.toInt().toString()
+                )
 
                 SimpleAlertDialog(
                     titleId = R.string.sleep_timer_alert_dialog_title,
@@ -246,18 +303,4 @@ private fun startSleepTimer(minute: Int, onComplete: () -> Unit) {
             onComplete()
         }, 100)
     }
-}
-
-private fun listItemAction(
-    track: Track,
-    coroutineScope: CoroutineScope,
-    listState: LazyListState,
-    index: Int,
-    viewModel: HomeViewModel
-) {
-    coroutineScope.launch(Dispatchers.Main) {
-        listState.animateScrollToItem(index)
-    }
-
-    viewModel.playTrack(track)
 }

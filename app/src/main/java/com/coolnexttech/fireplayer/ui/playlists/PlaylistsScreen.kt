@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui.playlists
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,23 +13,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.PlaylistViewMode
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.bottomSheet.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.components.dialog.AddPlaylistAlertDialog
 import com.coolnexttech.fireplayer.ui.playlists.topbar.PlaylistsTopBar
 import com.coolnexttech.fireplayer.utils.VMProvider
-import com.coolnexttech.fireplayer.utils.extensions.showToast
 
 @Composable
 fun PlaylistsScreen(
-    mode: PlaylistViewMode,
     viewModel: PlaylistsViewModel,
     changeScreen: () -> Unit
 ) {
-    val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
     val showAddPlaylist = remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -54,13 +48,8 @@ fun PlaylistsScreen(
                 ListItemText(
                     playlistTitle,
                     action = {
-                        playlistAction(
-                            context,
-                            mode,
-                            viewModel,
-                            playlistTitle,
-                            changeScreen
-                        )
+                        VMProvider.homeViewModel.initTrackList(playlistTitle)
+                        changeScreen()
                     },
                     longPressAction = {
                         selectedPlaylistTitle = playlistTitle
@@ -93,28 +82,4 @@ fun PlaylistsScreen(
             showAddPlaylist.value = false
         }
     }
-}
-
-private fun playlistAction(
-    context: Context,
-    mode: PlaylistViewMode,
-    viewModel: PlaylistsViewModel,
-    playlistTitle: String,
-    changeScreen: () -> Unit
-) {
-    if (mode is PlaylistViewMode.Add) {
-        viewModel.addTrackToPlaylist(mode.trackTitleRepresentation, playlistTitle)
-
-        context.showToast(
-            context.getString(
-                R.string.playlist_screen_add,
-                mode.trackTitle,
-                playlistTitle
-            )
-        )
-    } else {
-        VMProvider.homeViewModel.initTrackList(playlistTitle)
-    }
-
-    changeScreen()
 }

@@ -41,6 +41,9 @@
     <string name="playlists_content_unavailable_text">You dont have any playlist yet</string>
     <string name="playlists_content_unavailable_title">No playlists</string>
 
+    <string name="add_to_playlist_alert_dialog_title">Add to Playlist</string>
+    <string name="add_to_playlist_alert_dialog_description">Selected track will be added to chosen playlist</string>
+
     <string name="delete_alert_dialog_title">Delete</string>
     <string name="delete_alert_dialog_description">Could you confirm whether you want to delete the selected item?</string>
 
