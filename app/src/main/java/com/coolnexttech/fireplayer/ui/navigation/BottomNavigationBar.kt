@@ -33,17 +33,17 @@ fun BottomNavigationBar() {
     var screen by remember { mutableStateOf(Screen.Home) }
     val items = listOf(
         Triple(
-            R.string.bottom_navigation_bar_home,
+            stringResource(id = R.string.bottom_navigation_bar_home),
             Icons.Filled.Home,
             Screen.Home
         ),
         Triple(
-            R.string.bottom_navigation_bar_playlist,
+            stringResource(id = R.string.bottom_navigation_bar_playlist),
             Icons.Filled.Favorite,
             Screen.Playlist,
         ),
         Triple(
-            R.string.bottom_navigation_bar_info,
+            stringResource(id = R.string.bottom_navigation_bar_info),
             Icons.Filled.Info,
             Screen.Info
         )
@@ -54,8 +54,8 @@ fun BottomNavigationBar() {
             NavigationBar(containerColor = AppColors.alternateBackground, contentColor = AppColors.red) {
                 items.forEachIndexed { _, item ->
                     NavigationBarItem(
-                        icon = { Icon(item.second, contentDescription = item.first.toString()) },
-                        label = { Text(stringResource(id = item.first)) },
+                        icon = { Icon(item.second, contentDescription = item.first) },
+                        label = { Text(item.first) },
                         selected = screen == item.third,
                         onClick = { screen = item.third }
                     )
@@ -63,7 +63,9 @@ fun BottomNavigationBar() {
             }
         },
     ) {
-        Box(modifier = Modifier.fillMaxSize().padding(it)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)) {
             when (screen) {
                 Screen.Home -> {
                     HomeScreen(VMProvider.homeViewModel, VMProvider.playlistViewModel, VMProvider.audioPlayer)

@@ -4,7 +4,7 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
 
-    <string name="bottom_navigation_bar_home">Home</string>
+    <string name="bottom_navigation_bar_home">All Tracks</string>
     <string name="bottom_navigation_bar_playlist">Playlists</string>
     <string name="bottom_navigation_bar_info">Info</string>
 

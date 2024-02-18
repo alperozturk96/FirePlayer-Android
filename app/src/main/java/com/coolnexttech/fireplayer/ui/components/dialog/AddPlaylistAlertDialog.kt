@@ -1,5 +1,8 @@
 package com.coolnexttech.fireplayer.ui.components.dialog
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
@@ -12,8 +15,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
@@ -35,14 +40,18 @@ fun AddPlaylistAlertDialog(
         text = {
             TextField(
                 colors = TextFieldDefaults.colors(
-                    focusedTextColor = AppColors.unhighlight,
+                    focusedTextColor = AppColors.textColor,
                     focusedContainerColor = AppColors.alternateBackground,
                     unfocusedContainerColor = AppColors.alternateBackground,
-                    focusedIndicatorColor = AppColors.unhighlight,
-                    unfocusedIndicatorColor = AppColors.unhighlight,
+                    focusedIndicatorColor = AppColors.textColor,
+                    unfocusedIndicatorColor = AppColors.textColor,
                 ),
-                shape = RoundedCornerShape(30.dp),
-                placeholder = { Text(text = stringResource(id = R.string.playlist_screen_add_playlist_placeholder)) },
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.playlist_screen_add_playlist_placeholder),
+                        color = AppColors.textColor,
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 value = title,
                 onValueChange = {
