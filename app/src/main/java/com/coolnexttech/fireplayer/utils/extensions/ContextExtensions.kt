@@ -1,9 +1,7 @@
 package com.coolnexttech.fireplayer.utils.extensions
 
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
@@ -21,12 +19,6 @@ fun Context.showToast(message: String) {
 
 fun Context.showToast(messageId: Int) {
     Toast.makeText(this, getString(messageId), Toast.LENGTH_SHORT).show()
-}
-
-fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }
 
 fun Context.createReturnToAppPendingIntent(): PendingIntent {

@@ -58,18 +58,14 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun initTrackList(selectedPlaylistTitle: String?) {
-        viewModelScope.launch {
-            val tracksFromPlaylist: List<Track>? = withContext(Dispatchers.IO) {
-                if (selectedPlaylistTitle == null) {
-                    null
-                } else {
-                    FolderAnalyzer.getTracksFromPlaylist(_tracks, selectedPlaylistTitle)
-                }
-            }
+    fun getAllTracks(): List<Track> {
+        return _tracks
+    }
 
+    fun initTrackList(tracksInPlaylist: List<Track>?) {
+        viewModelScope.launch {
             _filteredTracks.update {
-                tracksFromPlaylist ?: _tracks
+                tracksInPlaylist ?: _tracks
             }
 
             Log.d("Home", "Total Track Count: " + _tracks.count())

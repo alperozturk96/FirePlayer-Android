@@ -54,6 +54,7 @@
     <string name="playlist_screen_selected_playlist">%s playlist selected</string>
     <string name="playlist_screen_add_playlist_dialog_title">Add Playlist</string>
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
+    <string name="playlist_screen_empty_track_list_warning">Please add tracks to this playlist before proceeding</string>
 
     <string name="playback_error_message">Cannot able to play selected track</string>
 

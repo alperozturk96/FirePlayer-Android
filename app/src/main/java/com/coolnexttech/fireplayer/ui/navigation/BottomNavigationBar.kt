@@ -70,12 +70,13 @@ fun BottomNavigationBar() {
                 }
                 Screen.Playlist -> {
                     PlaylistsScreen(
+                        homeViewModel = VMProvider.homeViewModel,
                         viewModel = VMProvider.playlistViewModel
                     ) {
                         screen = Screen.Home
                     }
                 }
-                else -> {
+                Screen.Info -> {
                     InfoScreen()
                 }
             }

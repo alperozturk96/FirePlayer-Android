@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui.playlists
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -13,27 +12,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.bottomSheet.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.components.dialog.AddPlaylistAlertDialog
+import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.playlists.topbar.PlaylistsTopBar
-import com.coolnexttech.fireplayer.utils.VMProvider
+import com.coolnexttech.fireplayer.utils.FolderAnalyzer
+import com.coolnexttech.fireplayer.utils.extensions.showToast
 
 @Composable
 fun PlaylistsScreen(
+    homeViewModel: HomeViewModel,
     viewModel: PlaylistsViewModel,
     changeScreen: () -> Unit
 ) {
+    val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
     val showAddPlaylist = remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlaylistTitle by remember { mutableStateOf("") }
-
-    BackHandler {
-        VMProvider.homeViewModel.initTrackList(null)
-        changeScreen()
-    }
 
     Scaffold(topBar = {
         PlaylistsTopBar(viewModel) {
@@ -48,7 +47,17 @@ fun PlaylistsScreen(
                 ListItemText(
                     playlistTitle,
                     action = {
-                        VMProvider.homeViewModel.initTrackList(playlistTitle)
+                        val tracksInPlaylist = FolderAnalyzer.getTracksFromPlaylist(
+                            homeViewModel.getAllTracks(),
+                            playlistTitle
+                        )
+
+                        if (tracksInPlaylist.isEmpty()) {
+                            context.showToast(R.string.playlist_screen_empty_track_list_warning)
+                            return@ListItemText
+                        }
+
+                        homeViewModel.initTrackList(tracksInPlaylist)
                         changeScreen()
                     },
                     longPressAction = {
