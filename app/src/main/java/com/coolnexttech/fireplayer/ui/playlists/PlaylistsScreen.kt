@@ -26,7 +26,7 @@ import com.coolnexttech.fireplayer.utils.extensions.showToast
 fun PlaylistsScreen(
     homeViewModel: HomeViewModel,
     viewModel: PlaylistsViewModel,
-    changeScreen: (String) -> Unit
+    changeScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
@@ -58,7 +58,7 @@ fun PlaylistsScreen(
                         }
 
                         homeViewModel.initTrackList(tracksInPlaylist)
-                        changeScreen(playlistTitle)
+                        changeScreen()
                     },
                     longPressAction = {
                         selectedPlaylistTitle = playlistTitle
