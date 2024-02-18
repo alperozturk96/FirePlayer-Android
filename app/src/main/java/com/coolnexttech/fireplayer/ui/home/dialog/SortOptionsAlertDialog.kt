@@ -1,4 +1,4 @@
-package com.coolnexttech.fireplayer.ui.components.dialog
+package com.coolnexttech.fireplayer.ui.home.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

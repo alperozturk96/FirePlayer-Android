@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui.home.topbar
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -10,11 +9,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.coolnexttech.fireplayer.model.FilterOptions
-import com.coolnexttech.fireplayer.model.PlayMode
+import androidx.compose.ui.platform.LocalContext
+import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.components.view.AlphabeticalScrollerView
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
@@ -23,19 +25,24 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeTopBar(
-    context: Context,
-    playMode: PlayMode,
-    alphabeticalScrollerIconId: Int,
-    filterOption: FilterOptions,
-    searchText: String,
     viewModel: HomeViewModel,
-    showAlphabeticalScroller: MutableState<Boolean>,
     characterList: Map<Char, Int>,
     coroutineScope: CoroutineScope,
     listState: LazyListState,
     showSortOptions: () -> Unit,
     showSleepTimerAlertDialog: () -> Unit
 ) {
+    val context = LocalContext.current
+    val searchText by viewModel.searchText.collectAsState()
+    val playMode by viewModel.playMode.collectAsState()
+    val filterOption by viewModel.filterOption.collectAsState()
+    val showAlphabeticalScroller = remember { mutableStateOf(false) }
+    val alphabeticalScrollerIconId = if (showAlphabeticalScroller.value) {
+        R.drawable.ic_arrow_up
+    } else {
+        R.drawable.ic_arrow_down
+    }
+
     Column {
         HomeTopBarOptions(
             context,
