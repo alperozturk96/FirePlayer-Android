@@ -18,7 +18,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 @Composable
 fun SimpleAlertDialog(
     titleId: Int,
-    description: String,
+    description: String?,
     heightFraction: Float? = null,
     content: @Composable (() -> Unit)? = null,
     onComplete: () -> Unit,
@@ -38,7 +38,9 @@ fun SimpleAlertDialog(
         },
         text = {
             Column(modifier = modifier) {
-                Text(text = description)
+                if (description != null) {
+                    Text(text = description)
+                }
 
                 content?.let {
                     Spacer(modifier = Modifier.height(16.dp))

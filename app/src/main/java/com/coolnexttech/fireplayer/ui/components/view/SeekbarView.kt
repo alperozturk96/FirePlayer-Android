@@ -1,6 +1,7 @@
 package com.coolnexttech.fireplayer.ui.components.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +39,7 @@ fun SeekbarView(
     selectedTrack: Track,
     audioPlayer: AudioPlayer,
     homeViewModel: HomeViewModel,
+    showTrackPositionAlertDialog: MutableState<Boolean>
 ) {
     val currentTime by audioPlayer.currentTime.collectAsState()
     val totalTime by audioPlayer.totalTime.collectAsState()
@@ -59,7 +62,7 @@ fun SeekbarView(
         VSpacing8()
 
         if (audioPlayer.isTotalTimeValid()) {
-            MediaSlider(audioPlayer, currentTime, totalTime)
+            MediaSlider(audioPlayer, currentTime, totalTime, showTrackPositionAlertDialog)
         } else {
             MediaSliderNotAvailable()
         }
@@ -84,7 +87,8 @@ private fun MediaSliderNotAvailable() {
 private fun MediaSlider(
     audioPlayer: AudioPlayer,
     currentTime: Long,
-    totalTime: Long
+    totalTime: Long,
+    showTrackPositionAlertDialog: MutableState<Boolean>
 ) {
     Row(
         modifier = Modifier
@@ -94,7 +98,9 @@ private fun MediaSlider(
     ) {
         Text(
             currentTime.convertToReadableTime(),
-            modifier = Modifier.wrapContentWidth(Alignment.Start),
+            modifier = Modifier
+                .wrapContentWidth(Alignment.Start)
+                .clickable { showTrackPositionAlertDialog.value = true },
             color = AppColors.unhighlight
         )
 

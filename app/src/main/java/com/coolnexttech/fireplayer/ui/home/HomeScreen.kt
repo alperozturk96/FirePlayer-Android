@@ -17,6 +17,7 @@ import com.coolnexttech.fireplayer.ui.home.dialog.AddTrackToPlaylistDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.DeleteTrackAlertDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.SleepTimerAlertDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.SortOptionsAlertDialog
+import com.coolnexttech.fireplayer.ui.home.dialog.TrackPositionAlertDialog
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.home.trackList.EmptyTrackList
 import com.coolnexttech.fireplayer.ui.home.trackList.TrackList
@@ -37,6 +38,7 @@ fun HomeScreen(
     val showAddTrackToPlaylistDialog = remember { mutableStateOf(false) }
     val showTrackActionsBottomSheet = remember { mutableStateOf(false) }
     val showDeleteTrackAlertDialog = remember { mutableStateOf(false) }
+    val showTrackPositionAlertDialog = remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val characterList = remember(filteredTracks) {
@@ -55,7 +57,14 @@ fun HomeScreen(
                 showSleepTimerAlertDialog = { showSleepTimerAlertDialog.value = true }
             )
         }, bottomBar = {
-            selectedTrack?.let { SeekbarView(it, audioPlayer, viewModel) }
+            selectedTrack?.let {
+                SeekbarView(
+                    it,
+                    audioPlayer,
+                    viewModel,
+                    showTrackPositionAlertDialog
+                )
+            }
         }) {
         if (filteredTracks.isEmpty()) {
             EmptyTrackList(viewModel)
@@ -90,6 +99,12 @@ fun HomeScreen(
                 )
             }
 
+            TrackPositionAlertDialog(
+                audioPlayer,
+                showTrackPositionAlertDialog,
+                showTrackActionsBottomSheet
+            )
+
             AddTrackToPlaylistDialog(
                 showAddTrackToPlaylistDialog,
                 showTrackActionsBottomSheet,
@@ -106,7 +121,11 @@ fun HomeScreen(
                 selectedTrack
             )
 
-            SleepTimerAlertDialog(audioPlayer, showSleepTimerAlertDialog, showTrackActionsBottomSheet)
+            SleepTimerAlertDialog(
+                audioPlayer,
+                showSleepTimerAlertDialog,
+                showTrackActionsBottomSheet
+            )
         }
     }
 }
