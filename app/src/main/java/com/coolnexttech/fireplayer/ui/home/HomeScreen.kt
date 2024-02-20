@@ -17,7 +17,6 @@ import com.coolnexttech.fireplayer.ui.home.dialog.AddTrackToPlaylistDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.DeleteTrackAlertDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.SleepTimerAlertDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.SortOptionsAlertDialog
-import com.coolnexttech.fireplayer.ui.home.dialog.TrackPositionAlertDialog
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.home.trackList.EmptyTrackList
 import com.coolnexttech.fireplayer.ui.home.trackList.TrackList
@@ -98,12 +97,6 @@ fun HomeScreen(
                     }
                 )
             }
-
-            TrackPositionAlertDialog(
-                audioPlayer,
-                showTrackPositionAlertDialog,
-                showTrackActionsBottomSheet
-            )
 
             AddTrackToPlaylistDialog(
                 showAddTrackToPlaylistDialog,

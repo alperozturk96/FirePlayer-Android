@@ -148,6 +148,12 @@ private fun MediaControl(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
+        ActionImageButton(R.drawable.ic_fast_rewind) {
+            audioPlayer.seekBackward()
+        }
+
+        HSpacing16()
+
         ActionImageButton(R.drawable.ic_previous) {
             selectPreviousTrack()
         }
@@ -165,6 +171,12 @@ private fun MediaControl(
 
         ActionImageButton(R.drawable.ic_next) {
             selectNextTrack()
+        }
+
+        HSpacing16()
+
+        ActionImageButton(R.drawable.ic_fast_forward) {
+            audioPlayer.seekForward()
         }
 
         Spacer(modifier = Modifier.weight(1f))

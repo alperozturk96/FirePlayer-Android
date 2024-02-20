@@ -172,6 +172,14 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
         }
     }
 
+    fun seekForward() {
+        seekTo(_currentTime.value + 15000)
+    }
+
+    fun seekBackward() {
+        seekTo(_currentTime.value - 15000)
+    }
+
     fun saveCurrentTrackPlaybackPosition() {
         val currentTrackId = homeViewModel.selectedTrack.value?.id
         val currentTrackPosition = mediaSession?.player?.currentPosition
