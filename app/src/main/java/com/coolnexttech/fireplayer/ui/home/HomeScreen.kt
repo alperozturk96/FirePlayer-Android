@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.ui.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
@@ -31,18 +32,28 @@ fun HomeScreen(
 ) {
     val filteredTracks by viewModel.filteredTracks.collectAsState()
     val selectedTrack by viewModel.selectedTrack.collectAsState()
+
     val showSortOptions = remember { mutableStateOf(false) }
-    val showSleepTimerAlertDialog = remember { mutableStateOf(false) }
+
     val selectedTrackForTrackAction = remember { mutableStateOf<Track?>(null) }
-    val showAddTrackToPlaylistDialog = remember { mutableStateOf(false) }
     val showTrackActionsBottomSheet = remember { mutableStateOf(false) }
+
+    val showSleepTimerAlertDialog = remember { mutableStateOf(false) }
+    val showAddTrackToPlaylistDialog = remember { mutableStateOf(false) }
     val showDeleteTrackAlertDialog = remember { mutableStateOf(false) }
     val showTrackPositionAlertDialog = remember { mutableStateOf(false) }
+
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val characterList = remember(filteredTracks) {
         filteredTracks.groupBy { it.title.first().uppercaseChar() }
             .mapValues { (_, tracks) -> filteredTracks.indexOf(tracks.first()) }
+    }
+
+    BackHandler {
+        if (viewModel.isTracksFiltered()) {
+            viewModel.reset()
+        }
     }
 
     Scaffold(

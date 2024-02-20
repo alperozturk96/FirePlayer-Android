@@ -62,6 +62,10 @@ class HomeViewModel : ViewModel() {
         return _tracks
     }
 
+    fun isTracksFiltered(): Boolean {
+        return _tracks.size != _filteredTracks.value.size
+    }
+
     fun initTrackList(tracksInPlaylist: List<Track>?) {
         viewModelScope.launch {
             _filteredTracks.update {
