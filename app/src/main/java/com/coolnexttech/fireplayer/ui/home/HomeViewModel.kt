@@ -186,17 +186,11 @@ class HomeViewModel : ViewModel() {
     }
 
     fun reset() {
-        clearSearch()
-
-        _filterOption.update {
-            FilterOptions.Title
+        viewModelScope.launch(Dispatchers.IO) {
+            _tracks = FolderAnalyzer.getTracksFromMusicFolder()
+            clearSearch()
+            initTrackList(null)
         }
-
-        _playMode.update {
-            PlayMode.Shuffle
-        }
-
-        initTrackList(null)
     }
 
     fun clearSearch() {

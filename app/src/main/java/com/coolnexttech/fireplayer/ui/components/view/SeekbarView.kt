@@ -51,7 +51,11 @@ fun SeekbarView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        HorizontalDivider(color = AppColors.textColor, modifier = Modifier.padding(vertical = 4.dp))
+        VSpacing8()
+
+        HorizontalDivider(color = AppColors.textColor)
+
+        VSpacing8()
 
         Text(
             text = selectedTrack.titleRepresentation(),

@@ -14,7 +14,7 @@
     <string name="home_filter_by_artist_section_title">Filtered By Artist</string>
     <string name="home_filter_by_title_section_title">Filtered By Title</string>
 
-    <string name="home_screen_reset_button_description">Track list updated</string>
+    <string name="home_screen_reset_button_description">Track list reset</string>
 
     <string name="home_bottom_sheet_add_to_playlist_action_title">Add To Playlist</string>
     <string name="home_bottom_sheet_delete_track_action_title">Delete Track</string>
