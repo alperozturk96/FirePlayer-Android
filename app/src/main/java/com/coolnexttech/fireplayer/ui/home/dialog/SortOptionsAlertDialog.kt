@@ -1,25 +1,19 @@
 package com.coolnexttech.fireplayer.ui.home.dialog
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.ui.components.Drawable
-import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
-import com.coolnexttech.fireplayer.ui.components.button.DialogButton
-import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.utils.extensions.VSpacing16
-import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
 
 @Composable
 fun SortOptionsAlertDialog(
@@ -29,44 +23,29 @@ fun SortOptionsAlertDialog(
     Dialog({ dismiss() }) {
         Column(
             modifier = Modifier
-                .width(400.dp)
-                .padding(16.dp)
-                .clip(RoundedCornerShape(30.dp))
-                .background(AppColors.alternateBackground),
-            verticalArrangement = Arrangement.Center,
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            VSpacing16()
-
-            Drawable(R.drawable.ic_fire, tint = AppColors.red)
-
-            VSpacing16()
-
-            HeadlineSmallText(R.string.home_sort_dialog_title)
-
-            VSpacing8()
-
-            DialogButton(R.string.home_sort_dialog_sort_by_title_a_z) {
-                sort(SortOptions.AToZ)
+            FilledTonalButton(onClick = { sort(SortOptions.AToZ) }) {
+                Text(text = stringResource(id = R.string.home_sort_dialog_sort_by_title_a_z))
             }
 
-            DialogButton(R.string.home_sort_dialog_sort_by_title_z_a) {
-                sort(SortOptions.ZToA)
+            FilledTonalButton(onClick = { sort(SortOptions.ZToA) }) {
+                Text(text = stringResource(id = R.string.home_sort_dialog_sort_by_title_z_a))
             }
 
-            DialogButton(R.string.home_sort_dialog_sort_by_new_to_old_title) {
-                sort(SortOptions.NewToOld)
+            FilledTonalButton(onClick = { sort(SortOptions.NewToOld) }) {
+                Text(text = stringResource(id = R.string.home_sort_dialog_sort_by_new_to_old_title))
             }
 
-            DialogButton(R.string.home_sort_dialog_sort_by_old_to_new_title) {
-                sort(SortOptions.OldToNew)
+            FilledTonalButton(onClick = { sort(SortOptions.OldToNew) }) {
+                Text(text = stringResource(id = R.string.home_sort_dialog_sort_by_old_to_new_title))
             }
 
-            DialogButton(R.string.common_cancel) {
-                dismiss()
+            TextButton(onClick = { dismiss() }) {
+                Text(text = stringResource(id = R.string.common_cancel))
             }
-
-            VSpacing16()
         }
     }
 }
