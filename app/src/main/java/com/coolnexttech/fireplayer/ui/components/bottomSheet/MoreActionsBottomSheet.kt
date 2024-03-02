@@ -24,7 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.coolnexttech.fireplayer.ui.theme.AppColors
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +37,6 @@ fun MoreActionsBottomSheet(
     val scope = rememberCoroutineScope()
 
     ModalBottomSheet(
-        containerColor = AppColors.alternateBackground,
         onDismissRequest = {
             dismiss()
         },
@@ -53,7 +51,7 @@ fun MoreActionsBottomSheet(
         ) {
             title?.let {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = title, fontSize = 18.sp, color = AppColors.textColor)
+                    Text(text = title, fontSize = 18.sp)
                 }
             }
 
@@ -77,13 +75,12 @@ fun MoreActionsBottomSheet(
                     Icon(
                         painter = painterResource(id = action.first),
                         contentDescription = "action icon",
-                        tint = AppColors.textColor,
                         modifier = Modifier.size(20.dp)
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Text(text = stringResource(action.second), fontSize = 16.sp, color = AppColors.textColor)
+                    Text(text = stringResource(action.second), fontSize = 16.sp)
                 }
             }
 

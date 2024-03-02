@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @Composable
 fun SimpleAlertDialog(
@@ -31,14 +31,13 @@ fun SimpleAlertDialog(
     }
 
     AlertDialog(
-        containerColor = AppColors.alternateBackground,
         onDismissRequest = { dismiss() },
         title = {
             Text(text = stringResource(id = titleId))
         },
         text = {
             Column(modifier = modifier) {
-                if (description != null) {
+                description?.let {
                     Text(text = description)
                 }
 
@@ -50,22 +49,16 @@ fun SimpleAlertDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
+            FilledTonalButton(onClick = {
                 onComplete()
                 dismiss()
             }) {
-                Text(
-                    stringResource(id = R.string.common_ok),
-                    color = AppColors.textColor
-                )
+                Text(stringResource(id = R.string.common_ok),)
             }
         },
         dismissButton = {
             TextButton(onClick = { dismiss() }) {
-                Text(
-                    stringResource(id = R.string.common_cancel),
-                    color = AppColors.textColor
-                )
+                Text(stringResource(id = R.string.common_cancel))
             }
         }
     )

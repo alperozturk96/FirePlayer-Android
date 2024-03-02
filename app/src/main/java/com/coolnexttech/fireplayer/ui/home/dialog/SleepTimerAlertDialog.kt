@@ -3,6 +3,7 @@ package com.coolnexttech.fireplayer.ui.home.dialog
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -14,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.dialog.SimpleAlertDialog
+import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,9 @@ fun SleepTimerAlertDialog(
             description = description,
             content = {
                 Slider(
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = AppColors.red,
+                    ),
                     value = sleepTimerDuration,
                     valueRange = 1f..60f,
                     onValueChange = { sleepTimerDuration = it }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.home.HomeScreen
-import com.coolnexttech.fireplayer.ui.info.InfoScreen
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsScreen
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.VMProvider
@@ -41,17 +39,12 @@ fun BottomNavigationBar() {
             stringResource(id = R.string.bottom_navigation_bar_playlist),
             Icons.Filled.Favorite,
             Screen.Playlist,
-        ),
-        Triple(
-            stringResource(id = R.string.bottom_navigation_bar_info),
-            Icons.Filled.Info,
-            Screen.Info
         )
     )
 
     Scaffold(
         bottomBar = {
-            NavigationBar(containerColor = AppColors.alternateBackground, contentColor = AppColors.red) {
+            NavigationBar(contentColor = AppColors.red) {
                 items.forEachIndexed { _, item ->
                     NavigationBarItem(
                         icon = { Icon(item.second, contentDescription = item.first) },
@@ -63,13 +56,20 @@ fun BottomNavigationBar() {
             }
         },
     ) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(it)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
             when (screen) {
                 Screen.Home -> {
-                    HomeScreen(VMProvider.homeViewModel, VMProvider.playlistViewModel, VMProvider.audioPlayer)
+                    HomeScreen(
+                        VMProvider.homeViewModel,
+                        VMProvider.playlistViewModel,
+                        VMProvider.audioPlayer
+                    )
                 }
+
                 Screen.Playlist -> {
                     PlaylistsScreen(
                         homeViewModel = VMProvider.homeViewModel,
@@ -77,9 +77,6 @@ fun BottomNavigationBar() {
                     ) {
                         screen = Screen.Home
                     }
-                }
-                Screen.Info -> {
-                    InfoScreen()
                 }
             }
         }

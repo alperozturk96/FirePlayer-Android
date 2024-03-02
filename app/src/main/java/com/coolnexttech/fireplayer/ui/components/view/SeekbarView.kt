@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui.components.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -47,14 +47,14 @@ fun SeekbarView(
 
     Column(
         modifier = Modifier
-            .background(AppColors.alternateBackground)
             .padding(all = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        HorizontalDivider(color = AppColors.textColor, modifier = Modifier.padding(vertical = 4.dp))
+
         Text(
             text = selectedTrack.titleRepresentation(),
-            color = AppColors.textColor,
             fontSize = 14.sp,
             textAlign = TextAlign.Center
         )
@@ -108,10 +108,7 @@ private fun MediaSlider(
 
         Slider(
             colors = SliderDefaults.colors(
-                thumbColor = AppColors.unhighlight,
-                activeTickColor = AppColors.unhighlight,
                 activeTrackColor = AppColors.red,
-                inactiveTickColor = AppColors.unhighlight
             ),
             value = currentTime.toFloat(),
             onValueChange = { newPosition ->

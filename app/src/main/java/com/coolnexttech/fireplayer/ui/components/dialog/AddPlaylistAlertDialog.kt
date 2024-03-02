@@ -2,6 +2,7 @@ package com.coolnexttech.fireplayer.ui.components.dialog
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -25,7 +26,6 @@ fun AddPlaylistAlertDialog(
     var title by remember { mutableStateOf("") }
 
     AlertDialog(
-        containerColor = AppColors.alternateBackground,
         onDismissRequest = { dismiss() },
         title = {
             Text(text = stringResource(id = R.string.playlist_screen_add_playlist_dialog_title))
@@ -33,17 +33,11 @@ fun AddPlaylistAlertDialog(
         text = {
             TextField(
                 colors = TextFieldDefaults.colors(
-                    focusedTextColor = AppColors.textColor,
-                    focusedContainerColor = AppColors.alternateBackground,
-                    unfocusedContainerColor = AppColors.alternateBackground,
-                    focusedIndicatorColor = AppColors.textColor,
-                    unfocusedIndicatorColor = AppColors.textColor,
+                    focusedContainerColor = AppColors.secondaryContainer,
+                    unfocusedContainerColor = AppColors.secondaryContainer,
                 ),
                 placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.playlist_screen_add_playlist_placeholder),
-                        color = AppColors.textColor,
-                    )
+                    Text(text = stringResource(id = R.string.playlist_screen_add_playlist_placeholder))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 value = title,
@@ -54,22 +48,16 @@ fun AddPlaylistAlertDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = {
+            FilledTonalButton(onClick = {
                 dismiss()
                 viewModel.addPlaylist(title)
             }) {
-                Text(
-                    stringResource(id = R.string.common_ok),
-                    color = AppColors.textColor
-                )
+                Text(stringResource(id = R.string.common_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = { dismiss() }) {
-                Text(
-                    stringResource(id = R.string.common_cancel),
-                    color = AppColors.textColor
-                )
+                Text(stringResource(id = R.string.common_cancel))
             }
         }
     )
