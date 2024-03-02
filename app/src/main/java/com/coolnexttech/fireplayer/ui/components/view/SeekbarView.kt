@@ -4,12 +4,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -19,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,12 +28,10 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
-import com.coolnexttech.fireplayer.ui.components.button.ActionImageButton
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.utils.extensions.HSpacing16
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing8
-import com.coolnexttech.fireplayer.utils.extensions.VSpacing8
+import com.coolnexttech.fireplayer.utils.extensions.VSpacing4
 import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 
 @Composable
@@ -46,16 +46,14 @@ fun SeekbarView(
     val isPlaying by audioPlayer.isPlaying.collectAsState()
 
     Column(
-        modifier = Modifier
-            .padding(all = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        VSpacing8()
+        VSpacing4()
 
         HorizontalDivider(color = AppColors.textColor)
 
-        VSpacing8()
+        VSpacing4()
 
         Text(
             text = selectedTrack.titleRepresentation(),
@@ -63,15 +61,11 @@ fun SeekbarView(
             textAlign = TextAlign.Center
         )
 
-        VSpacing8()
-
         if (audioPlayer.isTotalTimeValid()) {
             MediaSlider(audioPlayer, currentTime, totalTime, showTrackPositionAlertDialog)
         } else {
             MediaSliderNotAvailable()
         }
-
-        VSpacing8()
 
         MediaControl(audioPlayer, isPlaying, { homeViewModel.playPreviousTrack() }) {
             homeViewModel.playNextTrack()
@@ -97,6 +91,7 @@ private fun MediaSlider(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 8.dp)
             .height(50.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -142,44 +137,33 @@ private fun MediaControl(
     selectPreviousTrack: () -> Unit,
     selectNextTrack: () -> Unit
 ) {
+    val actions = listOf(
+        Pair(R.drawable.ic_fast_rewind) { audioPlayer.seekBackward() },
+        Pair(R.drawable.ic_previous) { selectPreviousTrack() },
+        Pair(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play) { audioPlayer.togglePlayPause() },
+        Pair(R.drawable.ic_next) { selectNextTrack() },
+        Pair(R.drawable.ic_fast_forward) { audioPlayer.seekForward() },
+    )
+
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(8.dp),
         verticalAlignment = Alignment.Bottom
     ) {
-        Spacer(modifier = Modifier.weight(1f))
-
-        ActionImageButton(R.drawable.ic_fast_rewind) {
-            audioPlayer.seekBackward()
+        actions.forEach {
+            FilledTonalIconButton(
+                onClick = { it.second() },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(60.dp)
+                    .padding(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = it.first),
+                    contentDescription = "action"
+                )
+            }
         }
-
-        HSpacing16()
-
-        ActionImageButton(R.drawable.ic_previous) {
-            selectPreviousTrack()
-        }
-
-        HSpacing16()
-
-        ActionImageButton(
-            if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play,
-            size = 40.dp
-        ) {
-            audioPlayer.togglePlayPause()
-        }
-
-        HSpacing16()
-
-        ActionImageButton(R.drawable.ic_next) {
-            selectNextTrack()
-        }
-
-        HSpacing16()
-
-        ActionImageButton(R.drawable.ic_fast_forward) {
-            audioPlayer.seekForward()
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 }

@@ -24,13 +24,3 @@ fun ActionIconButton(id: Int, modifier: Modifier = Modifier, action: () -> Unit)
         )
     }
 }
-
-@Composable
-fun ActionImageButton(id: Int, size: Dp = 30.dp, action: () -> Unit) {
-    Image(
-        painter = painterResource(id),
-        contentDescription = null,
-        modifier = Modifier
-            .size(size)
-            .clickable { action() })
-}
