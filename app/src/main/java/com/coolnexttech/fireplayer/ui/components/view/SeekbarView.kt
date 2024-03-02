@@ -31,7 +31,6 @@ import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing8
-import com.coolnexttech.fireplayer.utils.extensions.VSpacing4
 import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 
 @Composable
@@ -46,14 +45,11 @@ fun SeekbarView(
     val isPlaying by audioPlayer.isPlaying.collectAsState()
 
     Column(
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        VSpacing4()
-
-        HorizontalDivider(color = AppColors.textColor)
-
-        VSpacing4()
+        HorizontalDivider(color = AppColors.textColor, modifier = Modifier.padding(bottom = 8.dp))
 
         Text(
             text = selectedTrack.titleRepresentation(),
@@ -91,8 +87,7 @@ private fun MediaSlider(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-            .height(50.dp),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
