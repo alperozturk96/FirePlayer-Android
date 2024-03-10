@@ -66,6 +66,7 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
                 volume = 1.0f
                 setAudioAttributes(playerAttributes, true)
                 setHandleAudioBecomingNoisy(true)
+                setWakeMode(C.WAKE_MODE_LOCAL)
                 addListener(object : Player.Listener {
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
                         _isPlaying.value = isPlaying
