@@ -1,5 +1,7 @@
 package com.coolnexttech.fireplayer.ui.components.view
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SeekbarView(
     selectedTrack: Track,
@@ -54,7 +57,9 @@ fun SeekbarView(
         Text(
             text = selectedTrack.titleRepresentation(),
             fontSize = 14.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .basicMarquee()
         )
 
         if (audioPlayer.isTotalTimeValid()) {

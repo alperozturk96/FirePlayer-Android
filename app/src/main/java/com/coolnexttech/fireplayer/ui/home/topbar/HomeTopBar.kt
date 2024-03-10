@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -55,7 +54,7 @@ fun HomeTopBar(
             showAlphabeticalScroller.value = !showAlphabeticalScroller.value
         }
 
-        AnimatedVisibility(showAlphabeticalScroller.value) {
+        AnimatedVisibility(showAlphabeticalScroller.value || searchText.isNotEmpty()) {
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
