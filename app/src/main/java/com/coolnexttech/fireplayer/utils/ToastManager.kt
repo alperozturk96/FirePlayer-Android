@@ -22,6 +22,11 @@ object ToastManager {
             ?.showToast(R.string.user_storage_save_current_track_position_success_message)
     }
 
+    fun showEmptyPlaybackMessage() {
+        appContext.get()
+            ?.showToast(R.string.playlist_empty_message)
+    }
+
     fun showRemoveTrackPlaybackPosition() {
         appContext.get()
             ?.showToast(R.string.user_storage_reset_current_track_position_success_message)

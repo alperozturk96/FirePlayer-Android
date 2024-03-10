@@ -91,6 +91,7 @@ fun HomeScreen(
             )
 
             TrackActionsBottomSheet(
+                playlistsViewModel,
                 audioPlayer,
                 selectedTrackForTrackAction,
                 showDeleteTrackAlertDialog,

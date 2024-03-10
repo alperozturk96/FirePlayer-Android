@@ -66,6 +66,7 @@ fun MoreActionsBottomSheet(
                             .invokeOnCompletion {
                                 if (!sheetState.isVisible) {
                                     action.third()
+                                    dismiss()
                                 }
                             }
                     }

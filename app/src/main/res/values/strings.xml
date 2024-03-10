@@ -63,6 +63,7 @@
     <string name="playlist_screen_add_playlist_placeholder">Title</string>
     <string name="playlist_screen_empty_track_list_warning">Please add tracks to this playlist before proceeding</string>
 
+    <string name="playlist_empty_message">You dont have any playlists yet. Why not create one?</string>
     <string name="playback_error_message">Cannot able to play selected track</string>
 
     <string name="track_successfully_deleted_message">Track successfully deleted</string>
