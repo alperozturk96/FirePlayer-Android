@@ -2,6 +2,8 @@ package com.coolnexttech.fireplayer.ui.home.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
@@ -18,6 +20,8 @@ fun DeleteTrackAlertDialog(
     selectedTrackForTrackAction: MutableState<Track?>,
     selectedTrack: Track?,
 ) {
+    val searchText by viewModel.searchText.collectAsState()
+
     if (showDeleteTrackAlertDialog.value) {
         SimpleAlertDialog(
             titleId = R.string.delete_alert_dialog_title,
@@ -30,6 +34,7 @@ fun DeleteTrackAlertDialog(
 
                     FolderAnalyzer.deleteTrack(it)
                     viewModel.deleteTrack(it)
+                    viewModel.search(searchText)
                     ToastManager.showDeleteSuccessMessage()
                 }
             },
