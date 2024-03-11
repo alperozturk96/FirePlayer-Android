@@ -44,7 +44,7 @@ class HomeViewModel : ViewModel() {
     val showLoadingIndicator: StateFlow<Boolean> = _showLoadingIndicator
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val firstTwentyTrack = FolderAnalyzer.getTracksFromMusicFolder(20)
             _tracks = firstTwentyTrack
             initTrackList(null)
@@ -67,7 +67,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun initTrackList(tracksInPlaylist: List<Track>?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _filteredTracks.update {
                 tracksInPlaylist ?: _tracks
             }
@@ -77,7 +77,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun sort(sortOption: SortOptions) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = withContext(Dispatchers.IO) {
                 _filteredTracks.value.sort(sortOption)
             }
@@ -198,7 +198,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun search(value: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _searchText.update {
                 value
             }
