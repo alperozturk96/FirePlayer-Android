@@ -5,7 +5,6 @@ import android.os.Looper
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -13,7 +12,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.dialog.SimpleAlertDialog
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.showToast
@@ -26,44 +24,40 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SleepTimerAlertDialog(
-    audioPlayer: AudioPlayer,
-    showSleepTimerAlertDialog: MutableState<Boolean>,
-    showTrackActionsBottomSheet: MutableState<Boolean>,
+    pause: () -> Unit,
+    dismiss: () -> Unit
 ) {
     val context = LocalContext.current
     var sleepTimerDuration by remember { mutableFloatStateOf(1f) }
 
-    if (showSleepTimerAlertDialog.value) {
-        val description = stringResource(
-            id = R.string.sleep_timer_alert_dialog_description,
-            sleepTimerDuration.toInt().toString()
-        )
+    val description = stringResource(
+        id = R.string.sleep_timer_alert_dialog_description,
+        sleepTimerDuration.toInt().toString()
+    )
 
-        SimpleAlertDialog(
-            titleId = R.string.sleep_timer_alert_dialog_title,
-            description = description,
-            content = {
-                Slider(
-                    colors = SliderDefaults.colors(
-                        activeTrackColor = AppColors.red,
-                    ),
-                    value = sleepTimerDuration,
-                    valueRange = 1f..60f,
-                    onValueChange = { sleepTimerDuration = it }
-                )
-            },
-            onComplete = {
-                context.showToast(description)
-                startSleepTimer(sleepTimerDuration.toInt()) {
-                    audioPlayer.pause()
-                }
-            },
-            dismiss = {
-                showTrackActionsBottomSheet.value = false
-                showSleepTimerAlertDialog.value = false
+    SimpleAlertDialog(
+        titleId = R.string.sleep_timer_alert_dialog_title,
+        description = description,
+        content = {
+            Slider(
+                colors = SliderDefaults.colors(
+                    activeTrackColor = AppColors.red,
+                ),
+                value = sleepTimerDuration,
+                valueRange = 1f..60f,
+                onValueChange = { sleepTimerDuration = it }
+            )
+        },
+        onComplete = {
+            context.showToast(description)
+            startSleepTimer(sleepTimerDuration.toInt()) {
+                pause()
             }
-        )
-    }
+        },
+        dismiss = {
+            dismiss()
+        }
+    )
 }
 
 private fun startSleepTimer(minute: Int, onComplete: () -> Unit) {

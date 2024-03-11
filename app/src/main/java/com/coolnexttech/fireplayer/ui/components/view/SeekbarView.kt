@@ -17,9 +17,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,9 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
-import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
-import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing8
 import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
@@ -38,15 +33,20 @@ import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SeekbarView(
-    selectedTrack: Track,
-    audioPlayer: AudioPlayer,
-    homeViewModel: HomeViewModel,
-    showTrackPositionAlertDialog: MutableState<Boolean>
+    track: Track,
+    isTotalTimeValid: Boolean,
+    currentTime: Long,
+    totalTime: Long,
+    isPlaying: Boolean,
+    seekTo: (Long) -> Unit,
+    updateCurrentTime: (Long) -> Unit,
+    toggle: () -> Unit,
+    seekBackward: () -> Unit,
+    seekForward: () -> Unit,
+    playPreviousTrack: () -> Unit,
+    playNextTrack: () -> Unit,
+    showTrackPositionAlertDialog: () -> Unit
 ) {
-    val currentTime by audioPlayer.currentTime.collectAsState()
-    val totalTime by audioPlayer.totalTime.collectAsState()
-    val isPlaying by audioPlayer.isPlaying.collectAsState()
-
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,39 +55,50 @@ fun SeekbarView(
         HorizontalDivider(color = AppColors.textColor, modifier = Modifier.padding(bottom = 8.dp))
 
         Text(
-            text = selectedTrack.titleRepresentation(),
+            text = track.titleRepresentation(),
             fontSize = 14.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .basicMarquee()
         )
 
-        if (audioPlayer.isTotalTimeValid()) {
-            MediaSlider(audioPlayer, currentTime, totalTime, showTrackPositionAlertDialog)
+        if (isTotalTimeValid) {
+            MediaSlider(
+                currentTime,
+                totalTime,
+                showTrackPositionAlertDialog = { showTrackPositionAlertDialog() },
+                seekTo = {
+                    seekTo(it)
+                },
+                updateCurrentTime = {
+                    updateCurrentTime(it)
+                }
+            )
         } else {
-            MediaSliderNotAvailable()
+            HeadlineSmallText(
+                R.string.seek_bar_media_slider_not_available_text,
+                color = AppColors.unhighlight
+            )
         }
 
-        MediaControl(audioPlayer, isPlaying, { homeViewModel.playPreviousTrack() }) {
-            homeViewModel.playNextTrack()
-        }
+        MediaControl(
+            isPlaying = isPlaying,
+            toggle = { toggle() },
+            seekBackward = { seekBackward() },
+            seekForward = { seekForward() },
+            playPreviousTrack = { playPreviousTrack() },
+            playNextTrack = { playNextTrack() }
+        )
     }
 }
 
 @Composable
-private fun MediaSliderNotAvailable() {
-    HeadlineSmallText(
-        R.string.seek_bar_media_slider_not_available_text,
-        color = AppColors.unhighlight
-    )
-}
-
-@Composable
 private fun MediaSlider(
-    audioPlayer: AudioPlayer,
     currentTime: Long,
     totalTime: Long,
-    showTrackPositionAlertDialog: MutableState<Boolean>
+    updateCurrentTime: (Long) -> Unit,
+    seekTo: (Long) -> Unit,
+    showTrackPositionAlertDialog: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -99,7 +110,7 @@ private fun MediaSlider(
             currentTime.convertToReadableTime(),
             modifier = Modifier
                 .wrapContentWidth(Alignment.Start)
-                .clickable { showTrackPositionAlertDialog.value = true },
+                .clickable { showTrackPositionAlertDialog() },
             color = AppColors.unhighlight
         )
 
@@ -111,10 +122,10 @@ private fun MediaSlider(
             ),
             value = currentTime.toFloat(),
             onValueChange = { newPosition ->
-                audioPlayer.updateCurrentTime(newPosition.toLong())
+                updateCurrentTime(newPosition.toLong())
             },
             onValueChangeFinished = {
-                audioPlayer.seekTo(currentTime)
+                seekTo(currentTime)
             },
             valueRange = 0f..totalTime.toFloat(),
             modifier = Modifier.weight(0.85f)
@@ -132,17 +143,23 @@ private fun MediaSlider(
 
 @Composable
 private fun MediaControl(
-    audioPlayer: AudioPlayer,
     isPlaying: Boolean,
-    selectPreviousTrack: () -> Unit,
-    selectNextTrack: () -> Unit
+    toggle: () -> Unit,
+    seekBackward: () -> Unit,
+    seekForward: () -> Unit,
+    playPreviousTrack: () -> Unit,
+    playNextTrack: () -> Unit
 ) {
     val actions = listOf(
-        Pair(R.drawable.ic_fast_rewind) { audioPlayer.seekBackward() },
-        Pair(R.drawable.ic_previous) { selectPreviousTrack() },
-        Pair(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play) { audioPlayer.togglePlayPause() },
-        Pair(R.drawable.ic_next) { selectNextTrack() },
-        Pair(R.drawable.ic_fast_forward) { audioPlayer.seekForward() },
+        Pair(R.drawable.ic_fast_rewind) {
+            seekBackward()
+        },
+        Pair(R.drawable.ic_previous) { playPreviousTrack() },
+        Pair(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play) { toggle() },
+        Pair(R.drawable.ic_next) { playNextTrack() },
+        Pair(R.drawable.ic_fast_forward) {
+            seekForward()
+        },
     )
 
     Row(

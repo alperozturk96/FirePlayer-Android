@@ -139,12 +139,12 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
                pause()
             }
             PlayerEvents.Toggle.name -> {
-               togglePlayPause()
+               toggle()
             }
         }
     }
 
-    fun togglePlayPause() {
+    fun toggle() {
         mediaSession?.player?.apply {
             if (isPlaying) pause() else start()
             _isPlaying.update { isPlaying }

@@ -7,19 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
-import com.coolnexttech.fireplayer.ui.home.HomeViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun TrackList(
@@ -27,10 +20,8 @@ fun TrackList(
     it: PaddingValues,
     filteredTracks: List<Track>,
     selectedTrack: Track?,
-    coroutineScope: CoroutineScope,
-    viewModel: HomeViewModel,
-    selectedTrackForTrackAction: MutableState<Track?>,
-    showTrackActionsBottomSheet: MutableState<Boolean>
+    action: (Pair<Int, Track>) -> Unit,
+    longPressAction: (Track) -> Unit
 ) {
     Box {
         LazyColumn(state = listState, modifier = Modifier.padding(it)) {
@@ -39,15 +30,10 @@ fun TrackList(
                     track.title,
                     color = track.color(selectedTrack?.id),
                     action = {
-                        coroutineScope.launch(Dispatchers.Main) {
-                            listState.animateScrollToItem(index)
-                        }
-
-                        viewModel.playTrack(track)
+                        action(Pair(index, track))
                     },
                     longPressAction = {
-                        selectedTrackForTrackAction.value = track
-                        showTrackActionsBottomSheet.value = true
+                        longPressAction(track)
                     }
                 )
             }
@@ -56,9 +42,7 @@ fun TrackList(
 }
 
 @Composable
-fun EmptyTrackList(viewModel: HomeViewModel) {
-    val searchText by viewModel.searchText.collectAsState()
-
+fun EmptyTrackList(searchText: String) {
     if (searchText.isNotEmpty()) {
         ContentUnavailableView(titleSuffix = searchText)
     } else {

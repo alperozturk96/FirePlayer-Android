@@ -28,12 +28,12 @@ fun HomeTopBar(
     viewModel: HomeViewModel,
     characterList: Map<Char, Int>,
     coroutineScope: CoroutineScope,
+    searchText: String,
     listState: LazyListState,
     showSortOptions: () -> Unit,
     showSleepTimerAlertDialog: () -> Unit
 ) {
     val context = LocalContext.current
-    val searchText by viewModel.searchText.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
     val filterOption by viewModel.filterOption.collectAsState()
     val showAlphabeticalScroller = remember { mutableStateOf(false) }
