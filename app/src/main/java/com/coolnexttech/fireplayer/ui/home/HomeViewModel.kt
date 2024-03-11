@@ -68,11 +68,11 @@ class HomeViewModel : ViewModel() {
 
     fun initTrackList(tracksInPlaylist: List<Track>?) {
         viewModelScope.launch(Dispatchers.IO) {
-            _filteredTracks.update {
-                tracksInPlaylist ?: _tracks
-            }
+            val newTracks = tracksInPlaylist ?: _tracks
 
-            Log.d("Home", "Total Track Count: " + _tracks.count())
+            _filteredTracks.update {
+                newTracks
+            }
         }
     }
 
