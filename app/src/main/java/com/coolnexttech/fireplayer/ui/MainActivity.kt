@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,7 +22,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             LaunchedEffect(Unit) {
-                checkPermissions()
+                permissionManager.run {
+                    requestForStoragePermissions()
+                    requestReadPhoneStatePermission()
+                }
             }
 
             FirePlayerTheme {
@@ -35,13 +37,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    private fun checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            permissionManager.askStoragePermission()
-        }
-
-        permissionManager.requestReadPhoneStatePermission()
     }
 }

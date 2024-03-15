@@ -1,6 +1,5 @@
 package com.coolnexttech.fireplayer.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.coolnexttech.fireplayer.model.FilterOptions
@@ -43,7 +42,7 @@ class HomeViewModel : ViewModel() {
     private val _showLoadingIndicator = MutableStateFlow(true)
     val showLoadingIndicator: StateFlow<Boolean> = _showLoadingIndicator
 
-    init {
+    fun init() {
         viewModelScope.launch(Dispatchers.IO) {
             val firstTwentyTrack = FolderAnalyzer.getTracksFromMusicFolder(20)
             _tracks = firstTwentyTrack
