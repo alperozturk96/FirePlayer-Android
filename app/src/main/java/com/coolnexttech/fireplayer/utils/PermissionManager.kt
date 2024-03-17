@@ -1,14 +1,10 @@
 package com.coolnexttech.fireplayer.utils
 
 import android.Manifest
-import android.content.Intent
+import android.Manifest.permission.READ_MEDIA_AUDIO
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.provider.Settings
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,28 +18,21 @@ class PermissionManager(private val activity: ComponentActivity) {
 
     private val storagePermissionCode = 44
 
+    private val requestPermissions = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+        if (results[READ_MEDIA_AUDIO] == true) {
+            initHomeViewModel()
+        }
+    }
+
     private fun initHomeViewModel() {
         VMProvider.homeViewModel.init()
     }
 
-    private val storageActivityResultLauncher: ActivityResultLauncher<Intent> =
-        activity.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                if (Environment.isExternalStorageManager()) {
-                    initHomeViewModel()
-                }
-            } else {
-                if (it.resultCode == storagePermissionCode) {
-                    initHomeViewModel()
-                }
-            }
-        }
-
     private fun checkStoragePermissions(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                activity, READ_MEDIA_AUDIO
+            ) == PermissionChecker.PERMISSION_GRANTED
         } else {
             val writePermission = ContextCompat.checkSelfPermission(
                 activity, Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -62,19 +51,8 @@ class PermissionManager(private val activity: ComponentActivity) {
             return
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            try {
-                val intent = Intent().apply {
-                    action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-                    data = Uri.fromParts("package", activity.packageName, null)
-                }
-                storageActivityResultLauncher.launch(intent)
-            } catch (e: Exception) {
-                val intent = Intent().apply {
-                    setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                }
-                storageActivityResultLauncher.launch(intent)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions.launch(arrayOf(READ_MEDIA_AUDIO))
         } else {
             ActivityCompat.requestPermissions(
                 activity, arrayOf(
