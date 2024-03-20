@@ -72,6 +72,7 @@ fun HomeScreen(
         topBar = {
             HomeTopBar(
                 viewModel,
+                filteredTracks,
                 characterList,
                 coroutineScope,
                 searchText,

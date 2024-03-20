@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.ui.home.trackList
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TrackList(
     listState: LazyListState,

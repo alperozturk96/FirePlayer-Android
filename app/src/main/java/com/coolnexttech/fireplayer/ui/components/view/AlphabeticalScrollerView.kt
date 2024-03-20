@@ -24,8 +24,8 @@ fun AlphabeticalScrollerView(
                 style = MaterialTheme.typography.headlineSmall,
                 fontSize = 24.sp,
                 modifier = Modifier
-                    .padding(all = 8.dp)
-                    .clickable { onLetterSelected(characterList[letter] ?: 0) },
+                    .clickable { onLetterSelected(characterList[letter] ?: 0) }
+                    .padding(all = 8.dp),
                 color = AppColors.textColor
             )
         }
