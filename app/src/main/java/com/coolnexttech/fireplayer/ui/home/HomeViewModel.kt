@@ -128,8 +128,6 @@ class HomeViewModel : ViewModel() {
             if (updatePrevStack) {
                 updatePrevTracks(track)
             }
-        }, onFailure = {
-            playNextTrack()
         })
     }
 

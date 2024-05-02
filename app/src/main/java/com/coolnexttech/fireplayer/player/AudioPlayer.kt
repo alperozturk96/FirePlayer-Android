@@ -105,7 +105,7 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
         notificationManager.startService(service, mediaSession)
     }
 
-    fun play(track: Track, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    fun play(track: Track, onSuccess: () -> Unit) {
         try {
             mediaSession.play(track)
 
@@ -120,7 +120,6 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
         } catch (e: Exception) {
             ToastManager.showPlaybackErrorMessage()
             Log.d(tag, "Error caught at play: $e")
-            onFailure()
         }
     }
 
