@@ -17,7 +17,10 @@ import com.coolnexttech.fireplayer.utils.extensions.toContentString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistsTopBar(viewModel: PlaylistsViewModel, showAddPlaylist: () -> Unit) {
+fun PlaylistsTopBar(
+    viewModel: PlaylistsViewModel,
+    showAddPlaylist: () -> Unit
+) {
     val context = LocalContext.current
     val contentResolver = context.contentResolver
 

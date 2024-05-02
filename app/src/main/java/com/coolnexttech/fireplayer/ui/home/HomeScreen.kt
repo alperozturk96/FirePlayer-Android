@@ -37,6 +37,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     playlistsViewModel: PlaylistsViewModel,
     audioPlayer: AudioPlayer,
+    navigateToPlaylists: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -78,7 +79,10 @@ fun HomeScreen(
                 searchText,
                 listState,
                 showSortOptions = { showSortOptions.value = true },
-                showSleepTimerAlertDialog = { showSleepTimerAlertDialog.value = true }
+                showSleepTimerAlertDialog = { showSleepTimerAlertDialog.value = true },
+                navigateToPlaylists = {
+                    navigateToPlaylists()
+                }
             )
         }, bottomBar = {
             selectedTrack?.let { track ->

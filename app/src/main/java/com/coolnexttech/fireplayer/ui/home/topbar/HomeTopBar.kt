@@ -38,7 +38,8 @@ fun HomeTopBar(
     searchText: String,
     listState: LazyListState,
     showSortOptions: () -> Unit,
-    showSleepTimerAlertDialog: () -> Unit
+    showSleepTimerAlertDialog: () -> Unit,
+    navigateToPlaylists: () -> Unit
 ) {
     val context = LocalContext.current
     val playMode by viewModel.playMode.collectAsState()
@@ -57,9 +58,13 @@ fun HomeTopBar(
             filterOption.searchTitleId(),
             searchText,
             viewModel,
-        ) {
-            showAlphabeticalScroller.value = !showAlphabeticalScroller.value
-        }
+            toggleAlphabeticalScroller = {
+                showAlphabeticalScroller.value = !showAlphabeticalScroller.value
+            },
+            navigateToPlaylists = {
+                navigateToPlaylists()
+            }
+        )
 
         AnimatedVisibility(showAlphabeticalScroller.value || searchText.isNotEmpty()) {
             Column(

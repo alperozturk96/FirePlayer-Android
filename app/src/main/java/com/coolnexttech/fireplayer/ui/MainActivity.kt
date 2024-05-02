@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.coolnexttech.fireplayer.ui.navigation.BottomNavigationBar
+import com.coolnexttech.fireplayer.ui.navigation.MainScreen
 import com.coolnexttech.fireplayer.ui.theme.FirePlayerTheme
 import com.coolnexttech.fireplayer.utils.PermissionManager
 
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    BottomNavigationBar()
+                    MainScreen()
                 }
             }
         }

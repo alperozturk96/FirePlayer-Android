@@ -1,5 +1,6 @@
 package com.coolnexttech.fireplayer.ui.playlists
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -26,7 +27,7 @@ import com.coolnexttech.fireplayer.utils.extensions.showToast
 fun PlaylistsScreen(
     homeViewModel: HomeViewModel,
     viewModel: PlaylistsViewModel,
-    changeScreen: () -> Unit
+    navigateToHome: () -> Unit
 ) {
     val context = LocalContext.current
     val playlists by viewModel.playlists.collectAsState()
@@ -34,10 +35,15 @@ fun PlaylistsScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlaylistTitle by remember { mutableStateOf("") }
 
+    BackHandler {
+        navigateToHome()
+    }
+
     Scaffold(topBar = {
-        PlaylistsTopBar(viewModel) {
-            showAddPlaylist.value = true
-        }
+        PlaylistsTopBar(
+            viewModel,
+            showAddPlaylist = { showAddPlaylist.value = true }
+        )
     }) {
         LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
             val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
@@ -58,7 +64,7 @@ fun PlaylistsScreen(
                         }
 
                         homeViewModel.initTrackList(tracksInPlaylist)
-                        changeScreen()
+                        navigateToHome()
                     },
                     longPressAction = {
                         selectedPlaylistTitle = playlistTitle

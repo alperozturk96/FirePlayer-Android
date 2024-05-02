@@ -32,6 +32,7 @@ fun HomeTopBarOptions(
     searchText: String,
     viewModel: HomeViewModel,
     toggleAlphabeticalScroller: () -> Unit,
+    navigateToPlaylists: () -> Unit
 ) {
     val showLoadingIndicator by viewModel.showLoadingIndicator.collectAsState()
 
@@ -71,6 +72,10 @@ fun HomeTopBarOptions(
             ActionIconButton(R.drawable.ic_reset) {
                 viewModel.reset()
                 context.showToast(R.string.home_screen_reset_button_description)
+            }
+
+            ActionIconButton(R.drawable.ic_playlists) {
+                navigateToPlaylists()
             }
 
             ActionIconButton(alphabeticalScrollerIconId) {
