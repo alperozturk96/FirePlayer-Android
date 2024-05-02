@@ -12,8 +12,8 @@ android {
         applicationId = "com.coolnexttech.fireplayer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "0.5"
+        versionCode = 3
+        versionName = "0.6"
 
         vectorDrawables {
             useSupportLibrary = true
