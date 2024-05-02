@@ -1,7 +1,7 @@
 package com.coolnexttech.fireplayer.utils
 
 import android.content.Context
-import androidx.activity.ComponentActivity
+import android.content.Context.MODE_PRIVATE
 import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.model.Playlists
 import com.coolnexttech.fireplayer.utils.extensions.jsonToPlaylists
@@ -9,20 +9,19 @@ import com.coolnexttech.fireplayer.utils.extensions.toJson
 
 object UserStorage {
 
-    private const val appPreferences = "FirePlayer"
-    private const val playlists = "playlists"
-    private const val tag = "UserStorage"
+    private const val APP = "FirePlayer"
+    private const val PLAYLISTS = "playlists"
 
     private val sharedPreferences by lazy {
-        appContext.get()?.getSharedPreferences(appPreferences, ComponentActivity.MODE_PRIVATE)
+        appContext.get()?.getSharedPreferences(APP, MODE_PRIVATE)
     }
 
     fun readPlaylists(): Playlists {
-        return sharedPreferences?.getString(playlists, null)?.jsonToPlaylists() ?: hashMapOf()
+        return sharedPreferences?.getString(PLAYLISTS, null)?.jsonToPlaylists() ?: hashMapOf()
     }
 
     fun savePlaylists(value: Playlists) {
-        sharedPreferences?.edit()?.putString(playlists, value.toJson())?.apply()
+        sharedPreferences?.edit()?.putString(PLAYLISTS, value.toJson())?.apply()
     }
 
     fun removeTrackPlaybackPosition(id: Long) {
