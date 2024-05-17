@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
@@ -48,6 +49,7 @@ fun HomeScreen(
     val searchText by viewModel.searchText.collectAsState()
     val playlists by playlistsViewModel.playlists.collectAsState()
 
+    val sortOptions = remember { mutableStateOf(SortOptions.AToZ) }
     val showSortOptions = remember { mutableStateOf(false) }
 
     val selectedTrackForTrackAction = remember { mutableStateOf<Track?>(null) }
@@ -96,6 +98,7 @@ fun HomeScreen(
                 filteredTracks,
                 characterList,
                 coroutineScope,
+                sortOptions.value,
                 searchText,
                 listState,
                 showSortOptions = { showSortOptions.value = true },
@@ -189,10 +192,10 @@ fun HomeScreen(
             if (showSortOptions.value) {
                 SortOptionsAlertDialog(
                     dismiss = { showSortOptions.value = false },
-                    sort = { sortOption ->
-                        viewModel.sort(sortOption)
+                    sort = { selectedSortOption ->
+                        viewModel.sort(selectedSortOption)
                         showTrackActionsBottomSheet.value = false
-                        showSortOptions.value = false
+                        sortOptions.value = selectedSortOption
                     }
                 )
             }

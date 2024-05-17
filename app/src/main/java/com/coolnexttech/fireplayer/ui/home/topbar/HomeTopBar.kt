@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.view.AlphabeticalScrollerView
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
@@ -35,6 +36,7 @@ fun HomeTopBar(
     filteredTracks: List<Track>,
     characterList: Map<Char, Int>,
     coroutineScope: CoroutineScope,
+    sortOptions: SortOptions,
     searchText: String,
     listState: LazyListState,
     showSortOptions: () -> Unit,
@@ -89,7 +91,7 @@ fun HomeTopBar(
                         .background(AppColors.background)
                 )
 
-                if (searchText.isEmpty()) {
+                if (searchText.isEmpty() && sortOptions.name == SortOptions.AToZ.name) {
                     AlphabeticalScrollerView(
                         characterList = characterList,
                         modifier = Modifier
