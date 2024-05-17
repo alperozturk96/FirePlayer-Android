@@ -1,6 +1,9 @@
 package com.coolnexttech.fireplayer.ui.home
 
+import android.app.Activity.RESULT_OK
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
@@ -30,6 +33,7 @@ import com.coolnexttech.fireplayer.utils.ToastManager
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 @ExperimentalFoundationApi
 @Composable
@@ -62,6 +66,18 @@ fun HomeScreen(
         filteredTracks.groupBy { it.title.first().uppercaseChar() }
             .mapValues { (_, tracks) -> filteredTracks.indexOf(tracks.first()) }
     }
+
+
+    val contentResolver = context.contentResolver
+    val deleteResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = {
+            if (it.resultCode == RESULT_OK) {
+                viewModel.search(searchText)
+                ToastManager.showDeleteSuccessMessage()
+            }
+        }
+    )
 
     BackHandler {
         if (viewModel.isTracksFiltered()) {
@@ -214,10 +230,8 @@ fun HomeScreen(
                                 viewModel.playNextTrack()
                             }
 
-                            FolderAnalyzer.deleteTrack(track)
+                            FolderAnalyzer.deleteTrack(track, contentResolver, deleteResultLauncher)
                             viewModel.deleteTrack(track)
-                            viewModel.search(searchText)
-                            ToastManager.showDeleteSuccessMessage()
                         }
                     },
                     dismiss = {

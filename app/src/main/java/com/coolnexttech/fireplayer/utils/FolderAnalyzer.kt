@@ -1,10 +1,16 @@
 package com.coolnexttech.fireplayer.utils
 
+import android.app.RecoverableSecurityException
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
@@ -13,6 +19,8 @@ import com.coolnexttech.fireplayer.utils.extensions.sort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.Collections
+
 
 object FolderAnalyzer {
 
@@ -59,7 +67,8 @@ object FolderAnalyzer {
                     val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
                     val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
                     val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-                    val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                    val durationColumn =
+                        cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
                     val dateModifiedColumn =
                         cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
 
@@ -71,11 +80,15 @@ object FolderAnalyzer {
                         val duration = cursor.getLong(durationColumn)
                         val dateModified = cursor.getLong(dateModifiedColumn)
                         val path =
-                            ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                            ContentUris.withAppendedId(
+                                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                                id
+                            )
                         val pathExtension = getFileMimeType(path)
 
                         if (!unsupportedFileFormats.contains(pathExtension)) {
-                            val isPositionSaved = UserStorage.readTrackPlaybackPosition(id, false) != null
+                            val isPositionSaved =
+                                UserStorage.readTrackPlaybackPosition(id, false) != null
 
                             val track = Track(
                                 id,
@@ -100,13 +113,45 @@ object FolderAnalyzer {
         }
     }
 
-    fun deleteTrack(track: Track) {
-        val resolver = appContext.get()?.contentResolver
-        resolver?.delete(
-            track.path,
-            selection,
-            null
-        )
+    fun deleteTrack(
+        track: Track,
+        contentResolver: ContentResolver,
+        launcher: ActivityResultLauncher<IntentSenderRequest>
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val result: ArrayList<Uri> = ArrayList<Uri>().apply {
+                add(track.path)
+            }
+
+            Collections.addAll(result)
+
+            val intentSender = MediaStore.createDeleteRequest(contentResolver, result).intentSender
+            val senderRequest = IntentSenderRequest.Builder(intentSender)
+                .setFillInIntent(null)
+                .setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION, 0)
+                .build()
+
+            launcher.launch(senderRequest)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                contentResolver.delete(track.path, null, null)
+            } catch (securityException: SecurityException) {
+                Log.d("FolderAnalyzer", "Error caught at deleteTrack: $securityException")
+                val recoverableSecurityException = securityException as RecoverableSecurityException
+                val senderRequest = IntentSenderRequest.Builder(recoverableSecurityException.userAction.actionIntent.intentSender).build()
+                launcher.launch(senderRequest)
+            }
+        } else {
+            try {
+                contentResolver.delete(
+                    track.path,
+                    selection,
+                    null
+                )
+            } catch (e: Exception) {
+                Log.d("FolderAnalyzer", "Error caught at deleteTrack: $e")
+            }
+        }
     }
 
     private fun getFileMimeType(uri: Uri): String? {
