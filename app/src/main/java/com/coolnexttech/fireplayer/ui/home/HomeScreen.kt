@@ -14,11 +14,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
-import com.coolnexttech.fireplayer.ui.components.dialog.SimpleAlertDialog
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
 import com.coolnexttech.fireplayer.ui.home.bottomSheet.TrackActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.home.dialog.AddTrackToPlaylistDialog
@@ -57,7 +55,6 @@ fun HomeScreen(
 
     val showSleepTimerAlertDialog = remember { mutableStateOf(false) }
     val showAddTrackToPlaylistDialog = remember { mutableStateOf(false) }
-    val showDeleteTrackAlertDialog = remember { mutableStateOf(false) }
     val showTrackPositionAlertDialog = remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
@@ -67,14 +64,21 @@ fun HomeScreen(
             .mapValues { (_, tracks) -> filteredTracks.indexOf(tracks.first()) }
     }
 
-
     val contentResolver = context.contentResolver
     val deleteResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
         onResult = {
             if (it.resultCode == RESULT_OK) {
-                viewModel.search(searchText)
-                ToastManager.showDeleteSuccessMessage()
+                selectedTrackForTrackAction.value?.let { track ->
+                    if (track == selectedTrack) {
+                        viewModel.playNextTrack()
+                    }
+
+                    viewModel.deleteTrack(track)
+                    viewModel.search(searchText)
+                    ToastManager.showDeleteSuccessMessage()
+                }
+
             }
         }
     )
@@ -165,7 +169,9 @@ fun HomeScreen(
                     audioPlayer,
                     selectedTrackForTrackAction.value?.title ?: "",
                     showDeleteTrackAlertDialog = {
-                        showDeleteTrackAlertDialog.value = true
+                        selectedTrackForTrackAction.value?.let { track ->
+                            FolderAnalyzer.deleteTrack(track, contentResolver, deleteResultLauncher)
+                        }
                     },
                     dismiss = {
                         showTrackActionsBottomSheet.value = false
@@ -216,27 +222,6 @@ fun HomeScreen(
                     dismiss = {
                         showTrackActionsBottomSheet.value = false
                         showAddTrackToPlaylistDialog.value = false
-                    }
-                )
-            }
-
-            if (showDeleteTrackAlertDialog.value) {
-                SimpleAlertDialog(
-                    titleId = R.string.delete_alert_dialog_title,
-                    description = stringResource(R.string.delete_alert_dialog_description),
-                    onComplete = {
-                        selectedTrackForTrackAction.value?.let { track ->
-                            if (track == selectedTrack) {
-                                viewModel.playNextTrack()
-                            }
-
-                            FolderAnalyzer.deleteTrack(track, contentResolver, deleteResultLauncher)
-                            viewModel.deleteTrack(track)
-                        }
-                    },
-                    dismiss = {
-                        showTrackActionsBottomSheet.value = false
-                        showDeleteTrackAlertDialog.value = false
                     }
                 )
             }

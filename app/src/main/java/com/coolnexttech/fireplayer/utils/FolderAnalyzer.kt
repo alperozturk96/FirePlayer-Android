@@ -119,7 +119,7 @@ object FolderAnalyzer {
         launcher: ActivityResultLauncher<IntentSenderRequest>
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val result: ArrayList<Uri> = ArrayList<Uri>().apply {
+            val result = ArrayList<Uri>().apply {
                 add(track.path)
             }
 
