@@ -10,7 +10,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +23,6 @@ import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.button.ActionIconButton
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import com.coolnexttech.fireplayer.utils.extensions.blink
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.utils.extensions.showToast
 import kotlinx.coroutines.Job
@@ -42,7 +40,6 @@ fun HomeTopBarOptions(
     toggleAlphabeticalScroller: () -> Unit,
     navigateToPlaylists: () -> Unit
 ) {
-    val showLoadingIndicator by viewModel.showLoadingIndicator.collectAsState()
     var searchQuery by remember { mutableStateOf(TextFieldValue(searchText)) }
     var showPlaceholder by remember { mutableStateOf(searchQuery.text.isEmpty()) }
     var debounceJob: Job? by remember { mutableStateOf(null) }
@@ -87,10 +84,6 @@ fun HomeTopBarOptions(
                 ActionIconButton(R.drawable.ic_cancel) {
                     viewModel.clearSearch()
                 }
-            }
-
-            if (showLoadingIndicator) {
-                ActionIconButton(R.drawable.ic_loading, modifier = Modifier.blink()) { }
             }
 
             ActionIconButton(R.drawable.ic_reset) {

@@ -42,23 +42,16 @@ class HomeViewModel : ViewModel() {
     private val _showLoadingDialog = MutableStateFlow(false)
     val showLoadingDialog: StateFlow<Boolean> = _showLoadingDialog
 
-    private val _showLoadingIndicator = MutableStateFlow(false)
-    val showLoadingIndicator: StateFlow<Boolean> = _showLoadingIndicator
-
     fun init() {
         viewModelScope.launch(Dispatchers.IO) {
-            _showLoadingIndicator.update {
+            _showLoadingDialog.update {
                 true
             }
-
-            val firstTwentyTrack = FolderAnalyzer.getTracksFromMusicFolder(20)
-            _tracks = firstTwentyTrack
-            initTrackList(null)
 
             _tracks = FolderAnalyzer.getTracksFromMusicFolder(null)
             initTrackList(null)
 
-            _showLoadingIndicator.update {
+            _showLoadingDialog.update {
                 false
             }
         }
