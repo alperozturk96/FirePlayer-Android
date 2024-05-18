@@ -39,6 +39,9 @@ class HomeViewModel : ViewModel() {
     private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
     val filteredTracks: StateFlow<List<Track>> = _filteredTracks
 
+    private val _showLoadingDialog = MutableStateFlow(false)
+    val showLoadingDialog: StateFlow<Boolean> = _showLoadingDialog
+
     private val _showLoadingIndicator = MutableStateFlow(false)
     val showLoadingIndicator: StateFlow<Boolean> = _showLoadingIndicator
 
@@ -188,9 +191,19 @@ class HomeViewModel : ViewModel() {
 
     fun reset() {
         viewModelScope.launch(Dispatchers.IO) {
+            _showLoadingDialog.update {
+                true
+            }
             _tracks = FolderAnalyzer.getTracksFromMusicFolder()
             clearSearch()
             initTrackList(null)
+            hideLoadingDialog()
+        }
+    }
+
+    fun hideLoadingDialog() {
+        _showLoadingDialog.update {
+            false
         }
     }
 
