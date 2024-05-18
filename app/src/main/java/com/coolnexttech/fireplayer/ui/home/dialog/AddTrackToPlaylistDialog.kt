@@ -5,6 +5,7 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -15,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.Playlists
@@ -47,10 +49,12 @@ fun AddTrackToPlaylistDialog(
 
                     Text(
                         text = playlistTitle,
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         maxLines = 1,
+                        textAlign = TextAlign.Start,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(60.dp)
                             .basicMarquee()
                             .padding(all = 8.dp)
                             .clickable {
@@ -60,7 +64,7 @@ fun AddTrackToPlaylistDialog(
                         color = AppColors.textColor,
                     )
 
-                    HorizontalDivider()
+                    HorizontalDivider(color = AppColors.textColor)
                 }
             }
         }
