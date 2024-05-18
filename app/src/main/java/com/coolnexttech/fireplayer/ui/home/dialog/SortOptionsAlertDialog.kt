@@ -1,8 +1,10 @@
 package com.coolnexttech.fireplayer.ui.home.dialog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -14,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.model.SortOptions
+import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @Composable
 fun SortOptionsAlertDialog(
@@ -23,6 +26,7 @@ fun SortOptionsAlertDialog(
     Dialog({ dismiss() }) {
         Column(
             modifier = Modifier
+                .background(AppColors.background, shape = RoundedCornerShape(16.dp))
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
