@@ -12,8 +12,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.TextFieldValue
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.button.ActionIconButton
@@ -22,6 +27,9 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.blink
 import com.coolnexttech.fireplayer.utils.extensions.getTopAppBarColor
 import com.coolnexttech.fireplayer.utils.extensions.showToast
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,18 +43,34 @@ fun HomeTopBarOptions(
     navigateToPlaylists: () -> Unit
 ) {
     val showLoadingIndicator by viewModel.showLoadingIndicator.collectAsState()
+    var searchQuery by remember { mutableStateOf(TextFieldValue(searchText)) }
+    var showPlaceholder by remember { mutableStateOf(searchQuery.text.isEmpty()) }
+    var debounceJob: Job? by remember { mutableStateOf(null) }
+    var decorationBoxJob: Job? by remember { mutableStateOf(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     TopAppBar(
         colors = getTopAppBarColor(),
         title = {
             BasicTextField(
-                value = searchText,
+                value = searchQuery,
                 onValueChange = {
-                    viewModel.search(it)
+                    searchQuery = it
+                    debounceJob?.cancel()
+                    debounceJob = coroutineScope.launch {
+                        delay(300)
+                        viewModel.search(it.text)
+                        showPlaceholder = it.text.isEmpty()
+                    }
+
+                    decorationBoxJob?.cancel()
+                    decorationBoxJob = coroutineScope.launch {
+                        showPlaceholder = it.text.isEmpty()
+                    }
                 },
                 singleLine = true,
                 decorationBox = { innerTextField ->
-                    if (searchText.isEmpty()) {
+                    if (showPlaceholder) {
                         BodyMediumText(id = searchPlaceholderId)
                     }
                     innerTextField()
