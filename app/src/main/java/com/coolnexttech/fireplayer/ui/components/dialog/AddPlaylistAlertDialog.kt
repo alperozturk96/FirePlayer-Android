@@ -33,8 +33,8 @@ fun AddPlaylistAlertDialog(
         text = {
             TextField(
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = AppColors.secondaryContainer,
-                    unfocusedContainerColor = AppColors.secondaryContainer,
+                    focusedContainerColor = AppColors.alternateBackground,
+                    unfocusedContainerColor = AppColors.alternateBackground,
                 ),
                 placeholder = {
                     Text(text = stringResource(id = R.string.playlist_screen_add_playlist_placeholder))
