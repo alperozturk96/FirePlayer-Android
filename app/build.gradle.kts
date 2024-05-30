@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0" apply true
+    id("io.objectbox")
 }
 
 android {
@@ -41,9 +43,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -53,7 +52,8 @@ android {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
+
 
     // Jetpack Compose
     implementation("androidx.activity:activity-compose:1.9.0")
@@ -70,5 +70,5 @@ dependencies {
     implementation("androidx.media3:media3-session:1.3.1")
 
     // Gson
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.11.0")
 }
