@@ -4,7 +4,8 @@ import android.content.Context
 import io.objectbox.BoxStore
 
 object ObjectBox {
-    private lateinit var store: BoxStore
+    lateinit var store: BoxStore
+        private set
 
     fun init(context: Context) {
         store = MyObjectBox.builder()

@@ -3,35 +3,32 @@ package com.coolnexttech.fireplayer.utils
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import com.coolnexttech.fireplayer.appContext
-import com.coolnexttech.fireplayer.model.Playlists
+import com.coolnexttech.fireplayer.db.PlaylistBox
+import com.coolnexttech.fireplayer.db.PlaylistEntity
+import com.coolnexttech.fireplayer.db.TrackPlaybackBox
 import com.coolnexttech.fireplayer.utils.extensions.jsonToPlaylists
 import com.coolnexttech.fireplayer.utils.extensions.toJson
 
 object UserStorage {
 
     private const val APP = "FirePlayer"
-    private const val PLAYLISTS = "playlists"
 
     private val sharedPreferences by lazy {
         appContext.get()?.getSharedPreferences(APP, MODE_PRIVATE)
     }
 
-    fun readPlaylists(): Playlists {
-        return sharedPreferences?.getString(PLAYLISTS, null)?.jsonToPlaylists() ?: hashMapOf()
-    }
+    fun readPlaylists(): List<PlaylistEntity> = PlaylistBox.getAll()
 
-    fun savePlaylists(value: Playlists) {
-        sharedPreferences?.edit()?.putString(PLAYLISTS, value.toJson())?.apply()
-    }
+    fun savePlaylists(entity: PlaylistEntity) = PlaylistBox.add(entity)
 
     fun removeTrackPlaybackPosition(id: Long) {
-        sharedPreferences?.edit()?.remove(id.toString())?.apply()
+        TrackPlaybackBox.remove(id)
         ToastManager.showRemoveTrackPlaybackPosition()
     }
 
     fun saveTrackPlaybackPosition(id: Long?, position: Long?) {
         if (id == null || position == null) return
-        sharedPreferences?.edit()?.putLong(id.toString(), position)?.apply()
+        TrackPlaybackBox.add(id, position)
         ToastManager.showSaveTrackPlaybackPositionMessage()
     }
 
