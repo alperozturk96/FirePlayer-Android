@@ -48,14 +48,12 @@ fun PlaylistsScreen(
         LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
             val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
             itemsIndexed(sortedPlaylists) { _, entry ->
-                val (playlistTitle, _) = entry
-
                 ListItemText(
-                    playlistTitle,
+                    entry.title,
                     action = {
                         val tracksInPlaylist = FolderAnalyzer.getTracksFromPlaylist(
                             homeViewModel.getAllTracks(),
-                            playlistTitle
+                            entry.title
                         )
 
                         if (tracksInPlaylist.isEmpty()) {
@@ -67,7 +65,7 @@ fun PlaylistsScreen(
                         navigateToHome()
                     },
                     longPressAction = {
-                        selectedPlaylistTitle = playlistTitle
+                        selectedPlaylistTitle = entry.title
                         showBottomSheet = true
                     }
                 )

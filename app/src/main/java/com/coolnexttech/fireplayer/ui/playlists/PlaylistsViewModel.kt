@@ -1,7 +1,8 @@
 package com.coolnexttech.fireplayer.ui.playlists
 
 import androidx.lifecycle.ViewModel
-import com.coolnexttech.fireplayer.model.Playlists
+import com.coolnexttech.fireplayer.db.PlaylistBox
+import com.coolnexttech.fireplayer.db.PlaylistEntity
 import com.coolnexttech.fireplayer.utils.UserStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,8 +10,8 @@ import kotlinx.coroutines.flow.update
 
 class PlaylistsViewModel: ViewModel() {
 
-    private val _playlists = MutableStateFlow<Playlists>(hashMapOf())
-    val playlists: StateFlow<Playlists> = _playlists
+    private val _playlists = MutableStateFlow<List<PlaylistEntity>>(listOf())
+    val playlists: StateFlow<List<PlaylistEntity>> = _playlists
 
     init {
         readPlaylists()
@@ -23,26 +24,30 @@ class PlaylistsViewModel: ViewModel() {
     }
 
     fun addPlaylist(title: String) {
+        val playlistEntity = PlaylistEntity(title = title)
+        UserStorage.savePlaylists(playlistEntity)
+
+
         _playlists.update {
-            it[title] = arrayListOf()
-            UserStorage.savePlaylists(it)
-            it
+            UserStorage.readPlaylists()
         }
     }
 
     fun addTrackToPlaylist(trackTitleRepresentation: String, playlistTitle: String) {
+        val playlistEntity = PlaylistBox.getByTitle(playlistTitle) ?: return
+        playlistEntity.tracks.add(trackTitleRepresentation)
+        UserStorage.savePlaylists(playlistEntity)
+
         _playlists.update {
-            it[playlistTitle]?.add(trackTitleRepresentation)
-            UserStorage.savePlaylists(it)
-            it
+            UserStorage.readPlaylists()
         }
     }
 
     fun removePlaylist(title: String) {
+        PlaylistBox.removeByTitle(title)
+
         _playlists.update {
-            it.remove(title)
-            UserStorage.savePlaylists(it)
-            it
+            UserStorage.readPlaylists()
         }
     }
 }

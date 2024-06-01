@@ -12,7 +12,7 @@ object TrackPlaybackBox {
         box.put(TrackPlaybackEntity(id, id, position))
     }
 
-    fun read(id: Long): TrackPlaybackEntity {
+    fun read(id: Long): TrackPlaybackEntity? {
         return box.get(id)
     }
 

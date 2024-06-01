@@ -1,8 +1,6 @@
 package com.coolnexttech.fireplayer.utils
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
-import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.db.PlaylistBox
 import com.coolnexttech.fireplayer.db.PlaylistEntity
 import com.coolnexttech.fireplayer.db.TrackPlaybackBox
@@ -10,12 +8,6 @@ import com.coolnexttech.fireplayer.utils.extensions.jsonToPlaylists
 import com.coolnexttech.fireplayer.utils.extensions.toJson
 
 object UserStorage {
-
-    private const val APP = "FirePlayer"
-
-    private val sharedPreferences by lazy {
-        appContext.get()?.getSharedPreferences(APP, MODE_PRIVATE)
-    }
 
     fun readPlaylists(): List<PlaylistEntity> = PlaylistBox.getAll()
 
@@ -33,16 +25,11 @@ object UserStorage {
     }
 
     fun readTrackPlaybackPosition(id: Long, showToast: Boolean): Long? {
-        val result = sharedPreferences?.getLong(id.toString(), 0L)
-        return if (result == 0L) {
-            null
-        } else {
-            if (showToast && result != null) {
-                ToastManager.showReadTrackPlaybackPositionMessage(result)
-            }
-
-            result
+        val result = TrackPlaybackBox.read(id)?.position ?: return null
+        if (showToast) {
+            ToastManager.showReadTrackPlaybackPositionMessage(result)
         }
+        return result
     }
 
     fun exportPlaylists(context: Context) {
@@ -62,8 +49,8 @@ object UserStorage {
             return
         }
 
-        val playlist = playlistsAsJson.jsonToPlaylists()
-        savePlaylists(playlist)
+        val playlists = playlistsAsJson.jsonToPlaylists()
+        PlaylistBox.addAll(playlists)
 
         ToastManager.showSuccessImportPlaylistMessage()
     }

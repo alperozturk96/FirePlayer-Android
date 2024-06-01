@@ -12,6 +12,7 @@ import android.webkit.MimeTypeMap
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.coolnexttech.fireplayer.appContext
+import com.coolnexttech.fireplayer.db.PlaylistBox
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.extensions.filterByPlaylist
@@ -28,10 +29,9 @@ object FolderAnalyzer {
     private const val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
 
     fun getTracksFromPlaylist(tracks: List<Track>, selectedPlaylistTitle: String): List<Track> {
-        val playlists = UserStorage.readPlaylists()
-        val selectedPlaylist = playlists[selectedPlaylistTitle]
+        val selectedPlaylist = PlaylistBox.getByTitle(selectedPlaylistTitle)
         return if (selectedPlaylist != null) {
-            tracks.filterByPlaylist(selectedPlaylist).sort(SortOptions.AToZ)
+            tracks.filterByPlaylist(selectedPlaylist.tracks as ArrayList<String>).sort(SortOptions.AToZ)
         } else {
             listOf()
         }

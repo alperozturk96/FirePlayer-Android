@@ -11,4 +11,21 @@ object PlaylistBox {
     }
 
     fun add(entity: PlaylistEntity) = box.put(entity)
+
+    fun addAll(entity: List<PlaylistEntity>) = box.put(entity)
+
+    fun getByTitle(title: String): PlaylistEntity? {
+        box.all.forEach {
+            if (it.title == title) {
+                return it
+            }
+        }
+
+        return null
+    }
+
+    fun removeByTitle(title: String) {
+        val entity = getByTitle(title) ?: return
+        box.remove(entity)
+    }
 }

@@ -19,14 +19,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.Playlists
+import com.coolnexttech.fireplayer.db.PlaylistEntity
 import com.coolnexttech.fireplayer.ui.components.dialog.SimpleAlertDialog
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddTrackToPlaylistDialog(
-    playlists: Playlists,
+    playlists: List<PlaylistEntity>,
     padding: PaddingValues,
     addToPlaylist: (String) -> Unit,
     dismiss: () -> Unit
@@ -45,10 +45,9 @@ fun AddTrackToPlaylistDialog(
             ) {
                 val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
                 itemsIndexed(sortedPlaylists) { _, entry ->
-                    val (playlistTitle, _) = entry
 
                     Text(
-                        text = playlistTitle,
+                        text = entry.title,
                         style = MaterialTheme.typography.headlineMedium,
                         maxLines = 1,
                         textAlign = TextAlign.Start,
@@ -58,7 +57,7 @@ fun AddTrackToPlaylistDialog(
                             .basicMarquee()
                             .padding(all = 8.dp)
                             .clickable {
-                                addToPlaylist(playlistTitle)
+                                addToPlaylist(entry.title)
                                 dismiss()
                             },
                         color = AppColors.textColor,

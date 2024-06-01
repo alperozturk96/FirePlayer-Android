@@ -14,8 +14,8 @@ android {
         applicationId = "com.coolnexttech.fireplayer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.6"
+        versionCode = 4
+        versionName = "0.7"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -53,7 +53,6 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
-
 
     // Jetpack Compose
     implementation("androidx.activity:activity-compose:1.9.0")

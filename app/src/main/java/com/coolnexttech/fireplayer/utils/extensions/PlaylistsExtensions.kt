@@ -1,13 +1,13 @@
 package com.coolnexttech.fireplayer.utils.extensions
 
-import com.coolnexttech.fireplayer.model.Playlists
+import com.coolnexttech.fireplayer.db.PlaylistEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-fun String.jsonToPlaylists(): Playlists {
-    val type = object : TypeToken<Playlists>() {}.type
-    return Gson().fromJson<Playlists>(this, type) ?: return hashMapOf()
+fun String.jsonToPlaylists(): List<PlaylistEntity> {
+    val type = object : TypeToken<List<PlaylistEntity>>() {}.type
+    return Gson().fromJson<List<PlaylistEntity>>(this, type) ?: return listOf()
 }
 
-fun Playlists.toJson(): String = Gson().toJson(this)
+fun List<PlaylistEntity>.toJson(): String = Gson().toJson(this)
 
