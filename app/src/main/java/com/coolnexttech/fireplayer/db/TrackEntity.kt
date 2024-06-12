@@ -9,7 +9,8 @@ import io.objectbox.relation.ToMany
 
 @Entity
 data class TrackEntity(
-    @Id var id: Long = 0,
+    @Id(assignable = true)
+    var id: Long = 0,
     var title: String,
     var artist: String,
     var album: String,

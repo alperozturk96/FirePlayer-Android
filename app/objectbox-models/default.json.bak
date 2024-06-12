@@ -15,11 +15,6 @@
           "flags": 1
         },
         {
-          "id": "3:4619452363006869819",
-          "name": "tracks",
-          "type": 30
-        },
-        {
           "id": "4:5241957571890977705",
           "name": "title",
           "type": 9
@@ -28,40 +23,82 @@
       "relations": []
     },
     {
-      "id": "2:8643199841046254619",
-      "lastPropertyId": "3:6266357473258380962",
-      "name": "TrackPlaybackEntity",
+      "id": "3:7992141432465942276",
+      "lastPropertyId": "9:8536773241005239616",
+      "name": "TrackEntity",
       "properties": [
         {
-          "id": "1:8071694198733700035",
+          "id": "1:7951833378200133321",
           "name": "id",
           "type": 6,
           "flags": 129
         },
         {
-          "id": "2:5480728787067619872",
-          "name": "trackId",
+          "id": "2:779513587186945639",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "3:3505107629463992966",
+          "name": "artist",
+          "type": 9
+        },
+        {
+          "id": "4:3511753563474432502",
+          "name": "album",
+          "type": 9
+        },
+        {
+          "id": "5:7564198161420921839",
+          "name": "path",
+          "type": 9
+        },
+        {
+          "id": "6:5791116989140184716",
+          "name": "duration",
           "type": 6
         },
         {
-          "id": "3:6266357473258380962",
-          "name": "position",
+          "id": "7:2297563494743687031",
+          "name": "pathExtension",
+          "type": 9
+        },
+        {
+          "id": "8:3107938875009173381",
+          "name": "dateAdded",
+          "type": 6
+        },
+        {
+          "id": "9:8536773241005239616",
+          "name": "savedPosition",
           "type": 6
         }
       ],
-      "relations": []
+      "relations": [
+        {
+          "id": "1:4999393976710694150",
+          "name": "playlists",
+          "targetId": "1:3285137678776459949"
+        }
+      ]
     }
   ],
-  "lastEntityId": "2:8643199841046254619",
+  "lastEntityId": "3:7992141432465942276",
   "lastIndexId": "0:0",
-  "lastRelationId": "0:0",
+  "lastRelationId": "1:4999393976710694150",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    8643199841046254619
+  ],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
-    6230942964496820938
+    6230942964496820938,
+    4619452363006869819,
+    8071694198733700035,
+    5480728787067619872,
+    6266357473258380962
   ],
   "retiredRelationUids": [],
   "version": 1

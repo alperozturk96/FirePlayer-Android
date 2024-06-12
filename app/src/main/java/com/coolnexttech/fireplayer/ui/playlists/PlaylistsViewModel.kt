@@ -28,14 +28,13 @@ class PlaylistsViewModel: ViewModel() {
         val playlistEntity = PlaylistEntity(title = title)
         UserStorage.savePlaylists(playlistEntity)
 
-
         _playlists.update {
             UserStorage.readPlaylists()
         }
     }
 
-    fun addTrackToPlaylist(track: TrackEntity, playlistTitle: String) {
-        val playlistEntity = PlaylistBox.getByTitle(playlistTitle) ?: return
+    fun addTrackToPlaylist(track: TrackEntity, playlistId: Long) {
+        val playlistEntity = PlaylistBox.get(playlistId)
         playlistEntity.tracks.add(track)
         UserStorage.savePlaylists(playlistEntity)
 
@@ -44,8 +43,9 @@ class PlaylistsViewModel: ViewModel() {
         }
     }
 
-    fun removePlaylist(title: String) {
-        PlaylistBox.removeByTitle(title)
+    fun removePlaylist(id: Long?) {
+        if (id == null) return
+        PlaylistBox.remove(id)
 
         _playlists.update {
             UserStorage.readPlaylists()

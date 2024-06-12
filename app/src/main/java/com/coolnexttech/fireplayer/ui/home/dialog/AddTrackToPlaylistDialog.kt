@@ -28,7 +28,7 @@ import com.coolnexttech.fireplayer.ui.theme.AppColors
 fun AddTrackToPlaylistDialog(
     playlists: List<PlaylistEntity>,
     padding: PaddingValues,
-    addToPlaylist: (String) -> Unit,
+    addToPlaylist: (PlaylistEntity) -> Unit,
     dismiss: () -> Unit
 ) {
     SimpleAlertDialog(
@@ -44,10 +44,10 @@ fun AddTrackToPlaylistDialog(
                 modifier = Modifier.padding(padding)
             ) {
                 val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
-                itemsIndexed(sortedPlaylists) { _, entry ->
+                itemsIndexed(sortedPlaylists) { _, playlist ->
 
                     Text(
-                        text = entry.title,
+                        text = playlist.title,
                         style = MaterialTheme.typography.headlineMedium,
                         maxLines = 1,
                         textAlign = TextAlign.Start,
@@ -57,7 +57,7 @@ fun AddTrackToPlaylistDialog(
                             .basicMarquee()
                             .padding(all = 8.dp)
                             .clickable {
-                                addToPlaylist(entry.title)
+                                addToPlaylist(playlist)
                                 dismiss()
                             },
                         color = AppColors.textColor,

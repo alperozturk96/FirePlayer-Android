@@ -87,8 +87,8 @@ fun HomeTopBarOptions(
             }
 
             ActionIconButton(R.drawable.ic_reset) {
-                viewModel.reset()
-                context.showToast(R.string.home_screen_reset_button_description)
+                viewModel.update()
+                context.showToast(R.string.home_screen_update_button_description)
             }
 
             ActionIconButton(R.drawable.ic_playlists) {

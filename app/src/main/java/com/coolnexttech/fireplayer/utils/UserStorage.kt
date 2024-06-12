@@ -23,7 +23,7 @@ object UserStorage {
         val track = TrackBox.read(id)?.apply {
             savedPosition = newPosition
         } ?: return
-        TrackBox.save(track)
+        TrackBox.add(track)
         ToastManager.showSaveTrackPlaybackPositionMessage()
     }
 

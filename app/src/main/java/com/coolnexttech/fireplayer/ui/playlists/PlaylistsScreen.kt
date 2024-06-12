@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.db.PlaylistEntity
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.bottomSheet.MoreActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.components.dialog.AddPlaylistAlertDialog
@@ -33,7 +34,7 @@ fun PlaylistsScreen(
     val playlists by viewModel.playlists.collectAsState()
     val showAddPlaylist = remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedPlaylistTitle by remember { mutableStateOf("") }
+    val selectedPlaylist = remember { mutableStateOf<PlaylistEntity?>(null) }
 
     BackHandler {
         navigateToHome()
@@ -47,14 +48,11 @@ fun PlaylistsScreen(
     }) {
         LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(it)) {
             val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
-            itemsIndexed(sortedPlaylists) { _, entry ->
+            itemsIndexed(sortedPlaylists) { _, playlist ->
                 ListItemText(
-                    entry.title,
+                    playlist.title,
                     action = {
-                        val tracksInPlaylist = FolderAnalyzer.getTracksFromPlaylist(
-                            homeViewModel.getAllTracks(),
-                            entry.title
-                        )
+                        val tracksInPlaylist = FolderAnalyzer.getTracksFromPlaylist(playlist.id)
 
                         if (tracksInPlaylist.isEmpty()) {
                             context.showToast(R.string.playlist_screen_empty_track_list_warning)
@@ -65,7 +63,7 @@ fun PlaylistsScreen(
                         navigateToHome()
                     },
                     longPressAction = {
-                        selectedPlaylistTitle = entry.title
+                        selectedPlaylist.value = playlist
                         showBottomSheet = true
                     }
                 )
@@ -79,7 +77,7 @@ fun PlaylistsScreen(
                 R.drawable.ic_delete,
                 R.string.playlist_bottom_sheet_delete_action_title
             ) {
-                viewModel.removePlaylist(selectedPlaylistTitle)
+                viewModel.removePlaylist(selectedPlaylist.value?.id)
                 showBottomSheet = false
             }
         )

@@ -1,7 +1,6 @@
 package com.coolnexttech.fireplayer.ui.home
 
 import android.app.Activity.RESULT_OK
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -100,12 +99,6 @@ fun HomeScreen(
             }
         }
     )
-
-    BackHandler {
-        if (viewModel.isTracksFiltered()) {
-            viewModel.reset()
-        }
-    }
 
     if (showLoadingDialog) {
         Dialog(
@@ -239,11 +232,11 @@ fun HomeScreen(
                 AddTrackToPlaylistDialog(
                     playlists,
                     it,
-                    addToPlaylist = { playlistTitle ->
+                    addToPlaylist = { playlist ->
                         selectedTrackForTrackAction.value?.let { track ->
                             playlistsViewModel.addTrackToPlaylist(
                                 track,
-                                playlistTitle
+                                playlist.id
                             )
 
                             context.run {
@@ -251,7 +244,7 @@ fun HomeScreen(
                                     getString(
                                         R.string.playlist_screen_add,
                                         track.titleRepresentation(),
-                                        playlistTitle
+                                        playlist.title
                                     )
                                 )
                             }

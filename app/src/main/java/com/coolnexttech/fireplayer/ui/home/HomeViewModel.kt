@@ -48,21 +48,13 @@ class HomeViewModel : ViewModel() {
                 true
             }
 
-            _tracks = FolderAnalyzer.getTracksFromMusicFolder(null)
+            _tracks = FolderAnalyzer.getTracks(null)
             initTrackList(null)
 
             _showLoadingDialog.update {
                 false
             }
         }
-    }
-
-    fun getAllTracks(): List<TrackEntity> {
-        return _tracks
-    }
-
-    fun isTracksFiltered(): Boolean {
-        return _tracks.size != _filteredTracks.value.size
     }
 
     fun initTrackList(tracksInPlaylist: List<TrackEntity>?) {
@@ -182,12 +174,12 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun reset() {
+    fun update() {
         viewModelScope.launch(Dispatchers.IO) {
             _showLoadingDialog.update {
                 true
             }
-            _tracks = FolderAnalyzer.getTracksFromMusicFolder()
+            _tracks = FolderAnalyzer.addScannedTracksToTracksEntity(null)
             clearSearch()
             initTrackList(null)
             hideLoadingDialog()

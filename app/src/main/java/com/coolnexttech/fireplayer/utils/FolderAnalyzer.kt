@@ -13,10 +13,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.db.PlaylistBox
+import com.coolnexttech.fireplayer.db.TrackBox
 import com.coolnexttech.fireplayer.db.TrackEntity
-import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.utils.extensions.filterByPlaylist
-import com.coolnexttech.fireplayer.utils.extensions.sort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -26,18 +24,13 @@ import java.util.Collections
 object FolderAnalyzer {
 
     private val unsupportedFileFormats = listOf("dsf")
-    private const val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
+    private const val SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0"
 
-    fun getTracksFromPlaylist(tracks: List<TrackEntity>, selectedPlaylistTitle: String): List<TrackEntity> {
-        val selectedPlaylist = PlaylistBox.getByTitle(selectedPlaylistTitle)
-        return if (selectedPlaylist != null) {
-            tracks.filterByPlaylist(selectedPlaylist.tracks as ArrayList<String>).sort(SortOptions.AToZ)
-        } else {
-            listOf()
-        }
+    fun getTracksFromPlaylist(id: Long): List<TrackEntity> {
+        return PlaylistBox.get(id).tracks
     }
 
-    suspend fun getTracksFromMusicFolder(limit: Int? = null): ArrayList<TrackEntity> {
+    private suspend fun getTracksFromMusicFolder(limit: Int? = null): List<TrackEntity> {
         return withContext(Dispatchers.IO) {
             var limitVal = 0
             val result = arrayListOf<TrackEntity>()
@@ -58,7 +51,7 @@ object FolderAnalyzer {
             contentResolver?.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection,
-                selection,
+                SELECTION,
                 null,
                 sortOrder
             ).use {
@@ -87,8 +80,8 @@ object FolderAnalyzer {
                         val pathExtension = getFileMimeType(path)
 
                         if (!unsupportedFileFormats.contains(pathExtension)) {
-                            val isPositionSaved =
-                                UserStorage.readTrackPlaybackPosition(id, false) != null
+                            val savedPosition =
+                                UserStorage.readTrackPlaybackPosition(id, false)
 
                             val track = TrackEntity(
                                 id,
@@ -99,7 +92,7 @@ object FolderAnalyzer {
                                 duration,
                                 pathExtension,
                                 dateAdded = dateModified,
-                                null
+                                savedPosition
                             )
 
                             result.add(track)
@@ -111,6 +104,18 @@ object FolderAnalyzer {
 
             result
         }
+    }
+
+    suspend fun getTracks(limit: Int? = null): List<TrackEntity> {
+        return TrackBox.getAll().ifEmpty {
+            addScannedTracksToTracksEntity(limit)
+        }
+    }
+
+    suspend fun addScannedTracksToTracksEntity(limit: Int?): List<TrackEntity> {
+        val scannedTracks = getTracksFromMusicFolder(null)
+        TrackBox.addAll(scannedTracks)
+        return scannedTracks
     }
 
     fun deleteTrack(
@@ -132,9 +137,11 @@ object FolderAnalyzer {
                 .build()
 
             launcher.launch(senderRequest)
+            TrackBox.remove(track.id)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
                 contentResolver.delete(track.getUri(), null, null)
+                TrackBox.remove(track.id)
             } catch (securityException: SecurityException) {
                 Log.d("FolderAnalyzer", "Error caught at deleteTrack: $securityException")
                 val recoverableSecurityException = securityException as RecoverableSecurityException
@@ -145,9 +152,10 @@ object FolderAnalyzer {
             try {
                 contentResolver.delete(
                     track.getUri(),
-                    selection,
+                    SELECTION,
                     null
                 )
+                TrackBox.remove(track.id)
             } catch (e: Exception) {
                 Log.d("FolderAnalyzer", "Error caught at deleteTrack: $e")
             }

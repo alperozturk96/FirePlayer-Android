@@ -7,7 +7,8 @@ import io.objectbox.relation.ToMany
 
 @Entity
 data class PlaylistEntity(
-    @Id var id: Long = 0,
+    @Id(assignable = true)
+    var id: Long = 0,
     var title: String = "",
 ) {
     @Backlink(to = "playlists")
