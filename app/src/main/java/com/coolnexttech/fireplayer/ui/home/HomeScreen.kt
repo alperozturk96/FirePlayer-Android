@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.AudioPlayer
 import com.coolnexttech.fireplayer.ui.components.BodyMediumText
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
@@ -68,7 +68,7 @@ fun HomeScreen(
     val sortOptions = remember { mutableStateOf(SortOptions.AToZ) }
     val showSortOptions = remember { mutableStateOf(false) }
 
-    val selectedTrackForTrackAction = remember { mutableStateOf<Track?>(null) }
+    val selectedTrackForTrackAction = remember { mutableStateOf<TrackEntity?>(null) }
     val showTrackActionsBottomSheet = remember { mutableStateOf(false) }
 
     val showSleepTimerAlertDialog = remember { mutableStateOf(false) }
@@ -242,7 +242,7 @@ fun HomeScreen(
                     addToPlaylist = { playlistTitle ->
                         selectedTrackForTrackAction.value?.let { track ->
                             playlistsViewModel.addTrackToPlaylist(
-                                track.titleRepresentation(),
+                                track,
                                 playlistTitle
                             )
 

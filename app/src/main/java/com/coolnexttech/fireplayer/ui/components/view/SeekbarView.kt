@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.ui.components.HeadlineSmallText
 import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.extensions.HSpacing8
@@ -33,7 +33,7 @@ import com.coolnexttech.fireplayer.utils.extensions.convertToReadableTime
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SeekbarView(
-    track: Track,
+    track: TrackEntity,
     isTotalTimeValid: Boolean,
     currentTime: Long,
     totalTime: Long,

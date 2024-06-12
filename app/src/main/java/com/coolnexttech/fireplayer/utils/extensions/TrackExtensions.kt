@@ -1,11 +1,11 @@
 package com.coolnexttech.fireplayer.utils.extensions
 
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.model.Track
 
-fun List<Track>.sort(sortOption: SortOptions): List<Track> {
+fun List<TrackEntity>.sort(sortOption: SortOptions): List<TrackEntity> {
     return when(sortOption) {
         SortOptions.AToZ -> sortedBy { it.title }
         SortOptions.ZToA -> sortedByDescending { it.title }
@@ -14,7 +14,7 @@ fun List<Track>.sort(sortOption: SortOptions): List<Track> {
     }
 }
 
-fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
+fun List<TrackEntity>.filter(filterOption: FilterOptions, text: String): List<TrackEntity> {
     val normalizedText = text.normalize()
     return when(filterOption) {
         FilterOptions.Title -> filter { it.title.normalize().contains(normalizedText, ignoreCase = true) }
@@ -23,7 +23,7 @@ fun List<Track>.filter(filterOption: FilterOptions, text: String): List<Track> {
     }
 }
 
-fun List<Track>.nextTrack(playMode: PlayMode, prevTracks: List<Track>, selectedTrack: Track): Track? {
+fun List<TrackEntity>.nextTrack(playMode: PlayMode, prevTracks: List<TrackEntity>, selectedTrack: TrackEntity): TrackEntity? {
     return when (playMode) {
         PlayMode.Shuffle -> this.getNextRandomTrack(excludedTracks = prevTracks)
         PlayMode.Sequential -> this.getNextTrackAndIndex(selectedTrack)?.first
@@ -31,7 +31,7 @@ fun List<Track>.nextTrack(playMode: PlayMode, prevTracks: List<Track>, selectedT
     }
 }
 
-private fun List<Track>.getNextTrackAndIndex(track: Track?): Pair<Track, Int>? {
+private fun List<TrackEntity>.getNextTrackAndIndex(track: TrackEntity?): Pair<TrackEntity, Int>? {
     this.forEachIndexed { index, newTrack ->
         if (track?.id == newTrack.id) {
             return if (index + 1 in this.indices) {
@@ -45,7 +45,7 @@ private fun List<Track>.getNextTrackAndIndex(track: Track?): Pair<Track, Int>? {
     return null
 }
 
-private fun List<Track>.getNextRandomTrack(excludedTracks: List<Track>): Track {
+private fun List<TrackEntity>.getNextRandomTrack(excludedTracks: List<TrackEntity>): TrackEntity {
     val availableTracks = this.filterNot { it in excludedTracks }
 
     return if (availableTracks.isEmpty()) {
@@ -55,6 +55,6 @@ private fun List<Track>.getNextRandomTrack(excludedTracks: List<Track>): Track {
     }
 }
 
-fun List<Track>.filterByPlaylist(titles: ArrayList<String>): List<Track> {
+fun List<TrackEntity>.filterByPlaylist(titles: ArrayList<String>): List<TrackEntity> {
     return this.filter { track -> track.titleRepresentation() in titles }
 }

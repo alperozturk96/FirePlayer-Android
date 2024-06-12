@@ -2,11 +2,11 @@ package com.coolnexttech.fireplayer.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.model.FilterOptions
 import com.coolnexttech.fireplayer.model.PlayMode
 import com.coolnexttech.fireplayer.model.PlayerEvents
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.VMProvider
 import com.coolnexttech.fireplayer.utils.extensions.filter
@@ -30,14 +30,14 @@ class HomeViewModel : ViewModel() {
     private val _playMode = MutableStateFlow(PlayMode.Shuffle)
     val playMode: StateFlow<PlayMode> = _playMode
 
-    private val _selectedTrack: MutableStateFlow<Track?> = MutableStateFlow(null)
-    val selectedTrack: StateFlow<Track?> = _selectedTrack
+    private val _selectedTrack: MutableStateFlow<TrackEntity?> = MutableStateFlow(null)
+    val selectedTrack: StateFlow<TrackEntity?> = _selectedTrack
 
-    private var _tracks: List<Track> = listOf()
-    private val _prevTracks = MutableStateFlow<ArrayList<Track>>(arrayListOf())
+    private var _tracks: List<TrackEntity> = listOf()
+    private val _prevTracks = MutableStateFlow<ArrayList<TrackEntity>>(arrayListOf())
 
-    private val _filteredTracks = MutableStateFlow<List<Track>>(arrayListOf())
-    val filteredTracks: StateFlow<List<Track>> = _filteredTracks
+    private val _filteredTracks = MutableStateFlow<List<TrackEntity>>(arrayListOf())
+    val filteredTracks: StateFlow<List<TrackEntity>> = _filteredTracks
 
     private val _showLoadingDialog = MutableStateFlow(false)
     val showLoadingDialog: StateFlow<Boolean> = _showLoadingDialog
@@ -57,7 +57,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun getAllTracks(): List<Track> {
+    fun getAllTracks(): List<TrackEntity> {
         return _tracks
     }
 
@@ -65,7 +65,7 @@ class HomeViewModel : ViewModel() {
         return _tracks.size != _filteredTracks.value.size
     }
 
-    fun initTrackList(tracksInPlaylist: List<Track>?) {
+    fun initTrackList(tracksInPlaylist: List<TrackEntity>?) {
         viewModelScope.launch(Dispatchers.IO) {
             val newTracks = tracksInPlaylist ?: _tracks
 
@@ -87,7 +87,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun deleteTrack(track: Track) {
+    fun deleteTrack(track: TrackEntity) {
         _tracks = _tracks.filter { it != track }
         _filteredTracks.update {
             _tracks
@@ -117,7 +117,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun playTrack(track: Track, updatePrevStack: Boolean = true) {
+    fun playTrack(track: TrackEntity, updatePrevStack: Boolean = true) {
         VMProvider.audioPlayer.play(track, onSuccess = {
             updateSelectedTrack(track)
 
@@ -127,13 +127,13 @@ class HomeViewModel : ViewModel() {
         })
     }
 
-    private fun updateSelectedTrack(track: Track) {
+    private fun updateSelectedTrack(track: TrackEntity) {
         _selectedTrack.update {
             track
         }
     }
 
-    private fun updatePrevTracks(track: Track) {
+    private fun updatePrevTracks(track: TrackEntity) {
         _prevTracks.update {
             if (it.size == _filteredTracks.value.size) {
                 it.clear()

@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:3285137678776459949",
-      "lastPropertyId": "3:4619452363006869819",
+      "lastPropertyId": "4:5241957571890977705",
       "name": "PlaylistEntity",
       "properties": [
         {
@@ -15,14 +15,14 @@
           "flags": 1
         },
         {
-          "id": "2:6230942964496820938",
-          "name": "name",
-          "type": 9
-        },
-        {
           "id": "3:4619452363006869819",
           "name": "tracks",
           "type": 30
+        },
+        {
+          "id": "4:5241957571890977705",
+          "name": "title",
+          "type": 9
         }
       ],
       "relations": []
@@ -60,7 +60,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    6230942964496820938
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

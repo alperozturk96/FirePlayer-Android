@@ -13,8 +13,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.coolnexttech.fireplayer.appContext
 import com.coolnexttech.fireplayer.db.PlaylistBox
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.utils.extensions.filterByPlaylist
 import com.coolnexttech.fireplayer.utils.extensions.sort
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +28,7 @@ object FolderAnalyzer {
     private val unsupportedFileFormats = listOf("dsf")
     private const val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
 
-    fun getTracksFromPlaylist(tracks: List<Track>, selectedPlaylistTitle: String): List<Track> {
+    fun getTracksFromPlaylist(tracks: List<TrackEntity>, selectedPlaylistTitle: String): List<TrackEntity> {
         val selectedPlaylist = PlaylistBox.getByTitle(selectedPlaylistTitle)
         return if (selectedPlaylist != null) {
             tracks.filterByPlaylist(selectedPlaylist.tracks as ArrayList<String>).sort(SortOptions.AToZ)
@@ -37,10 +37,10 @@ object FolderAnalyzer {
         }
     }
 
-    suspend fun getTracksFromMusicFolder(limit: Int? = null): ArrayList<Track> {
+    suspend fun getTracksFromMusicFolder(limit: Int? = null): ArrayList<TrackEntity> {
         return withContext(Dispatchers.IO) {
             var limitVal = 0
-            val result = arrayListOf<Track>()
+            val result = arrayListOf<TrackEntity>()
 
             val contentResolver = appContext.get()?.contentResolver
             val projection = arrayOf(
@@ -90,16 +90,16 @@ object FolderAnalyzer {
                             val isPositionSaved =
                                 UserStorage.readTrackPlaybackPosition(id, false) != null
 
-                            val track = Track(
+                            val track = TrackEntity(
                                 id,
                                 title,
                                 artist,
                                 album,
-                                path,
+                                path.toString(),
                                 duration,
                                 pathExtension,
                                 dateAdded = dateModified,
-                                isPositionSaved
+                                null
                             )
 
                             result.add(track)
@@ -114,13 +114,13 @@ object FolderAnalyzer {
     }
 
     fun deleteTrack(
-        track: Track,
+        track: TrackEntity,
         contentResolver: ContentResolver,
         launcher: ActivityResultLauncher<IntentSenderRequest>
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val result = ArrayList<Uri>().apply {
-                add(track.path)
+                add(track.getUri())
             }
 
             Collections.addAll(result)
@@ -134,7 +134,7 @@ object FolderAnalyzer {
             launcher.launch(senderRequest)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
-                contentResolver.delete(track.path, null, null)
+                contentResolver.delete(track.getUri(), null, null)
             } catch (securityException: SecurityException) {
                 Log.d("FolderAnalyzer", "Error caught at deleteTrack: $securityException")
                 val recoverableSecurityException = securityException as RecoverableSecurityException
@@ -144,7 +144,7 @@ object FolderAnalyzer {
         } else {
             try {
                 contentResolver.delete(
-                    track.path,
+                    track.getUri(),
                     selection,
                     null
                 )

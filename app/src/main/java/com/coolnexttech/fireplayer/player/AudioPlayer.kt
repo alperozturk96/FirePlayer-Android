@@ -13,8 +13,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.coolnexttech.fireplayer.appContext
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.model.PlayerEvents
-import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.player.helper.MediaSessionForwardingPlayer
 import com.coolnexttech.fireplayer.player.notification.PlayerNotificationManager
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
@@ -105,7 +105,7 @@ class AudioPlayer(context: Context?, private val homeViewModel: HomeViewModel): 
         notificationManager.startService(service, mediaSession)
     }
 
-    fun play(track: Track, onSuccess: () -> Unit) {
+    fun play(track: TrackEntity, onSuccess: () -> Unit) {
         try {
             mediaSession.play(track)
 

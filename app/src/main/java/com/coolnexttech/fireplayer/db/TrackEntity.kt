@@ -1,31 +1,34 @@
-package com.coolnexttech.fireplayer.model
+package com.coolnexttech.fireplayer.db
 
 import android.net.Uri
-import android.os.Parcelable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.coolnexttech.fireplayer.ui.theme.AppColors
-import kotlinx.parcelize.Parcelize
+import io.objectbox.annotation.Entity
+import io.objectbox.annotation.Id
+import io.objectbox.relation.ToMany
 
-@Parcelize
-@Immutable
-data class Track(
-    var id: Long,
+@Entity
+data class TrackEntity(
+    @Id var id: Long = 0,
     var title: String,
     var artist: String,
     var album: String,
-    var path: Uri,
+    var path: String,
     var duration: Long,
     var pathExtension: String? = null,
     var dateAdded: Long,
-    val isPositionSaved: Boolean
-) : Parcelable {
+    var savedPosition: Long? = null
+) {
+    lateinit var playlists: ToMany<PlaylistEntity>
+
+    fun getUri(): Uri = Uri.parse(path)
+
     fun titleRepresentation(): String {
         return title + " · " + trackDetail()
     }
 
     fun color(selectedTrackId: Long?): Color {
-        if (isPositionSaved) {
+        if (savedPosition != null) {
             return AppColors.saved
         }
 

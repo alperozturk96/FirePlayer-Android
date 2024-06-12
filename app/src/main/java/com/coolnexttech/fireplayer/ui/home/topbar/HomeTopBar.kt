@@ -22,8 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.model.SortOptions
-import com.coolnexttech.fireplayer.model.Track
 import com.coolnexttech.fireplayer.ui.components.view.AlphabeticalScrollerView
 import com.coolnexttech.fireplayer.ui.home.HomeViewModel
 import com.coolnexttech.fireplayer.ui.theme.AppColors
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeTopBar(
     viewModel: HomeViewModel,
-    filteredTracks: List<Track>,
+    filteredTracks: List<TrackEntity>,
     characterList: Map<Char, Int>,
     coroutineScope: CoroutineScope,
     sortOptions: SortOptions,

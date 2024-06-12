@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.coolnexttech.fireplayer.R
-import com.coolnexttech.fireplayer.model.Track
+import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.ui.components.ListItemText
 import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 
@@ -20,10 +20,10 @@ import com.coolnexttech.fireplayer.ui.components.view.ContentUnavailableView
 fun TrackList(
     listState: LazyListState,
     it: PaddingValues,
-    filteredTracks: List<Track>,
-    selectedTrack: Track?,
-    action: (Pair<Int, Track>) -> Unit,
-    longPressAction: (Track) -> Unit
+    filteredTracks: List<TrackEntity>,
+    selectedTrack: TrackEntity?,
+    action: (Pair<Int, TrackEntity>) -> Unit,
+    longPressAction: (TrackEntity) -> Unit
 ) {
     Box {
         LazyColumn(state = listState, modifier = Modifier.padding(it)) {
