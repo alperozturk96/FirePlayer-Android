@@ -1,18 +1,11 @@
 package com.coolnexttech.fireplayer.ui.home
 
 import android.app.Activity.RESULT_OK
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,27 +13,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.db.TrackEntity
 import com.coolnexttech.fireplayer.model.SortOptions
 import com.coolnexttech.fireplayer.player.AudioPlayer
-import com.coolnexttech.fireplayer.ui.components.BodyMediumText
+import com.coolnexttech.fireplayer.ui.components.dialog.AddPlaylistAlertDialog
 import com.coolnexttech.fireplayer.ui.components.view.SeekbarView
 import com.coolnexttech.fireplayer.ui.home.bottomSheet.TrackActionsBottomSheet
 import com.coolnexttech.fireplayer.ui.home.dialog.AddTrackToPlaylistDialog
+import com.coolnexttech.fireplayer.ui.home.dialog.LoadingDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.SleepTimerAlertDialog
 import com.coolnexttech.fireplayer.ui.home.dialog.SortOptionsAlertDialog
 import com.coolnexttech.fireplayer.ui.home.topbar.HomeTopBar
 import com.coolnexttech.fireplayer.ui.home.trackList.EmptyTrackList
 import com.coolnexttech.fireplayer.ui.home.trackList.TrackList
 import com.coolnexttech.fireplayer.ui.playlists.PlaylistsViewModel
-import com.coolnexttech.fireplayer.ui.theme.AppColors
 import com.coolnexttech.fireplayer.utils.FolderAnalyzer
 import com.coolnexttech.fireplayer.utils.ToastManager
 import com.coolnexttech.fireplayer.utils.extensions.showToast
@@ -63,6 +51,7 @@ fun HomeScreen(
     val searchText by viewModel.searchText.collectAsState()
     val showLoadingDialog by viewModel.showLoadingDialog.collectAsState()
     val playlists by playlistsViewModel.playlists.collectAsState()
+    val isPlaylistSelected by viewModel.isPlaylistSelected.collectAsState()
 
     val sortOptions = remember { mutableStateOf(SortOptions.AToZ) }
     val showSortOptions = remember { mutableStateOf(false) }
@@ -70,6 +59,7 @@ fun HomeScreen(
     val selectedTrackForTrackAction = remember { mutableStateOf<TrackEntity?>(null) }
     val showTrackActionsBottomSheet = remember { mutableStateOf(false) }
 
+    val showAddPlaylist = remember { mutableStateOf(false) }
     val showSleepTimerAlertDialog = remember { mutableStateOf(false) }
     val showAddTrackToPlaylistDialog = remember { mutableStateOf(false) }
     val showTrackPositionAlertDialog = remember { mutableStateOf(false) }
@@ -100,22 +90,15 @@ fun HomeScreen(
         }
     )
 
+    BackHandler {
+        if (isPlaylistSelected) {
+            viewModel.init()
+        }
+    }
+
     if (showLoadingDialog) {
-        Dialog(
-            onDismissRequest = { viewModel.hideLoadingDialog() },
-            DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .background(AppColors.alternateBackground, shape = RoundedCornerShape(16.dp))
-                    .padding(16.dp)
-            ) {
-                CircularProgressIndicator(color = AppColors.red)
-                Spacer(modifier = Modifier.height(16.dp))
-                BodyMediumText(id = R.string.home_screen_loading_dialog_text)
-            }
+        LoadingDialog {
+            viewModel.hideLoadingDialog()
         }
     }
 
@@ -230,8 +213,10 @@ fun HomeScreen(
 
             if (showAddTrackToPlaylistDialog.value) {
                 AddTrackToPlaylistDialog(
-                    playlists,
                     it,
+                    createNewPlaylist = {
+                        showAddPlaylist.value = true
+                    },
                     addToPlaylist = { playlist ->
                         selectedTrackForTrackAction.value?.let { track ->
                             playlistsViewModel.addTrackToPlaylist(
@@ -255,6 +240,12 @@ fun HomeScreen(
                         showAddTrackToPlaylistDialog.value = false
                     }
                 )
+            }
+
+            if (showAddPlaylist.value) {
+                AddPlaylistAlertDialog(playlistsViewModel) {
+                    showAddPlaylist.value = false
+                }
             }
 
             if (showSleepTimerAlertDialog.value) {

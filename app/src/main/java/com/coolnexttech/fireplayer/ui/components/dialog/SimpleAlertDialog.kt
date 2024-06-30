@@ -1,6 +1,7 @@
 package com.coolnexttech.fireplayer.ui.components.dialog
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,18 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.fireplayer.R
+import com.coolnexttech.fireplayer.ui.components.button.ActionIconButton
 
 @Composable
 fun SimpleAlertDialog(
     titleId: Int,
     description: String?,
+    titleIconId: Int? = null,
+    titleIconAction: ( () -> Unit )?,
     heightFraction: Float? = null,
     content: @Composable (() -> Unit)? = null,
     onComplete: () -> Unit,
     dismiss: () -> Unit
 ) {
     val modifier = if (heightFraction != null) {
-        Modifier.fillMaxWidth().fillMaxHeight(heightFraction)
+        Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(heightFraction)
     } else {
         Modifier.fillMaxWidth()
     }
@@ -33,7 +39,15 @@ fun SimpleAlertDialog(
     AlertDialog(
         onDismissRequest = { dismiss() },
         title = {
-            Text(text = stringResource(id = titleId))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(text = stringResource(id = titleId))
+                titleIconId?.let {
+                    Spacer(modifier = Modifier.weight(1f))
+                    ActionIconButton(id = titleIconId) {
+                        titleIconAction?.invoke()
+                    }
+                }
+            }
         },
         text = {
             Column(modifier = modifier) {

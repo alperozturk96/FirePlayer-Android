@@ -22,18 +22,24 @@ import com.coolnexttech.fireplayer.R
 import com.coolnexttech.fireplayer.db.PlaylistEntity
 import com.coolnexttech.fireplayer.ui.components.dialog.SimpleAlertDialog
 import com.coolnexttech.fireplayer.ui.theme.AppColors
+import com.coolnexttech.fireplayer.utils.UserStorage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddTrackToPlaylistDialog(
-    playlists: List<PlaylistEntity>,
     padding: PaddingValues,
     addToPlaylist: (PlaylistEntity) -> Unit,
+    createNewPlaylist: () -> Unit,
     dismiss: () -> Unit
 ) {
+    val sortedPlaylists = UserStorage.readPlaylists().toList().sortedBy { (key, _) -> key }
+
     SimpleAlertDialog(
-        heightFraction = 0.5f,
         titleId = R.string.add_to_playlist_alert_dialog_title,
+        titleIconId = R.drawable.ic_add_playlist,
+        titleIconAction = {
+            createNewPlaylist()
+        },
         description = stringResource(id = R.string.add_to_playlist_alert_dialog_description),
         dismiss = {
             dismiss()
@@ -43,9 +49,7 @@ fun AddTrackToPlaylistDialog(
                 state = rememberLazyListState(),
                 modifier = Modifier.padding(padding)
             ) {
-                val sortedPlaylists = playlists.toList().sortedBy { (key, _) -> key }
                 itemsIndexed(sortedPlaylists) { _, playlist ->
-
                     Text(
                         text = playlist.title,
                         style = MaterialTheme.typography.headlineMedium,

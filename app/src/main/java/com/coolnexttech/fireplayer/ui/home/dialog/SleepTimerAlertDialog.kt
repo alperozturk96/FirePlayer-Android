@@ -37,6 +37,8 @@ fun SleepTimerAlertDialog(
 
     SimpleAlertDialog(
         titleId = R.string.sleep_timer_alert_dialog_title,
+        titleIconId = null,
+        titleIconAction = null,
         description = description,
         content = {
             Slider(

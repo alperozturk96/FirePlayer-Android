@@ -30,6 +30,9 @@ class HomeViewModel : ViewModel() {
     private val _playMode = MutableStateFlow(PlayMode.Shuffle)
     val playMode: StateFlow<PlayMode> = _playMode
 
+    private val _isPlaylistSelected = MutableStateFlow(false)
+    val isPlaylistSelected: StateFlow<Boolean> = _isPlaylistSelected
+
     private val _selectedTrack: MutableStateFlow<TrackEntity?> = MutableStateFlow(null)
     val selectedTrack: StateFlow<TrackEntity?> = _selectedTrack
 
@@ -60,6 +63,10 @@ class HomeViewModel : ViewModel() {
     fun initTrackList(tracksInPlaylist: List<TrackEntity>?) {
         viewModelScope.launch(Dispatchers.IO) {
             val newTracks = tracksInPlaylist ?: _tracks
+
+            _isPlaylistSelected.update {
+                tracksInPlaylist != null
+            }
 
             _filteredTracks.update {
                 newTracks
